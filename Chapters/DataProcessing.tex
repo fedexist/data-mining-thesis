@@ -1,0 +1,25 @@
+\chapter{Data Processing}
+
+\section{Apache Spark} \label{Spark}
+
+\section{Stream Processing} \label{StreamProc}
+
+L'elaborazione di dati in streaming si differenzia da quella classica per il fatto che l'oggetto dell'elaborazione è un dataset unbounded, cioè un flusso di dati continuo e infinito che ha bisogno di astrazioni dedicate per applicare operatori o trasformazioni come Map, Reduce e Filter. \\
+
+Sono possibili, in generale, 2 modelli di esecuzione con cui operare su dataset unbounded:
+
+\begin{itemize}
+	\item Streaming: elaborazione continua fintanto che vengono prodotti dati
+	\item Batch: esecuzione che termina in un tempo finito, rilasciando risorse al termine
+\end{itemize}
+
+Un'esecuzione di tipo Batch è utilizzabile se non si hanno requisiti nella gestione degli stati, consumazione dei dati in-order e windowing e, quindi, generalmente, è preferibile un approccio di tipo Streaming, che prevede l'uso di un paradigma di programmazione specifico: il Dataflow Programming.
+
+\paragraph{Dataflow Programming}  \label{DataflowProg} ~\\
+
+Il Dataflow Programming è un paradigma di programmazione che modella un programma come un Grafo Diretto Aciclico (DAG) e si differenzia, quindi, sostanzialmente dall'Imperative Programming (o Control Flow), il quale modella un programma come una sequenza finita di operazioni. Esso, infatti, enfatizza il movimento continuo di dati tra operatori, definiti come delle Black Box con input e output espliciti usati per collegarsi con altri operatori. Visto che un operatore viene eseguito non appena tutti i suoi input sono validi, è facile notare come questo paradigma sia adatto ad architetture distribuite con la parallelizzazione dei carichi computazionali.
+
+
+\subsection{Apache Flink}\label{Flink}
+
+Apache Flink è un framework sviluppato appositamente per l'elaborazione continua e distribuita di flussi di dati. 
