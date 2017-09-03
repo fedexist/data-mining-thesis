@@ -40,8 +40,13 @@ onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespa
 
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
+\usepackage{fontspec} % Better font handling
 
 \usepackage{palatino} % Use the Palatino font by default
+\usepackage{minted} % Code Highlighting
+
+\setmainfont{Palatino Linotype}
+\setmonofont{Consolas}
 
 \usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
 
@@ -265,7 +270,7 @@ $\omega$ & angular frequency & \si{\radian} \\
 % Include the chapters of the thesis as separate files from the Chapters folder
 % Uncomment the lines as you write the chapters
 
-\include{Chapters/Chapter1}
+%\include{Chapters/Chapter1}
 \include{Chapters/Chapter2} 
 \include{Chapters/DataProcessing}
 %\include{Chapters/Chapter4} 

@@ -22,4 +22,43 @@ Il Dataflow Programming è un paradigma di programmazione che modella un program
 
 \subsection{Apache Flink}\label{Flink}
 
-Apache Flink è un framework sviluppato appositamente per l'elaborazione continua e distribuita di flussi di dati. 
+Apache Flink è un framework sviluppato per l'elaborazione continua e distribuita di flussi di dati, fondato sul paradigma del Dataflow Programming. Mette a disposizione un insieme di astrazioni utilizzabili per lo sviluppo di applicazioni:
+
+\paragraph{Livelli di astrazione}  \label{AbstractionLevels} ~\\
+
+\begin{itemize}
+	\item \textbf{Stateful Streaming}: il livello di astrazione più basso, che permette agli utenti di poter gestire liberamente il flusso di dati e la sua elaborazione, usare stati \textit{fault-tolerant} e la registrazione di callback su determinati eventi;
+	\item \textbf{Core API}: è l'insieme di API base, che si divide tra \textbf{DataStream API}, per l'elaborazione di dataset bounded e unbounded, e \textbf{DataSet API}, considerato come caso particolare di un flusso di dati, usato per la sola elaborazione di dataset bounded. Queste 2 API offrono trasformazioni e operazioni come unioni, aggregazioni, windowing e gestione degli stati, necessarie per la gestione del flusso di dati considerato
+	\item \textbf{Table API}: è un DSL \footnote{Domain Specific Language: un linguaggio dall'espressività limitata che si concentra su un particolare dominio.} dichiarativo che segue il modello relazionale esteso e offre la possibilità di modellare uno stream di dati come una tabella su cui effettuare proiezioni, aggregazioni, raggruppamenti e altre operazioni. Queste API risultano essere meno espressive rispetto alle Core API, ma permettono una maggiore concisione quando occorre descrivere la logica delle operazioni da eseguire sui dati.
+	\item \textbf{SQL}: è il livello di astrazione più alto offerto da Flink ed interagisce con la Table API per fornire una rappresentazione dell'applicazione tramite query SQL, che possono essere eseguite sulle tabelle definite dalla Table API e, di conseguenza, direttamente sui dati.
+\end{itemize}
+
+\paragraph{Flussi di dati e Programmi}  \label{ProgramsDataflows} ~\\
+
+Gli elementi base di un'applicazione sviluppata con Flink sono gli stream e le trasformazioni applicate su di essi. Come menzionato in precedenza, uno stream è un flusso, potenzialmente infinito, di dati, mentre una trasformazione è un'operazione che prende uno o più stream in ingresso e produce come risultato uno o più stream in uscita.
+
+\pagebreak
+
+\begin{minted}{Scala}
+    val lines = env.addSource(new Consumer[String](...))
+	
+    val events = lines.map((line) -> parse(line))
+	
+    val stats = events
+        .keyBy("id")
+        .timeWindow(Time.seconds(10))
+        .apply(MyWindowAggregationFunction())
+		
+    stats.addSink(new RollingSink(path))
+\end{minted}
+
+\begin{figure}[th]
+	\centering
+	\def\svgwidth{\columnwidth}
+	\input{Figures/dataflow.pdf_tex}
+	\decoRule
+	\caption[Streaming Dataflow]{Visualizzazione in forma di DAG delle istruzioni}
+	\label{fig:Dataflow}
+\end{figure}
+
+
