@@ -54,23 +54,22 @@
     \put(0,0){\includegraphics[width=\unitlength,page=2]{dataflow.pdf}}%
     \put(0.33017728,0.26907356){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{map()}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=3]{dataflow.pdf}}%
-    \put(0.1419953,0.41094483){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\textit{Source}}}}%
-    \put(0.13044032,0.38357778){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\textit{Operator}}}}%
+    \put(0.1419953,0.41094483){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Source}}}%
+    \put(0.13044032,0.38357778){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Operator}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=4]{dataflow.pdf}}%
-    \put(0.59604472,0.29339984){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{keyBy}}}%
-    \put(0.65868491,0.29339984){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{()/}}}%
+    \put(0.59604472,0.29339984){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{keyBy()/}}}%
     \put(0.5890509,0.26907356){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{window()/}}}%
     \put(0.60425487,0.24474728){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{apply()}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=5]{dataflow.pdf}}%
     \put(0.89848906,0.26907356){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Sink}}}%
-    \put(0.41112731,0.41094483){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\textit{Transformation}}}}%
-    \put(0.44153512,0.38357778){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\textit{Operators}}}}%
-    \put(0.8407599,0.41094483){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\textit{Sink}}}}%
-    \put(0.81460912,0.38357778){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\textit{Operator}}}}%
+    \put(0.41112731,0.41094483){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Transformation}}}%
+    \put(0.44153512,0.38357778){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Operators}}}%
+    \put(0.8407599,0.41094483){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Sink}}}%
+    \put(0.81460912,0.38357778){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Operator}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=6]{dataflow.pdf}}%
-    \put(0.44896102,0.10748399){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\textit{Stream}}}}%
+    \put(0.44896102,0.10748399){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Stream}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=7]{dataflow.pdf}}%
-    \put(0.38483712,0.0047104){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\textit{Streaming Dataflow}}}}%
+    \put(0.38483712,0.0047104){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Streaming Dataflow}}}%
     \put(-0.3804446,0.34392507){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{}}}%
   \end{picture}%
 \endgroup%

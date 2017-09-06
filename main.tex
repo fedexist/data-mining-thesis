@@ -22,6 +22,8 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
+% !TeX spellcheck = it_IT
+
 \documentclass[
 11pt, % The default document font size, options: 10pt, 11pt, 12pt
 %oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
@@ -42,8 +44,11 @@ onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespa
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 \usepackage{fontspec} % Better font handling
 
-\usepackage{palatino} % Use the Palatino font by default
-\usepackage{minted} % Code Highlighting
+\usepackage[newfloat]{minted} % Code Highlighting
+\usepackage{caption}
+
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\SetupFloatingEnvironment{listing}{name=Snippet}
 
 \setmainfont{Palatino Linotype}
 \setmonofont{Consolas}
@@ -53,6 +58,7 @@ onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespa
 \addbibresource{example.bib} % The filename of the bibliography
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+
 
 %----------------------------------------------------------------------------------------
 %	MARGIN SETTINGS
@@ -93,6 +99,7 @@ onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespa
 }
 
 \begin{document}
+\hypersetup{hidelinks}
 
 \frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
 
@@ -271,7 +278,7 @@ $\omega$ & angular frequency & \si{\radian} \\
 % Uncomment the lines as you write the chapters
 
 %\include{Chapters/Chapter1}
-\include{Chapters/Chapter2} 
+\include{Chapters/Introduzione} 
 \include{Chapters/DataProcessing}
 %\include{Chapters/Chapter4} 
 %\include{Chapters/Chapter5} 
