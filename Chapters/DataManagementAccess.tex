@@ -1,0 +1,43 @@
+\chapter{Data Management \& Data Access}
+
+\section{HDFS}
+
+\section{YARN}
+
+\section{SQL: Hive}
+
+Apache Hive is a relational database for Big Data, developed as a part of the Hadoop environment to provide fast access to data in very big data sets through its own
+query language, \textbf{HiveQL}, and through several possible execution engines such as Apache Tez, MapReduce and Apache Spark.
+
+\subsection{Components}
+
+Hive architecture can be divided in 5 main components:
+
+\begin{itemize}
+    \item \textbf{Warehouse}: HDFS is the default physical storage of database and tables in Hive, but support for S3 and other HDFS compatible filesystems is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files. Hive supports also direct serialization and deserialization of CSV, JSON, AVRO and Parquet files as row formats.
+    \item \textbf{Shell}: Beeline is the frontend tool for interactive querying on the database. Hive supports connections via its own JDBC driver, allowing easy integration in clients and user applications.
+    \item \textbf{Metastore}: It stores metadata about HDFS file locations and the table schemas.
+    \item \textbf{Compiler}: It manages query parsing, planning and optimization. For what concerns the parsing, HiveQL is a SQL extension, compliant with the SQL:2011 standard
+    \item \textbf{Execution Engine}: Hive uses Apache Tez as a default execution engine  which allows low latency querying through its LLAP (Low Latency Analytical Processing) daemons, persistent processes running on YARN which enable to bypass all of the overhead caused by container deployment for query executions. Other execution engines usable by Hive are, as already mentioned, MapReduce and Spark. The first one is needed, as of Hive 2.1, in order to use Hive Streaming API, while the other uses its own LLAP daemons, similarly to Tez, and is still behind performance wise.
+\end{itemize}
+
+\subsection{Hive Low Latency Processing on Tez}
+
+Starting from Hive2, OLAP, OnLine Analytical Processing support has been introduced as default mode for query execution on top of Apache Tez.\\  
+This functionality has been implemented on top of YARN where, while deploying the HiveServer2, the endpoint for all clients' queries, two applications are deployed: 
+
+\begin{itemize}
+    \item a Tez query coordinator application, which deals with coordinating a single query plan execution, a series of Map and Reduce operations, but also the concurrency of many queries, if needed;
+    \item a Slider application with the persistent containers which deal with the actual execution of the single operation which needs to be executed.
+\end{itemize}
+
+With respect to the usual query execution, this architecture allows, firstly, to critically decrease the latency caused by the creation of the YARN containers needed for the query execution, which is usually the biggest time consuming task, and, secondly, parallel and concurrent query execution, shared between all the daemons instances, taking also advantage of the In-Memory Cache of the single daemon, useful if different queries need to access the same data.
+
+The introduction of LLAP/OLAP daemons provided Hive2 with an average 260\% performance gain when compared to Hive1 using Tez, on a dataset of 1 TB.
+
+
+\subsection{Hive vs SQL Server}
+
+
+\section{NoSQL: HBase \& Cassandra}
+
