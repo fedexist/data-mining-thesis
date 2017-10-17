@@ -10,20 +10,20 @@ Data Processing is the layer immediately following the Data Quality: once data h
 
 \subsection{Stream Processing} \label{StreamProc}
 
-Streaming data processing differentiates itself from the classic data processing for its use of unbounded datasets, that is a continuous and endless data flow which needs of adequate abstractions in order to be able to apply operators or transformations like Map, Reduce and Filter operations. \\ 
+Streaming data processing differentiates itself from the classic data processing for its use of unbounded datasets, that is a continuous and endless data flow which needs adequate abstractions in order to be able to apply operators or transformations like Map, Reduce and Filter operations. \\ 
 
-Generally, there are 2 execution models usable when to approach an unbound dataset:
+Generally, there are 2 execution models usable when to approach an unbounded dataset:
 
 \begin{itemize}
-    \item \textbf{Streaming}: continuous elaboration as long as data are being produced
-    \item \textbf{(Micro-)Batch}: finite time execution, which releases resources when the batch processing ends
+    \item \textbf{Streaming}: continuous elaboration as long as data are being produced.
+    \item \textbf{(Micro-)Batch}: finite time execution, which releases resources when the batch processing ends.
 \end{itemize}
 
-A Batch based execution is feasibly usable when requirements on the state management, in-order consuming and windowing are not present or very relaxed and, thus, a Streaming approach is generally favoured because of the conceptual paradigm which defines it: Dataflow Programming.
+A Batch based execution is feasible when requirements on the state management, in-order consuming and windowing are not present or very relaxed and, thus, a Streaming approach is generally favoured because of the conceptual paradigm which defines it: Dataflow Programming.
 
 \paragraph{Dataflow Programming}  \label{DataflowProg} ~\\
 
-Dataflow Programming is programming paradigm which models an application as a Direct Acyclic Graph (DAG) and thus it differentiates itself very heavily from the Imperative Programming (or Control Flow), which models a program like finite sequence of operations.\\
+Dataflow Programming is a programming paradigm which models an application as a Direct Acyclic Graph (DAG) and thus it differentiates itself very heavily from the Imperative Programming (or Control Flow), which models a program like finite sequence of operations.\\
 This paradigm emphasizes the continuous flow of data between operators, defined as Black Boxes with explicit input and output ports used to connect with other operators. An operation runs as soon as all of its inputs become valid. Thus, dataflow languages are inherently parallel and can work well in large, decentralized systems\footcite{DataflowProgramming}.\\
 
 \section{Apache Spark} \label{Spark}
@@ -35,10 +35,10 @@ Apache Flink is an open source framework developed for the continuous and distri
 \subsection{Abstraction levels}  \label{AbstractionLevels} ~\\
 
 \begin{itemize}
-	\item \textbf{Stateful Streaming}: it's the lowest abstraction layer, which allows developers to freely manage data flows and their processing, use fault-tolerant states and callback registration on events;
+	\item \textbf{Stateful Streaming}: It's the lowest abstraction layer, which allows developers to freely manage data flows and their processing, use fault-tolerant states and callback registration on events.
 	\item \textbf{Core API}: it's the basic API, which is divided between \textbf{DataStream API}, specifically conceived for bounded and unbounded dataset processing, and \textbf{DataSet API}, implemented as a special case of the first API set, used only for bounded datasets. These 2 APIs offer transformations and operations like unions, aggregations, windowing and state management, needed for the data flow upon which they are applied.
-	\item \textbf{Table API}: it's a declarative DSL \footnote{Domain Specific Language: a language with a limited expressivity which focuses on a given domain of use.} which follows the extended relational model and offers the possibility to model a data stream like a table upon which it's possible execute operations like projections, aggregations and groupings. Despite being less expressive with respect to the Core Api, these APIs allow a greater compactness when it comes to describe the operations to be executed on the data.
-	\item \textbf{SQL}: it's the highest level of abstraction offered by Flink and interacts directly with the Table APIs in order to provide a representation of the application being developed through SQL queries, executable on the tables defined by the Table API, directly on the data.
+	\item \textbf{Table API}: it's a declarative DSL \footnote{Domain Specific Language: a language with a limited expressiveness which focuses on a given domain of use.} which follows the extended relational model and offers the possibility to model a data stream like a table upon which it's possible to execute operations like projections, aggregations and groupings. Despite being less expressive with respect to the Core API, they allow for a greater compactness when it comes to describing the operations to be executed on the data.
+	\item \textbf{SQL}: it's the highest level of abstraction offered by Flink and interacts directly with the Table APIs in order to provide a representation of the application being developed through SQL queries. It can be executed on the tables defined by the Table API, directly on the data.
 \end{itemize}
 
 \subsection{Programs Dataflows}  \label{ProgramsDataflows} ~\\
@@ -46,10 +46,10 @@ Apache Flink is an open source framework developed for the continuous and distri
 The base elements of a Flink application are the following:
 
 \begin{itemize}
-	\item \textbf{Streams}, data structures containing data
-	\item \textbf{Transformation Operators}, which can change the stream, for example, via aggregations, groupings, mappings and reductions
-	\item \textbf{Sources}, they are primary data entry points and can be files or records from queues like Kafka. They are the starting nodes of the application DAG
-    \item \textbf{Sinks}, They are the application output, being it a file, a process or another queue. They are the ending nodes of the application DAG
+	\item \textbf{Streams}, data structures containing data.
+	\item \textbf{Transformation Operators}, which can change the stream, for example, via aggregations, groupings, mappings and reductions.
+	\item \textbf{Sources}, they are primary data entry points and can be files or records from queues like Kafka. They are the starting nodes of the application DAG.
+    \item \textbf{Sinks}, They are the application output, being it a file, any process or another queue. They are the ending nodes of the application DAG.
 \end{itemize}
 
 \pagebreak
@@ -57,7 +57,7 @@ The base elements of a Flink application are the following:
 \begin{minted}{Scala}
     val lines = env.addSource(new Consumer[String](...))
 	
-    val events = lines.map((line) -> parse(line))
+    val events = lines.map(line -> parse(line))
 	
     val stats = events
         .keyBy("id")                          // Stream is partitioned by the key "id"
@@ -80,8 +80,8 @@ The base elements of a Flink application are the following:
 
 \paragraph{Parallelism} \label{ParallelismFlink} ~\\
 
-Applications using Flink are inherently parallels and distributed. During execution, a stream may have more than one partition, while each operator can have more than a single sub-task operating on data, each one independent from the other and executed on different threads and, if possible, on different machines or containers.\\
-The parallelism of a task is the parameter indicating the number of subtasks an operator can have and, consequentially, the number of the partitions of the stream getting outputted from that operator.\\
+Applications using Flink are inherently parallels and distributed. During execution, a stream may be divided in more than one partition; each operator can have more than a single sub-task operating on data, each one independent from the other and executed on different threads or, if possible, on different machines or containers.\\
+The parallelism of a task is the parameter indicating the number of subtasks an operator can have and, consequentially, the number of partitions of the stream getting outputted from that operator.\\
 
 \begin{figure}
     \centering
@@ -91,11 +91,11 @@ The parallelism of a task is the parameter indicating the number of subtasks an 
     \label{fig:ParallelDataflow}
 \end{figure}
 
-Streams can transport data between 2 operators following 2 different patterns: One-to-one pattern and redistributing pattern:
+Streams can transport data between a pair of operators following two different patterns: One-to-one pattern and redistributing pattern:
 \begin{itemize}
 	\item \textbf{One-to-one streams} preserve the stream partitioning and the order of the elements passed to the following operator. For example, the subtask[0] of a map() operator will get to see the same elements produced by the subtask[0] of the previous Source operator.
    
-    \item \textbf{Redistributing streams} change their partitioning, sending the data to different subtasks, based on the transformation being applied. For example, a keyBy() operator repartition the stream using the hash of the chosen key. In this case, the elements' order will be preserved only between neighbouring operations pairs, and won't be ever guaranteed being the same in the following operators.
+    \item \textbf{Redistributing streams} change their partitioning, sending the data to different subtasks, based on the transformation being applied. For example, a keyBy() operator repartitions the stream using the hash of the chosen key. In this case, the elements' order will be preserved only between neighbouring operations pairs, and won't be ever guaranteed being the same in the following operators.
 \end{itemize}
 
 \subsection{Flink Extensions} \label{FlinkLibs}
@@ -125,7 +125,7 @@ val result: DataStream[Alert] = patternStream.select(createAlert(_))
 In FlinkCEP, a \textbf{Pattern}, similarly to a pattern of a Regular Expression, can be \textbf{single} or \textbf{iterative}. For example, in a pattern like \verb|"a b+ c? d"|, \verb|a|, \verb|c?| e \verb|d| are single patterns, while \verb|b+| is iterative.
 \\
 
-In a Pattern there can be, analogously to RegExp, Quantifiers and Conditions.
+In a Pattern there can be, analogously to Regular Expressions, Quantifiers and Conditions.
 
 \paragraph{Quantifiers}
 
@@ -141,7 +141,7 @@ Iterative patterns can be specified with the following self explanatory methods:
 
 Each pattern can have additional conditions specified, which can be related to a property of an incoming event, or the contiguity to other events.
 
-In this case, methods \verb|pattern.where()| and \verb|pattern.or()| can be used to specify \verb|IterativeCondition|s, \verb|SimpleCondition|s or a combination of multiple conditions. In this case, combinations can be specified concatenating all the previous methods, including the quantifiers, optionally adding more constraints on contiguity of the same pattern by calling \verb|consecutive()|, for the strict contiguit, and \verb|allowCombinations()| for the relaxed non-deterministic contiguity.
+In this case, methods \verb|pattern.where()| and \verb|pattern.or()| can be used to specify \verb|IterativeCondition|s, \verb|SimpleCondition|s or a combination of multiple conditions. In this case, combinations can be specified concatenating all the previous methods, including the quantifiers, optionally adding more constraints on the contiguity of the same pattern by calling \verb|consecutive()|, for the strict contiguity, and \verb|allowCombinations()| for the relaxed non-deterministic contiguity.
 \\
 Some examples:
 
@@ -175,29 +175,30 @@ start.subtype(classOf[SubEvent]).where(subEvent => ... /* some condition */)
 
 \paragraph{Pattern Combination}
 
-Similarly to conditions combination, pattern combination is possible concatenating the calls of the following methods allowing to specify the contiguity constraints which a given pattern should satisfy:
+Similarly to conditions combination, pattern combination is possible through the consecutive calls to the following methods allowing to specify the contiguity constraints which a given pattern should satisfy:
 
 \begin{itemize}
     
-    \item \verb|next()|, for strict contiguity
-    \item \verb|followedBy()|, for relaxed contiguity
-    \item \verb|followedByAny()|, for non deterministic relaxed contiguity
-    \item \verb|notNext()|, NOT pattern with strict contiguity
-    \item \verb|notFollowedBy()|, NOT pattern with relaxed contiguity
+    \item \verb|next()|, for strict contiguity.
+    \item \verb|followedBy()|, for relaxed contiguity.
+    \item \verb|followedByAny()|, for non deterministic relaxed contiguity.
+    \item \verb|notNext()|, NOT pattern with strict contiguity.
+    \item \verb|notFollowedBy()|, NOT pattern with relaxed contiguity.
 
 \end{itemize}
 
-each pattern combination can be followed by a time constraint specified by concatenating \verb|within(Time)|.
+Each pattern combination can be followed by a time constraint specified by concatenating \verb|within(Time)|.
 
 \paragraph{Pattern Detection}
 
-Once a pattern sequence has been specified, it needs to applied to the target \verb|Datastream|, creating this way a \verb|PatternStream|. On this new stream needs to applied \verb|select| or \verb|flatSelect| operations in order to enable further processing on the events satisfying the pattern.
+Once a pattern sequence has been specified, it needs to applied to the target \verb|Datastream|, creating this way a \verb|PatternStream|.
+On this new stream \verb|select| or \verb|flatSelect| operations need to be applied in order to enable further processing on the events satisfying the pattern.
 
 \subsubsection{Other extensions: Flink Gelly and FlinkML}
 
-In addition to the aforementioned library for complex event handling, Flink makes available specific sets of API useful when it comes to enable advanced processing on the streaming data.
+In addition to the aforementioned library for complex event handling, Flink makes specific sets of API available, which provide useful tools when it comes to enable advanced processing on data.
 
-\paragraph{Flink Gelly} is an API based on the Flink \verb|Dataset|s API specifically developed for Graph Processing. Graphs are stored as a special case of  a \verb|Dataset|, a finite set of vertices and edges. This library allows the application of operators like Map, Filter, Intersect and Union, Mutations like edge and vertex removal, but also advanced techniques belonging to Graph Theory like \textit{Iterative Graph Processing} (Vertex-centric, Scatter-Gather and Gather-Sum-Apply), \textit{Single Source Shortest Paths}, \textit{Clustering} and Similarity analysis.
+\paragraph{Flink Gelly} is an API based on the Flink \verb|Dataset|s API specifically developed for Graph Processing. Graphs are stored as a finite set of vertices and edges, a special case of a \verb|Dataset|. This library allows the application of operators like Map, Filter, Intersect and Union, Mutations like edge and vertex removal, but also advanced techniques belonging to Graph Theory like \textit{Iterative Graph Processing} (Vertex-centric, Scatter-Gather and Gather-Sum-Apply), \textit{Single Source Shortest Paths}, \textit{Clustering} and Similarity analysis.
 
 \paragraph{FlinkML} is a set of tools which allows the application of Machine Learning techniques on Flink data streams, including both algorithmic implementations for supervised (SVMs and Multiple Linear Regressors) and unsupervised (K-nearest neighbours) learning, Data Preprocessing and Recommendation (ALS)
 

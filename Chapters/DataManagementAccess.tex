@@ -6,33 +6,38 @@
 
 \section{SQL: Hive}
 
-Apache Hive is a relational database for Big Data, developed as a part of the Hadoop environment to provide fast access to very big data sets through its own query language, \textbf{HiveQL}, and through several possible execution engines such as Apache Tez, MapReduce and Apache Spark. Hive, as of recently, added  support for ACID transactions, making it viable as a data storage for more complex applications, including streaming applications.
+Apache Hive is a relational database for Big Data, developed as a part of the Hadoop environment to provide fast access to huge data sets through its own query language, \textbf{HiveQL}, and through several possible execution engines such as Apache Tez, MapReduce and Apache Spark. Hive, as of recently, added  support for ACID transactions, making it viable as a data storage for more complex endeavours, including streaming applications.
 
 \subsection{Components}
 
-Hive architecture can be divided in 5 main components:
+Hive architecture can be divided in five main components:
 
 \begin{itemize}
-    \item \textbf{Warehouse}: HDFS is the default physical storage of database and tables in Hive, but support for S3 and other HDFS compatible filesystems is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files. Hive supports also direct serialization and deserialization of CSV, JSON, AVRO and Parquet files as row formats.
-    \item \textbf{Shell}: Beeline is the frontend tool for interactive querying on the database. Hive supports connections via its own JDBC driver, allowing easy integration in clients and user applications.
+    \item \textbf{Warehouse}: HDFS is the default physical storage of database and tables in Hive, but support for S3 and other HDFS compatible filesystems is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files. Hive also supports direct serialization and deserialization of CSV, JSON, AVRO and Parquet files as row formats.
+    \item \textbf{Shell}: Beeline is the frontend tool for interactive querying on the database. Hive supports connections via its own JDBC driver, allowing easy integration with clients and user applications.
     \item \textbf{Metastore}: It stores metadata about HDFS file locations and the table schemas.
-    \item \textbf{Compiler}: It manages query parsing, planning and optimization. For what concerns the parsing, HiveQL is a SQL extension, compliant with the SQL:2011 standard
-    \item \textbf{Execution Engine}: Hive uses Apache Tez as a default execution engine  which allows low latency querying through its LLAP (Low Latency Analytical Processing) daemons, persistent processes running on YARN which enable to bypass all of the overhead caused by container deployment for query executions. Other execution engines usable by Hive are, as already mentioned, MapReduce and Spark. The first one is needed, as of Hive 2.1, in order to use Hive Streaming API, while the other uses its own LLAP daemons, similarly to Tez, and is still behind performance wise.
+    \item \textbf{Compiler}: It manages query parsing, planning and optimization. For what concerns the parsing, HiveQL is a SQL extension, compliant with the SQL:2011 standard.
+    \item \textbf{Execution Engine}: Hive uses Apache Tez as a default execution engine  which allows low latency querying through its LLAP (Low Latency Analytical Processing) daemons: persistent processes running on YARN enabling the system to avoid the overhead caused by the container deployment for query executions. Other execution engines usable by Hive are, as already mentioned, MapReduce and Spark. The first one is needed, as of Hive 2.1, in order to use Hive Streaming API, while the other uses its own LLAP daemons, similarly to Tez, and still lags behind, performance wise.
 \end{itemize}
 
 \subsection{Hive Low Latency Processing on Tez}
 
 Starting from Hive2, OLAP, OnLine Analytical Processing support has been introduced as default mode for query execution on top of Apache Tez.\\  
-This functionality has been implemented on top of YARN where, while deploying the HiveServer2, the endpoint for all clients queries, two applications are deployed: 
+This functionality has been implemented on top of YARN where, while deploying the endpoint for the clients queries (HiveServer2), two applications are deployed: 
 
 \begin{itemize}
-    \item a Tez query coordinator application, which deals with coordinating a single query plan execution, a series of Map and Reduce operations, but also the concurrency of many queries, if needed;
-    \item a Slider \footnote{\href{https://slider.incubator.apache.org/}{Apache Slider} is an application which allows dynamic deployment and monitoring of YARN applications} application together with the persistent daemons containers which deal with the actual execution of the single operation which needs to be executed.
+    \item a Tez query coordinator application, which deals with a single query execution planning, a series of Map and Reduce operations, but also the concurrency of many queries, if needed;
+    \item a Slider \footnote{\href{https://slider.incubator.apache.org/}{Apache Slider} is an application which allows dynamic deployment and monitoring of YARN applications} application that, together with the persistent daemons containers, deals with the actual processing of the single operation that needs to be executed.
 \end{itemize}
 
-With respect to the usual query execution, this architecture allows, firstly, to critically decrease the latency caused by the creation of the YARN containers needed for the query execution, which is usually the biggest time consuming task, and, secondly, parallel and concurrent query execution, shared between all the daemons instances, taking also advantage of the In-Memory Cache of the single daemon, useful if different queries need to access the same data.
+With respect to the usual query execution, this architecture allows:
 
-The introduction of LLAP/OLAP daemons provided Hive2 with an average 260\% performance gain when compared to Hive1 using Tez, on a dataset of 1 TB.
+\begin{itemize} 
+	\item a critical decrease in the latency caused by the creation of the YARN containers needed for the query execution, which is usually the biggest time consuming task.
+	\item parallel and concurrent query execution, shared between all the daemons instances, taking also advantage of the In-Memory Cache of the single daemon, especially useful if different queries need to access the same data.
+\end{itemize}
+
+The introduction of LLAP/OLAP daemons provided Hive2 with an average 2600\% performance gain when compared to Hive1 using Tez, on a dataset of 1 TB.
 
 \subsection{HiveQL}
 
@@ -41,7 +46,7 @@ HiveQL, which stands for Hive Query Language, is a SQL:2011 compliant language u
 \subsubsection{Data Definition Language}
 
 HiveQL Data Definition Language allows creation and alteration of databases, tables and indices.\\When it comes to DBs, the classic statements \verb|CREATE|, \verb|ALTER| \& \verb|DROP| are available for creation, alteration and deletion of databases, together with the possibility to specify as ownership, filesystem location and other custom properties.\\
-For what concerns tables, Hive DDL adds the possibility to define external tables, that is a filesystem location other than the default warehouse which can be read and queried like a normal table. In addition, it's possible to define constraints on column keys, such as foreign and primary keys, partitioning, bucketing , skewing and sorting for optimization purposes, and also to define what kind of deserialization Hive needs to use in order to read the data stored, according to their file format with the \verb|ROW FORMAT| clause.
+Concerning tables, Hive DDL provides the ability to define external tables, located in the filesystem somewhere other than on the default warehouse, which can be read and queried like a normal table. In addition, it is possible to define constraints on column keys, such as foreign and primary keys, partitioning, bucketing, skewing and sorting for optimization purposes. It allows to define the kind of deserialization Hive needs to use in order to read the data stored, according to their file format with the \verb|ROW FORMAT| clause.
 
 For example, the statement
 
@@ -53,24 +58,24 @@ For example, the statement
     STORED AS ORC;
 \end{minted}
 
-creates a table named "log\_table", using the default database, stored in ORC format partitioned according to a certain user-input string "date", in 10 ORC files sorted descendingly, where values are skewed on the id values 3, 4 and 10.
+creates a table named "log\_table", using the default database, stored in ORC format partitioned according to a certain user-input string "date", in 10 ORC files sorted in descending order, where values are skewed on the id values 3, 4 and 10.
 
 \subsubsection{Data Manipulation Language}
 
 HiveQL Data Manipulation Language allows to modify data in Hive through multiple ways:
 
 \begin{itemize}
-    \item \verb|LOAD| allows file loading into Hive tables from HDFS or local filesystem  
-    \item \verb|INSERT| allows to insert query results into Hive tables or filesystem directories. In case it's needed, it is possible to overwrite or insert them into a dynamically created partition 
-    \item \verb|UPDATE| and \verb|DELETE| allow to update or delete values in tables supporting Hive Transactions
-    \item \verb|MERGE| allows to merge files belonging to the same table, if it supports Hive Transactions
-    \item \verb|IMPORT| and \verb|EXPORT| allow importing and exporting of both table values and metadata, to use them with other DBMS
+    \item \verb|LOAD| allows file loading into Hive tables from HDFS or local filesystem.  
+    \item \verb|INSERT| allows to insert query results into Hive tables or filesystem directories. In case it's needed, it is possible to overwrite or insert them into a dynamically created partition. 
+    \item \verb|UPDATE| and \verb|DELETE| allow to update or delete values in tables supporting Hive Transactions.
+    \item \verb|MERGE| allows to merge files belonging to the same table, if it supports Hive Transactions.
+    \item \verb|IMPORT| and \verb|EXPORT| allow importing and exporting of both table values and metadata, to use them with other DBMS.
 \end{itemize}
 
 \subsection{Storage and Optimizations}
 
 \subsubsection{File formats, SerDe and Compression}
-Hive default warehouse storage, as mentioned before, is HDFS, but it's possible to use any HDFS compatible filesystem such as Amazon S3 as a backend. 
+Hive default warehouse storage, as mentioned before, is HDFS, but i i's possible to use any HDFS compatible filesystem, such as Amazon S3, as a backend. 
 
 \subsubsection{DBs \& Tables}
 
