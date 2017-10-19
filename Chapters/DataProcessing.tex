@@ -24,7 +24,7 @@ A Batch based execution is feasible when requirements on the state management, i
 \paragraph{Dataflow Programming}  \label{DataflowProg} ~\\
 
 Dataflow Programming is a programming paradigm which models an application as a Direct Acyclic Graph (DAG) and thus it differentiates itself very heavily from the Imperative Programming (or Control Flow), which models a program like finite sequence of operations.\\
-This paradigm emphasizes the continuous flow of data between operators, defined as Black Boxes with explicit input and output ports used to connect with other operators. An operation runs as soon as all of its inputs become valid. Thus, dataflow languages are inherently parallel and can work well in large, decentralized systems\footcite{DataflowProgramming}.\\
+This paradigm emphasizes the continuous flow of data between operators, defined as Black Boxes with explicit input and output ports used to connect with other operators. An operation runs as soon as all of its inputs become valid. Thus, dataflow languages are inherently parallel and can work well in large, decentralized systems\footcite{Johnston:2004:ADP:1013208.1013209}.\\
 
 \section{Apache Spark} \label{Spark}
 
@@ -141,7 +141,7 @@ Iterative patterns can be specified with the following self explanatory methods:
 
 Each pattern can have additional conditions specified, which can be related to a property of an incoming event, or the contiguity to other events.
 
-In this case, methods \verb|pattern.where()| and \verb|pattern.or()| can be used to specify \verb|IterativeCondition|s, \verb|SimpleCondition|s or a combination of multiple conditions. In this case, combinations can be specified concatenating all the previous methods, including the quantifiers, optionally adding more constraints on the contiguity of the same pattern by calling \verb|consecutive()|, for the strict contiguity, and \verb|allowCombinations()| for the relaxed non-deterministic contiguity.
+Methods \verb|pattern.where()| and \verb|pattern.or()| can be used to specify \verb|IterativeCondition|s, \verb|SimpleCondition|s or a combination of multiple conditions. In this case, combinations can be specified concatenating all the previous methods, including the quantifiers, optionally adding more constraints on the contiguity of the same pattern by calling \verb|consecutive()|, for the strict contiguity, and \verb|allowCombinations()| for the relaxed non-deterministic contiguity.
 \\
 Some examples:
 

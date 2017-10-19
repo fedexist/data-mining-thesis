@@ -13,10 +13,10 @@ Apache Hive is a relational database for Big Data, developed as a part of the Ha
 Hive architecture can be divided in five main components:
 
 \begin{itemize}
-    \item \textbf{Warehouse}: HDFS is the default physical storage of database and tables in Hive, but support for S3 and other HDFS compatible filesystems is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files. Hive also supports direct serialization and deserialization of CSV, JSON, AVRO and Parquet files as row formats.
-    \item \textbf{Shell}: Beeline is the frontend tool for interactive querying on the database. Hive supports connections via its own JDBC driver, allowing easy integration with clients and user applications.
-    \item \textbf{Metastore}: It stores metadata about HDFS file locations and the table schemas.
-    \item \textbf{Compiler}: It manages query parsing, planning and optimization. For what concerns the parsing, HiveQL is a SQL extension, compliant with the SQL:2011 standard.
+    \item \textbf{Shell/UI}: Beeline is the frontend tool for interactive querying on the database. Hive supports connections via its own JDBC driver, allowing easy integration with clients and user applications.
+    \item \textbf{Driver}: The component which receives the queries. This component implements the notion of session handles and provides execute and fetch APIs modeled on JDBC/ODBC interfaces.
+    \item \textbf{Metastore}: It stores metadata about HDFS file locations and the table schemas, but also column and column type information and the serializers and deserializers necessary to read and write data.
+    \item \textbf{Compiler}: It manages query parsing, planning and optimization, does semantic analysis on the different query blocks and query expressions generating, eventually, an execution plan with the help of the table and partition metadata looked up from the metastore. For what concerns the parsing, HiveQL is a SQL extension, compliant with the SQL:2011 standard.
     \item \textbf{Execution Engine}: Hive uses Apache Tez as a default execution engine  which allows low latency querying through its LLAP (Low Latency Analytical Processing) daemons: persistent processes running on YARN enabling the system to avoid the overhead caused by the container deployment for query executions. Other execution engines usable by Hive are, as already mentioned, MapReduce and Spark. The first one is needed, as of Hive 2.1, in order to use Hive Streaming API, while the other uses its own LLAP daemons, similarly to Tez, and still lags behind, performance wise.
 \end{itemize}
 
@@ -45,7 +45,7 @@ HiveQL, which stands for Hive Query Language, is a SQL:2011 compliant language u
 
 \subsubsection{Data Definition Language}
 
-HiveQL Data Definition Language allows creation and alteration of databases, tables and indices.\\When it comes to DBs, the classic statements \verb|CREATE|, \verb|ALTER| \& \verb|DROP| are available for creation, alteration and deletion of databases, together with the possibility to specify as ownership, filesystem location and other custom properties.\\
+HiveQL Data Definition Language allows creation and alteration of databases, tables and indices.\\When it comes to DBs, the classic statements \verb|CREATE|, \verb|ALTER| \& \verb|DROP| are available for creation, alteration and deletion of databases, together with the possibility to specify ownership, filesystem location and other custom properties.\\
 Concerning tables, Hive DDL provides the ability to define external tables, located in the filesystem somewhere other than on the default warehouse, which can be read and queried like a normal table. In addition, it is possible to define constraints on column keys, such as foreign and primary keys, partitioning, bucketing, skewing and sorting for optimization purposes. It allows to define the kind of deserialization Hive needs to use in order to read the data stored, according to their file format with the \verb|ROW FORMAT| clause.
 
 For example, the statement
@@ -72,13 +72,23 @@ HiveQL Data Manipulation Language allows to modify data in Hive through multiple
     \item \verb|IMPORT| and \verb|EXPORT| allow importing and exporting of both table values and metadata, to use them with other DBMS.
 \end{itemize}
 
-\subsection{Storage and Optimizations}
+\subsection{Warehouse}
+HDFS is the default physical storage of database and tables in Hive, but support for S3 and any other HDFS compatible filesystems is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files.\\
+Hive has built-in direct serialization and deserialization of CSV, JSON, AVRO and Parquet files as row formats, and allows to easily add custom SerDe\footnote{SerDe: Serialization/Deserialization} components.
 
-\subsubsection{File formats, SerDe and Compression}
-Hive default warehouse storage, as mentioned before, is HDFS, but i i's possible to use any HDFS compatible filesystem, such as Amazon S3, as a backend. 
+\subsubsection{Hive Data Model}
 
-\subsubsection{DBs \& Tables}
+Data in Hive is organized into:
 
+\begin{itemize}
+\item \textbf{Tables} – These are analogous to Tables in Relational Databases. Tables can be filtered, projected, joined and unioned. Additionally all the data of a table is stored in a directory in its default warehouse, usually HDFS. Hive also supports the notion of external tables wherein a table can be created on pre-existing files or directories in HDFS by providing the appropriate location to the table creation DDL. The rows in a table are organized into typed columns similar to Relational Databases.
+\item \textbf{Partitions} – Each Table can have one or more partition keys which determine how the data is stored, for example a table \verb|T| with a date partition column  \verb|ds| had files with data for a particular date stored in the  \verb|<table location>/ds=<date>| directory in HDFS. Partitions allow the system to prune data to be inspected based on query predicates, for example a query that is interested in rows from \verb|T| that satisfy the predicate \verb|T.ds = '2008-09-01'| would only have to look at files in \verb|<table location>/ds=2008-09-01/| directory in HDFS.
+\item \textbf{Buckets} – Data in each partition may, in turn, be divided into Buckets based on the hash of a column in the table. Each bucket is stored as a file in the partition directory. Bucketing allows the system to efficiently evaluate queries that depend on a sample of data (these are queries that use the SAMPLE clause on the table).
+
+\end{itemize}
+
+Apart from primitive column types (integers, floating point numbers, generic strings, dates and booleans), Hive also supports arrays and maps. Additionally, users can compose their own types programmatically from any of the primitives, collections or other user-defined types. The typing system is closely tied to the SerDe and object inspector interfaces. Users can create their own types by implementing their own object inspectors, and using these object inspectors they can create their own SerDes to serialize and deserialize their data into HDFS files).\\
+These two interfaces provide the necessary hooks to extend the capabilities of Hive when it comes to understanding other data formats and richer types. Built-in object inspectors like \verb|ListObjectInspector|, \verb|StructObjectInspector| and \verb|MapObjectInspector| provide the necessary primitives to compose richer types in an extensible manner. For maps (associative arrays) and arrays useful built-in functions like size and index operators are provided. The dotted notation is used to navigate nested types.
 
 \subsection{Hive vs SQL Server}
 
