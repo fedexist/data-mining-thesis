@@ -51,7 +51,8 @@ Concerning tables, Hive DDL provides the ability to define external tables, loca
 For example, the statement
 
 \begin{minted}{SQL}
-    CREATE TABLE IF NOT EXISTS log_table(id string, count int, time timestamp)
+    CREATE TABLE IF NOT EXISTS 
+    log_table(id string, count int, time timestamp)
     PARTITIONED BY (date string)
     CLUSTERED BY id SORTED BY (count DESC) INTO 10 BUCKETS
     SKEWED BY id ON 3, 4, 10
@@ -78,20 +79,70 @@ Hive has built-in direct serialization and deserialization of CSV, JSON, AVRO an
 
 \subsubsection{Hive Data Model}
 
-Data in Hive is organized into:
+Data in Hive is organized into 3 main abstractions: Tables, Partitions and Buckets.
 
-\begin{itemize}
-\item \textbf{Tables} – These are analogous to Tables in Relational Databases. Tables can be filtered, projected, joined and unioned. Additionally all the data of a table is stored in a directory in its default warehouse, usually HDFS. Hive also supports the notion of external tables wherein a table can be created on pre-existing files or directories in HDFS by providing the appropriate location to the table creation DDL. The rows in a table are organized into typed columns similar to Relational Databases.
-\item \textbf{Partitions} – Each Table can have one or more partition keys which determine how the data is stored, for example a table \verb|T| with a date partition column  \verb|ds| had files with data for a particular date stored in the  \verb|<table location>/ds=<date>| directory in HDFS. Partitions allow the system to prune data to be inspected based on query predicates, for example a query that is interested in rows from \verb|T| that satisfy the predicate \verb|T.ds = '2008-09-01'| would only have to look at files in \verb|<table location>/ds=2008-09-01/| directory in HDFS.
-\item \textbf{Buckets} – Data in each partition may, in turn, be divided into Buckets based on the hash of a column in the table. Each bucket is stored as a file in the partition directory. Bucketing allows the system to efficiently evaluate queries that depend on a sample of data (these are queries that use the SAMPLE clause on the table).
-
-\end{itemize}
-
+\paragraph{Tables} These are analogous to Tables in Relational Databases. Tables can be filtered, projected, joined and unioned. Additionally all the data of a table is stored in a directory in its default warehouse, usually HDFS. Hive also supports the notion of external tables wherein a table can be created on pre-existing files or directories in HDFS by providing the appropriate location to the table creation DDL. The rows in a table are organized into typed columns similar to Relational Databases.
+\paragraph{Partitions} Each Table can have one or more partition keys which determine how the data is stored, for example a table \verb|T| with a date partition column  \verb|ds| had files with data for a particular date stored in the  \verb|<table location>/ds=<date>| directory in HDFS. Partitions allow the system to prune data to be inspected based on query predicates, for example a query that is interested in rows from \verb|T| that satisfy the predicate \verb|T.ds='2008-09-01'| would only have to look at files in \verb|<table location>/ds=2008-09-01/| directory in HDFS.
+\paragraph{Buckets} Data in each partition may, in turn, be divided into Buckets based on the hash of a column in the table. Each bucket is stored as a file in the partition directory. Bucketing allows the system to efficiently evaluate queries that depend on a sample of data (these are queries that use the SAMPLE clause on the table).
+\newline
+\par
 Apart from primitive column types (integers, floating point numbers, generic strings, dates and booleans), Hive also supports arrays and maps. Additionally, users can compose their own types programmatically from any of the primitives, collections or other user-defined types. The typing system is closely tied to the SerDe and object inspector interfaces. Users can create their own types by implementing their own object inspectors, and using these object inspectors they can create their own SerDes to serialize and deserialize their data into HDFS files).\\
 These two interfaces provide the necessary hooks to extend the capabilities of Hive when it comes to understanding other data formats and richer types. Built-in object inspectors like \verb|ListObjectInspector|, \verb|StructObjectInspector| and \verb|MapObjectInspector| provide the necessary primitives to compose richer types in an extensible manner. For maps (associative arrays) and arrays useful built-in functions like size and index operators are provided. The dotted notation is used to navigate nested types.
 
-\subsection{Hive vs SQL Server}
+\subsection{Hive \& SQL Server 2016: Comparison}
 
+When it comes to enterprise-level solutions, every data warehousing product needs to be compared with the de-facto standard of this sector. Considering a pure Windows environments, Microsoft's SQL Server is the most widely used RDBMS and data warehouse.\newline
+
+A comparison has been set up in order to compare the capabilities of Hive with respect to SQL Server, using Hortonworks' TPC-DS\footnote{TPC Benchmark DS is a decision support benchmark that models several generally applicable aspects of a decision support system, including queries and data maintenance. The benchmark provides a representative evaluation of performance as a general purpose decision support system. TPC-DS Version 2 enables emerging technologies, such as Big Data systems, to execute the benchmark.} Testbench implementation with a dataset of 30 GB, results averaged on 5 executions with machines with the following specifications and the following optimizations:
+\newline
+
+\begin{table}[!htb]
+    \caption{Machine Specifications and Optimizations}
+\begin{center}
+    \begin{tabular}{|l|p{6cm}|p{5cm}|}
+        \hline
+        & Hive & SQL Server \\ \hline
+        Specifications & 4 LLAP executors (4GB and 2 vCPU each) & 4 cores\\
+        & Tez (512MB, 1vCPU) & 16GB RAM\\
+        & Slider (512MB, 1vCPU) & Windows Server 2012 R2 \\
+        & Total: 17GB, 5 core (10 vCPU) & \\ \hline    
+        Optimizations & ORC Format storage, Partitioned tables & Clustered, suggested and ad hoc indices\\ \hline      
+    \end{tabular}
+\end{center}
+\end{table}
+
+
+Note: Tez and Slider containers, as mentioned in the previous chapter don't actually process any data and are used only for query orchestration.
+
+\subsubsection{Results}
+
+For a total of 65 queries executed, Hive is faster (1.5 to 1200 times) for 38 of them, while SQL Server is better in 19 query executions (1.5 to 54 times), while the remaining 8 queries display similar performances, standing inside the neighbourhood of 1.5x ratio.
+
+Looking at the best results for both sides, we can see that Hive performs better with queries with many WHERE clauses and nested queries, while SQL Server performs better with queries with many GROUP BY, SORT BY and JOIN clauses.
+
+\begin{table}[!htb]
+    \begin{center}
+            \caption{Hive top 3 best results}
+        \begin{tabular}{|l|c|c|c|} \hline
+            & Hive & SQL Server & Speedup factor\\ \hline
+            query60 & 945 ms & 1.127.549 ms & 1193 \\ \hline
+            query7 & 814 ms & 243.714 ms & 299 \\ \hline
+            query26 & 1.083 ms & 80.997 ms & 74 \\ \hline
+        \end{tabular}
+    \bigskip
+    \caption{SQL Server top 3 best results}
+        \begin{tabular}{|l|c|c|c|} \hline
+        & Hive & SQL Server & Speedup factor\\ \hline
+        query95 & 37.762 ms & 1.104 ms & 34 \\ \hline
+        query22 & 83.305 ms & 7.007 ms & 12 \\ \hline
+        query72 & 134.611 ms & 40.043 ms & 3,3 \\ \hline
+    \end{tabular}
+    \end{center}
+\end{table}
+
+\subsubsection{Conclusions}
+
+We can conclude that, generally, Hive applies to different use cases with respect to SQL Server. Whereas, Hive is suitable in scenarios where data sets are very big, where a distributed architecture can be used to scale and speed up the processing of huge swaths of data, SQL Server handles itself progressively worse as data set size increase, becoming an unideal fit in this case. Still, if the data set is limited in size, a single machine architecture is certainly more cost-effective and gives out good performances, having a better and more mature and optimized ACID transactions handling if required.
 
 \section{NoSQL: HBase \& Cassandra}
 
