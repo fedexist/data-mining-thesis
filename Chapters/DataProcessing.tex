@@ -52,8 +52,6 @@ The base elements of a Flink application are the following:
     \item \textbf{Sinks}, They are the application output, being it a file, any process or another queue. They are the ending nodes of the application DAG.
 \end{itemize}
 
-\pagebreak
-
 \begin{minted}{Scala}
     val lines = env.addSource(new Consumer[String](...))
 	
@@ -75,8 +73,6 @@ The base elements of a Flink application are the following:
 	\caption[Streaming Dataflow]{DAG outlining the previous code snippet}
 	\label{fig:Dataflow}
 \end{figure}
-
-\pagebreak
 
 \paragraph{Parallelism} \label{ParallelismFlink} ~\\
 

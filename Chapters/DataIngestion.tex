@@ -4,4 +4,38 @@ When it comes to use data coming from one or more sources, being them sensors or
 
 \section{Apache Kafka}
 
+Apache Kafka is a distributed streaming platform which lets you publish and subscribe to streams of records, similar to a message queue or enterprise messaging system, store streams of records in a fault-tolerant way and optionally process them as they occur. 
+
+It is mainly used for building real-time streaming data pipelines that reliably get data between systems or applications and real-time streaming applications that transform or react to the streams of data.
+
+Kafka is run on one or more servers as a cluster which stores streams of \textit{records} in categories called \textit{topics}. Each record consists of a key, a value and a timestamp.
+
+It has two main core APIs, Producer and Consumer API, the basic blocks to create streams, but it's possible to use two more sets of APIs: the Streams API, which can be used to process the records and transform them from between two or more topics, and the Connector API, which allows to run producers and consumers that connect to other applications or data systems.
+
+\subsection{Topics}
+
+A topic is a category or feed name to which records are published. Topics in Kafka are always multi-subscriber; that is, a topic can have zero, one, or many consumers that subscribe to the data written to it.
+
+For each topic, the Kafka cluster maintains a partitioned log, where each partition is an ordered, immutable sequence of records that is continually appended to. The records in the partitions are each assigned a sequential id number called the offset that uniquely identifies each record within the partition.
+
+The Kafka cluster retains all published records, whether or not they have been consumed, using a configurable retention period. For example, if the retention policy is set to two days, then for the two days after a record is published, it is available for consumption, after which it will be discarded to free up space. Kafka's performance is effectively constant with respect to data size so storing data for a long time is not a problem.
+
+In fact, the only metadata retained on a per-consumer basis is the offset or position of that consumer in the log. This offset is controlled by the consumer: normally a consumer will advance its offset linearly as it reads records, but, in fact, since the position is controlled by the consumer it can consume records in any order it likes. For example a consumer can reset to an older offset to reprocess data from the past or skip ahead to the most recent record and start consuming from "now".
+
+The partitions in the log serve several purposes. First, they allow the log to scale beyond a size that will fit on a single server. Each individual partition must fit on the servers that host it, but a topic may have many partitions so it can handle an arbitrary amount of data. Second they act as the unit of parallelism—more on that in a bit. This way, it's possible to increase the number of partitions of a topic as much as needed, according to the throughput required.
+
+\subsection{Producers and Consumers}
+
+Producers are the components that publish the data to the topics of their choice. They handle the assignment of each record to the partitions within the topic. This can be done according to the round-robin scheduling, to balance load, or accordingly to a semantic partition function (such it may be the key of a record).
+
+Consumers are labelled according to a \textit{consumer group} name
+
+\subsection{Use cases}
+
+\paragraph{Messaging}
+\paragraph{Log Aggregation}
+\paragraph{Activity Tracking \& Metrics}
+
+
 \section{Apache NiFi}
+
