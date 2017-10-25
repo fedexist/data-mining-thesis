@@ -2,8 +2,55 @@
 
 \section{HDFS}
 
+\pagebreak
 \section{YARN}
 
+\textbf{YARN (Yet Another Resource Negotiator)} is Hadoop's cluster and resource manager, whose fundamental idea is to split up the functionalities of resource management and job scheduling and monitoring into separate daemons: a global \textbf{Resource Manager (RM)} and per-application, either a single job or a DAG of jobs, \textbf{Application Master (AM)}.
+\newline\newline
+The \textbf{Resource Manager}, together with the \textbf{Node Manager (NM)}, forms the data-computation framework: the first one is the ultimate authority that arbitrates resources among all the applications in the system, while the other is the per-machine framework agent who is responsible for containers, monitoring their resource usage and reporting it to the Resource Manager.
+\newline\newline
+The per-application Application Master is, in effect, a framework specific library and is tasked with negotiating resources from the Resource Manager and working with the Node Manager(s) to execute and monitor the tasks.
+
+\subsection{Resource Manager}
+
+The \textbf{Resource Manager}, the master component in YARN architecture, has two main components: the Scheduler and the Applications Manager.
+
+The \textbf{Scheduler} is responsible for allocating resources to the various running applications subject to familiar constraints of capacities, queues etc. It performs no monitoring or tracking of status for the application and offers no guarantees about restarting failed tasks either due to application failure or hardware failures. 
+
+Scheduling is performed based on the abstract notion of a Container incorporating elements such as memory, CPU, disk, network etc. which represent the resource requirements of the applications. It has a pluggable policy which is responsible for partitioning the cluster resources among the various queues, applications etc. The current schedulers such as the \textit{Capacity Scheduler} and the \textit{Fair Scheduler} would be some examples of plug-ins.
+
+The \textbf{Applications Manager} is responsible for accepting job-submissions, negotiating the first container for executing the application specific Application Master and provides the service for restarting the Application Master container on failure. The per-application Application Master has the responsibility of negotiating appropriate resource containers from the Scheduler, tracking their status and monitoring for progress.
+
+YARN supports the notion of resource reservation via a \textbf{Reservation System}, that allows users to specify a profile of resources over-time and temporal constraints (e.g., deadlines), and reserve resources to ensure the predictable execution of important jobs. The Reservation System tracks resources over-time, performs admission control for reservations, and dynamically instruct the underlying scheduler to ensure that the reservation is fulfilled.
+
+\paragraph{Schedulers}
+
+\subsubsection{Fault tolerance \& High Availability}
+
+The Resource Manager is the central authority that manages resources and schedules applications running on YARN. Hence, it is potentially a single point of failure in a YARN cluster. 
+
+They are thus needed functionalities that provide for down-time invisibility to end-users, keeping the RM functioning across restarts and remedying in case of node failures.
+
+\paragraph{Non-work-preserving RM restart} RM will save the application metadata, together with credentials like security keys and tokens, when clients submit an application in a pluggable state-store, storing its status and diagnostics at completion. In case of RM outage, as long as the required information is available in the state-store, at restart, the RM can pick up the application metadata and re-submit the applications if they weren't already completed (failed, killed, or finished) before RM went down.
+
+During the down-time of RM, Node Managers and clients will keep polling RM until it comes up. Once it does, a re-sync command is sent by the RM, killing all NM's managed containers, re-registering with RM, shutting down this way all the Application Masters. After RM restarts and loads all the application metadata, it will create a new attempt (i.e. Application Master) for each application not yet completed, re-kicking that application as usual.
+
+\paragraph{Work-preserving RM restart} This type of restart focuses on re-constructing the running state of RM by combining the container status from Node Managers and container requests from Application Masters on restart: running applications won't be killed after RM restarts, and so applications will not lose their work because of RM outage. 
+
+RM ensures the persistence of application state, reloading it on recovery and re-constructing the entire running state of the YARN cluster, whose major information comes from the RM scheduler which keeps track of all containers' life-cycle, applications' headroom and resource requests and queues' resource usage. 
+Applications can simply re-sync back with RM and resume from where they were left off: RM recovers its own running state by taking advantage of the containers statuses sent from all NMs on re-registration, reconstructing the container instances and the associated applications' scheduling status by absorbing this information. 
+
+In the meantime, AM needs to re-send the resource requests to RM because RM may lose the unfulfilled requests when it shuts down.
+
+\paragraph{High Availability} Resource Manager HA is realized through an Active/Standby architecture: at any point of time, one of the RMs is Active, and one or more RMs are in Standby mode waiting to take over should anything happen to the Active. The trigger to transition-to-active comes from either the admin (through CLI) or through the integrated failover-controller when automatic-failover is enabled. When automatic fail-over is not enabled, admins have to manually transition one of the RMs to Active, using the \verb|yarn rmadmin| CLI, first transitioning the Active-RM to Standby and then the Standby-RM to Active.
+
+In order to guarantee automatic fail-over, it's possible to use both an existing \textbf{Zookeeper} cluster or the embedded \verb|ActiveStandbyElector|, acting as a failure detector and leader elector instead of a separate Zookeeper FailoverController daemon, to decide which RM should be the Active: when the Active goes down or becomes unresponsive, another RM is automatically elected to be the Active, taking then over.
+
+When there are multiple RMs, the configuration (\verb|yarn-site.xml|) used by clients and nodes is expected to list all the RMs. Clients, Application Masters and Nod eManagers try connecting to the RMs in a round-robin fashion until they hit the Active RM. If the Active goes down, they resume the round-robin polling until they hit the “new” Active. This retry logic can be overridden by a user-specified fail-over provider.
+
+\subsection{Node Manager \& Application Manager}
+
+\pagebreak
 \section{SQL: Hive}
 
 Apache Hive is a relational database for Big Data, developed as a part of the Hadoop environment to provide fast access to huge data sets through its own query language, \textbf{HiveQL}, and through several possible execution engines such as Apache Tez, MapReduce and Apache Spark. Hive, as of recently, added  support for ACID transactions, making it viable as a data storage for more complex endeavours, including streaming applications.
