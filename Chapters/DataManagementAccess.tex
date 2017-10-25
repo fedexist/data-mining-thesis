@@ -2,6 +2,35 @@
 
 \section{HDFS}
 
+The Hadoop Distributed File System, or HDFS for short, is a distributed File System engineered to run on any kind of hardware and to be easily scalable into huge clusters. Originally developed for Apache Nutch is now part of the Hadoop project, providing high fault-tolerance thanks to data replication and high throughput access to application data, making it suitable for Big Data applications.
+
+\subsection{Architecture} 
+
+HDFS has a master-slave architecture, comprised of two main components: a single \textbf{NameNode} which functions as a master and is in charge of the File System namespace management and the access control on its data by the clients and a list of \textbf{DataNodes} spread among the cluster's machines which handle the storage on the node they run on.\newline
+HDFS interface, managed by the \textbf{NameNode} exposes a File System namespace and allows users to store data in files within a directory-based hierarchy, much like the regular File Systems used in general purpose machines; under the surface the file is split in one or more blocks which are then stored on a subset of \textbf{DataNodes} called rack.\newline The \textbf{NameNode} stores the metadata of the content of the whole File System and is responsible for the File System namespace operations over the files and directories and determines how blocks are mapped to the \textbf{DataNodes}.
+The \textbf{DataNodes} serve the read and write requests sent by the File System's clients and can perform basic operations on the block (creation, deletion, copy) when so instructed by the \textbf{NameNode}.
+
+\subsection{Replication} 
+
+Exposing a File System built upon a cluster of many machines requires the technology to be reliable in case of a malfunction, since the chance of failure of the whole system is inherently greater if its functions depend on any of the single machines that comprise it. \newline Therefore to make sure that data is always available to clients, whenever a file is stored on the File System namespace and the \textbf{NameNode} chooses where to store the single blocks, it actually store the same block on more than one \textbf{DataNode} (the number depends on a configuration aptly named Replication Factor), in such a way that if any of those nodes become inaccessible for any reason, among all the others will always be a reachable copy of each block stored on it.\newline Secondly, the \textbf{NameNode} must always be available, therefore the HDFS provides a \textbf{Secondary NameNode}
+
+\subsection{Persistence}
+
+The File System metadata, as previously stated, is managed by the \textbf{NameNode}. The \textbf{NameNode} uses a log to store persistently all the changes to these metadata, such as changing the replication factor, creating a new file, renaming an old one; the log, called EditLog, is stored in the host machine's File System. Similarly the state of the File System is stored on the machine's File System in a file called FsImage.\newline
+In case of HDFS failure, on restart the \textbf{NameNode} will load in memory the FsImage and then apply all the transactions stored on EditLog, to return to the last safe state it was before failure.
+\newline
+If no failures occur and the \textbf{NameNode} is not restarted, FsImage will become stale while EditLog's size will continue to increase to unmanagable size, to cope with this problem, HDFS uses a \textbf{Secondary NameNode} whose object is to query EditLogs to the \textbf{Primary NameNode} at regular intervals, to update its own copy of FsImage accordingly and to then send its copy to the \textbf{Primary NameNode}
+
+\subsection{Robustness}
+
+HDFS is designed to be reliable in the event of the three most common failures: \textbf{NameNode} failures, \textbf{DataNode} failure and network failures.
+
+Each \textbf{DataNode} sends a heartbeat regularly to the \textbf{NameNode} to prove its liveness, the latter considers the formers without recent heartbeats dead and stop sending read and write requests to them until a new heartbeat arrives.\newline
+While \textbf{DataNodes} failures may cause them to be dead, Network failures can cause alive \textbf{DataNodes} to lose their heartbeats and be considered dead.\newline
+Whatever the root of the problem, the \textbf{NameNode} tracks the blocks that are now under replicated and marks them to be replicated as soon as it has available space on a machine that doesn't already have a copy of them.\newline
+Checksums for each block of stored files make sure that corruption caused by faults in Nodes are spotted and their corrupted blocks rejected.\newline
+As for \textbf{NameNode} problems, the secondary \textbf{Secondary NameNode} manages a consistent copy of FsImage and EditLog that functions as a backup in case of the corruption of the original ones. Nevertheless the \textbf{NameNode} is a single point of failure in the whole system; this is solved through High Availability, by providing a perfect another \textbf{NameNode}, which serves as a \textbf{Secondary NameNode} during downtime and as a \textbf{Primary NameNode} if the main one is not available.
+
 \section{YARN}
 
 \section{SQL: Hive}
