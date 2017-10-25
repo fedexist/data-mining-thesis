@@ -1,6 +1,6 @@
 \chapter{Data Ingestion}
 
-When it comes to use data coming from one or more sources, being them sensors or user activities from a website, there needs to be adequate tools for handling, gathering and routing them inside the cluster where they will be processed.
+When it comes to using data coming from one or more sources, being them sensors or user activities from a website, there needs to be adequate tools for handling, gathering and routing them inside the cluster where they will be processed.
 
 \section{Apache Kafka}
 
@@ -18,7 +18,8 @@ A topic is a category or feed name to which records are published. Topics in Kaf
 
 For each topic, the Kafka cluster maintains a partitioned log, where each partition is an ordered, immutable sequence of records that is continually appended to. The records in the partitions are each assigned a sequential id number called \textit{offset} that uniquely identifies each record within the partition.
 
-The Kafka cluster retains all published records, whether or not they have been consumed, using a configurable retention period. For example, if the retention policy is set to two days, then for the two days after a record is published, it is available for consumption, after which it will be discarded to free up space. Kafka's performance is effectively constant with respect to data size so storing data for a long time is not a problem.
+The Kafka cluster retains all published records, whether or not they have been consumed, using a configurable retention period. For example, if the retention policy is set to two days, then for the two days after a record is published, it is available for consumption, after which it will be discarded to free up space. Kafka's performance is effectively constant with respect to data size so storing data for a long time is not a cause of concerns.
+
 
 \begin{figure}[h]
     \centering
@@ -27,9 +28,9 @@ The Kafka cluster retains all published records, whether or not they have been c
     \label{fig:loganatomy}
 \end{figure}
 
-The only metadata retained on a per-consumer basis is the offset or position of that consumer in the log. This offset is controlled by the consumer: normally it would advance its offset linearly as it reads records, but, in fact, since the position is controlled by it, a consuming instance can consume records in any order it likes. For example a consumer can reset to an older offset to reprocess data from the past or skip ahead to the most recent record and start consuming from the latest.
+The only metadata retained on a per-consumer basis is the offset or position of that consumer in the log. This offset is controlled by the consumer: normally it would advance its offset linearly as it reads records, but, in fact, it could consume records in any order it prefers. For example a consumer can reset to an older offset to reprocess data from the past or skip ahead to the most recent record and start consuming from the latest.
 
-The partitions in the log serve several purposes. First, they allow the log to scale beyond a size that will fit on a single server. Each individual partition must fit on the servers that host it, but a topic may have many partitions so it can handle an arbitrary amount of data. Second they act as the unit of parallelism—more on that in a bit. This way, it's possible to increase the number of partitions of a topic as much as needed, according to the throughput required.
+The partitions in the log serve several purposes. Firstly, they allow the log to scale beyond a size that will fit on a single server. Each individual partition must fit on the servers that host it, but a topic may have many partitions so it can handle an arbitrary amount of data. Secondly, they act as the unit of parallelism, more on that in a bit. This way, it's possible to increase the number of partitions of a topic as needed, according to the throughput required.
 
 \subsection{Producers and Consumers}
 
@@ -65,7 +66,7 @@ Log aggregation typically collects physical log files off servers and puts them 
  
 \paragraph{Activity Tracking \& Metrics}
 
-The original use case for Kafka was to be able to rebuild a user activity tracking pipeline as a set of real-time publish-subscribe feeds. This means site activity (page views, searches, or other actions users may take) is published to central topics with one topic per activity type. These feeds are available for subscription for a range of use cases including real-time processing, real-time monitoring, and loading into Hadoop or offline data warehousing systems for offline processing and reporting.
+The original use case for Kafka was to be able to rebuild a user activity tracking pipeline as a set of real-time publish-subscribe feeds. This means site activity (page views, searches, or other actions users may take) is published to central topics with one topic per activity type. These feeds are available for subscription for a range of use cases including real-time processing, real-time monitoring, and loading into Hadoop or any data warehousing systems for offline processing and reporting.
 
 Kafka is often used for operational monitoring data, aggregating statistics from distributed applications to produce centralized feeds of operational data and thus can be used as base component for a low latency fault-tolerant monitoring pipeline.
 
