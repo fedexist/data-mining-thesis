@@ -34,7 +34,7 @@ This paradigm emphasizes the continuous flow of data between operators, defined 
 
 Apache Flink is an open source framework developed for the continuous and distributed processing of data flows. Based on the Dataflow Programming model, it provides a set of abstractions specifically designed for real time stream processing.
 
-\subsection{Abstraction levels}  \label{AbstractionLevels} ~\\
+\subsection{Abstraction levels}  \label{AbstractionLevels}
 
 \begin{itemize}
 	\item \textbf{Stateful Streaming}: It's the lowest abstraction layer, which allows developers to freely manage data flows and their processing, use fault-tolerant states and callback registration on events.
@@ -43,7 +43,7 @@ Apache Flink is an open source framework developed for the continuous and distri
 	\item \textbf{SQL}: it's the highest level of abstraction offered by Flink and interacts directly with the Table APIs in order to provide a representation of the application being developed through SQL queries. It can be executed on the tables defined by the Table API, directly on the data.
 \end{itemize}
 
-\subsection{Programs Dataflows}  \label{ProgramsDataflows} ~\\
+\subsection{Programs Dataflows}  \label{ProgramsDataflows}
 
 The base elements of a Flink application are the following:
 
@@ -76,7 +76,7 @@ The base elements of a Flink application are the following:
 	\label{fig:Dataflow}
 \end{figure}
 
-\paragraph{Parallelism} \label{ParallelismFlink} ~\\
+\paragraph{Parallelism} \label{ParallelismFlink}
 
 Applications using Flink are inherently parallels and distributed. During execution, a stream may be divided in more than one partition; each operator can have more than a single sub-task operating on data, each one independent from the other and executed on different threads or, if possible, on different machines or containers.\\
 The parallelism of a task is the parameter indicating the number of subtasks an operator can have and, consequentially, the number of partitions of the stream getting outputted from that operator.\\
