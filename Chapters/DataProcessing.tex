@@ -21,10 +21,10 @@ Generally, there are 2 execution models usable when to approach an unbounded dat
 
 A Batch based execution is feasible when requirements on the state management, in-order consuming and windowing are not present or very relaxed and, thus, a Streaming approach is generally favoured because of the conceptual paradigm which defines it: Dataflow Programming.
 
-\paragraph{Dataflow Programming}  \label{DataflowProg} ~\\
+\paragraph{Dataflow Programming}  \label{DataflowProg}
 
 Dataflow Programming is a programming paradigm which models an application as a Direct Acyclic Graph (DAG) and thus it differentiates itself very heavily from the Imperative Programming (or Control Flow), which models a program like finite sequence of operations.\\
-This paradigm emphasizes the continuous flow of data between operators, defined as Black Boxes with explicit input and output ports used to connect with other operators. An operation runs as soon as all of its inputs become valid. Thus, dataflow languages are inherently parallel and can work well in large, decentralized systems\footcite{Johnston:2004:ADP:1013208.1013209}.\\
+This paradigm emphasizes the continuous flow of data between operators, defined as Black Boxes with explicit input and output ports used to connect with other operators. An operation runs as soon as all of its inputs become valid. Thus, dataflow languages are inherently parallel and can work well in large, decentralized systems \cite{Johnston:2004:ADP:1013208.1013209}.
 
 \pagebreak
 \section{Apache Spark} \label{Spark}
@@ -96,6 +96,8 @@ Streams can transport data between a pair of operators following two different p
     \item \textbf{Redistributing streams} change their partitioning, sending the data to different subtasks, based on the transformation being applied. For example, a keyBy() operator repartitions the stream using the hash of the chosen key. In this case, the elements' order will be preserved only between neighbouring operations pairs, and won't be ever guaranteed being the same in the following operators.
 \end{itemize}
 
+\subsection{Fault Tolerance \& High Availability}
+
 \subsection{Flink Extensions} \label{FlinkLibs}
 
 \subsubsection{FlinkCEP: Complex Events Processing}
@@ -120,7 +122,7 @@ val result: DataStream[Alert] = patternStream.select(createAlert(_))
 \captionof{listing}{An example of Pattern API usage}
 \end{code}~\\
 
-In FlinkCEP, a \textbf{Pattern}, similarly to a pattern of a Regular Expression, can be \textbf{single} or \textbf{iterative}. For example, in a pattern like \verb|"a b+ c? d"|, \verb|a|, \verb|c?| e \verb|d| are single patterns, while \verb|b+| is iterative.
+In FlinkCEP, a \textbf{Pattern}, similarly to a pattern of a Regular Expression, can be \textbf{single} or \textbf{iterative}. For example, in a pattern like \texttt{"a b+ c? d"}, \texttt{a}, \texttt{c?} e \texttt{d} are single patterns, while \texttt{b+} is iterative.
 \\
 
 In a Pattern there can be, analogously to Regular Expressions, Quantifiers and Conditions.
@@ -130,16 +132,16 @@ In a Pattern there can be, analogously to Regular Expressions, Quantifiers and C
 Iterative patterns can be specified with the following self explanatory methods:
 
 \begin{itemize}
-    \item \verb|pattern.oneOrMore()|;
-    \item \verb|pattern.times(#ofTimes)|;
-    \item \verb|pattern.optional()|
+    \item \texttt{pattern.oneOrMore()};
+    \item \texttt{pattern.times(\#ofTimes)};
+    \item \texttt{pattern.optional()}
 \end{itemize}
 
 \paragraph{Conditions}
 
 Each pattern can have additional conditions specified, which can be related to a property of an incoming event, or the contiguity to other events.
 
-Methods \verb|pattern.where()| and \verb|pattern.or()| can be used to specify \verb|IterativeCondition|s, \verb|SimpleCondition|s or a combination of multiple conditions. In this case, combinations can be specified concatenating all the previous methods, including the quantifiers, optionally adding more constraints on the contiguity of the same pattern by calling \verb|consecutive()|, for the strict contiguity, and \verb|allowCombinations()| for the relaxed non-deterministic contiguity.
+Methods \texttt{pattern.where()} and \texttt{pattern.or()} can be used to specify \texttt{IterativeCondition}s, \texttt{SimpleCondition}s or a combination of multiple conditions. In this case, combinations can be specified concatenating all the previous methods, including the quantifiers, optionally adding more constraints on the contiguity of the same pattern by calling \texttt{consecutive()}, for the strict contiguity, and \texttt{allowCombinations()} for the relaxed non-deterministic contiguity.
 \\
 Some examples:
 
@@ -177,26 +179,26 @@ Similarly to conditions combination, pattern combination is possible through the
 
 \begin{itemize}
     
-    \item \verb|next()|, for strict contiguity.
-    \item \verb|followedBy()|, for relaxed contiguity.
-    \item \verb|followedByAny()|, for non deterministic relaxed contiguity.
-    \item \verb|notNext()|, NOT pattern with strict contiguity.
-    \item \verb|notFollowedBy()|, NOT pattern with relaxed contiguity.
+    \item \texttt{next()}, for strict contiguity.
+    \item \texttt{followedBy()}, for relaxed contiguity.
+    \item \texttt{followedByAny()}, for non deterministic relaxed contiguity.
+    \item \texttt{notNext()}, NOT pattern with strict contiguity.
+    \item \texttt{notFollowedBy()}, NOT pattern with relaxed contiguity.
 
 \end{itemize}
 
-Each pattern combination can be followed by a time constraint specified by concatenating \verb|within(Time)|.
+Each pattern combination can be followed by a time constraint specified by concatenating \texttt{within(Time)}.
 
 \paragraph{Pattern Detection}
 
-Once a pattern sequence has been specified, it needs to applied to the target \verb|Datastream|, creating this way a \verb|PatternStream|.
-On this new stream \verb|select| or \verb|flatSelect| operations need to be applied in order to enable further processing on the events satisfying the pattern.
+Once a pattern sequence has been specified, it needs to applied to the target \texttt{Datastream}, creating this way a \texttt{PatternStream}.
+On this new stream \texttt{select} or \texttt{flatSelect} operations need to be applied in order to enable further processing on the events satisfying the pattern.
 
 \subsubsection{Other extensions: Flink Gelly and FlinkML}
 
 In addition to the aforementioned library for complex event handling, Flink makes specific sets of API available, which provide useful tools when it comes to enable advanced processing on data.
 
-\paragraph{Flink Gelly} is an API based on the Flink \verb|Dataset|s API specifically developed for Graph Processing. Graphs are stored as a finite set of vertices and edges, a special case of a \verb|Dataset|. This library allows the application of operators like Map, Filter, Intersect and Union, Mutations like edge and vertex removal, but also advanced techniques belonging to Graph Theory like \textit{Iterative Graph Processing} (Vertex-centric, Scatter-Gather and Gather-Sum-Apply), \textit{Single Source Shortest Paths}, \textit{Clustering} and Similarity analysis.
+\paragraph{Flink Gelly} is an API based on the Flink \texttt{Dataset}s API specifically developed for Graph Processing. Graphs are stored as a finite set of vertices and edges, a special case of a \texttt{Dataset}. This library allows the application of operators like Map, Filter, Intersect and Union, Mutations like edge and vertex removal, but also advanced techniques belonging to Graph Theory like \textit{Iterative Graph Processing} (Vertex-centric, Scatter-Gather and Gather-Sum-Apply), \textit{Single Source Shortest Paths}, \textit{Clustering} and Similarity analysis.
 
 \paragraph{FlinkML} is a set of tools which allows the application of Machine Learning techniques on Flink data streams, including both algorithmic implementations for supervised (SVMs and Multiple Linear Regressors) and unsupervised (K-nearest neighbours) learning, Data Preprocessing and Recommendation (ALS)
 

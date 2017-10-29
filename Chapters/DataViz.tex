@@ -1,17 +1,23 @@
 \chapter{Data Visualization}
 
-La Data Visualization è definita come la rappresentazione visiva dei dati attraverso l'utilizzo di modelli e grafici. Essa è posta al livello più alto dello stack infrastrutturale perché è il mezzo attraverso il quale viene mostrato il risultato dell'intera catena di processi operanti sui dati. Il motivo per cui è necessario utilizzare la visualizzazione nasce dall'incapacità del cervello umano di estrarre le informazioni utili presenti nei dati a partire dalla visione degli stessi nella loro forma grezza; tale informazione può però essere presentata in una forma interpretabile attraverso l'utilizzo di uno o più grafici. È quindi necessario che i grafici costruiti siano il più chiari, intuitivi e informativi possibile. Nello stack implementato è stato utilizzato come software di visualizzazione Tableau e, nel capitolo, è illustrata la sua struttura e quelli che sono i suoi punti di forza.
+Data Visualization is the visual representation of data using plots and visual models. In the infrastructural stack stands at the highest level since it's the mean through which the result of all the processing is shown. The reason that makes it so important is that humans are not able to extract useful information from raw data at a glance, and thus comes the need for clear and intuitive plots capturing all the helpful statistics contained, in a concise way: insights from which human can act accordingly.
 
-\section{Introduzione a Tableau}
+The stack uses as a visualization tool Tableau, and in this chapter will be presented its structure and its strengths. 
 
-Tableau è un software per la produzione di visualizzazioni dedicate alla Business Intelligence. Secondo Gartner \cite{gartner_tableau}, Tableau offre un'esplorazione visuale intuitiva e altamente interattiva attraverso l'accesso, la manipolazione e l'analisi dei dati senza la necessità di scrivere codice, posizionandosi tra i primi 3 prodotti leader nel suo settore. Tra gli elementi che distinguono Tableau c'è la semplicità e l'intuitività nell'utilizzo del software, la gestione dei data source e alcune caratteristiche innovative come le table calculation e la possibilità di fare analisi dati direttamente sui grafici. L'applicazione utilizzata On Premise si compone di due elementi:
+\section{Introduction}
+
+Tableau is a software dedicated to creation of visualizations for the Business Intelligence. According to Gartner \cite{gartner_tableau}, Tableau offers an highly intuitive and interactive way to the access, manipulation and analysis of data, without the need for coding, positioning itself among the first three product leaders in the sector. Tableau's main features include easiness and intuitiveness in the software use, data sources management and some innovative features such as table calculations and the possibility to use data analysis techniques directly on the plots.
+
+Tableau On Premise version is composed of two elements:
+
 \begin{itemize}
-    \item \textbf{Tableau Desktop}: Permette la creazione di worksheet, dashboard e story collegate ad una o più sorgente di dati.
-    \item \textbf{Tableau Server}: È utilizzato per pubblicare i grafici creati con Tableau Desktop al fine di renderli disponibili online.
+    \item \textbf{Tableau Desktop}: Allows for the creation of worksheets, dashboards and stories, linked to one or more data sources.
+    \item \textbf{Tableau Server}: It is used to publish the plots created with Tableau Desktop, in order to make them available to end users.
 \end{itemize}
+
 \section{Tableau Desktop}
 
-Tableau utilizza una struttura basata su workbook e sheet in stile Microsoft Excel: un workbook è composto da un insieme di sheet che possono assumere il ruolo di worksheet, dashboard, o story. Un worksheet contiene un singolo grafico con i relativi filtri e la sua legenda mentre un insieme di worksheet formano una dashboard. Una sequenza di dashboard crea invece una story che è solitamente la vista condivisa e mostrata all'utente finale. Alla base di ogni workbook c'è una o più sorgenti con le quali Tableau si connette per ricevere i dati da utilizzare.
+Tableau is structured in a Microsoft Excel fashion, with workbooks and sheets: a workbook is made of many sheets which can be worksheets, dashboards or stories. A worksheet is a single plot, with its own filters and legend, and can be combined with other worksheets to make a dashboard. A story is a sequence of dashboards and it's usually the view shown to the end user. Each workbook starts from one or more data sources, used by Tableau for fetching the data used in the plots.
 
 \subsection{Data Source}
 
