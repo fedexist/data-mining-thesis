@@ -21,63 +21,72 @@ Tableau is structured in a Microsoft Excel fashion, with workbooks and sheets: a
 
 \subsection{Data Source}
 
-Il primo passo nella creazione di un workbook è quello di collegare Tableau ad un data source \cite{data_tableau}. Tableau Desktop supporta la connessione, attraverso connettori dedicati, a svariate fonti dati che possono essere raggruppati in due categorie: File e Server. Per quanto riguarda i File, sono supportati tutti i principali file di testo e relative formattazioni come JSON, CSV o TSV, i file in formato PDF, i fogli di calcolo Excel e i file Extract di Tableau. Per le connessioni ai Server, sono disponibili connettori ottimizzati per database relazionali come Microsoft SQL Server, database non relazioni come MongoDB e per sorgenti dati in cloud come Google Analytics, Amazon Redshift, e Salesforce. Nel caso in cui non sia presente l'interfaccia desiderata, è sempre possibile creare il proprio driver attraverso l'utilizzo di un ODBC\footnote{ODBC: Open DataBase Connectivity è una Application Programming Interface (API) per l'accesso ad un DBMS}. L'interazione con qualunque data source è gestito in maniera automatica da Tableau con \textbf{VizQL} (Visual Query Language). VizQL si occupa di tradurre le azioni di drag-and-drop eseguite in query adatte alla sorgente dati utilizzata al fine di rappresentare i risultati in maniera visuale attraverso dimensioni, forme e colori nei grafici. Una volta collegato Tableau al data source è possibile scegliere due tipologie di connessioni: Live e Extract.
+The first step during the creation of a workbook is to link Tableau to a data source \cite{data_tableau}, either through a \textbf{File Connection}, which supports all of the main data formats available such as JSON, CSV, TSV, PDF and Excel sheets, or a \textbf{Server Connection}, to relational databases, such as Microsoft SQL Server and Hive, NoSQL databases, such as MongoDB or Cassandra, and data sources in cloud, such as Google Analytics, Amazon Redshift and Salesforce. If there's no optimized built-in driver, it's possible to use any ODBC\footnote{ODBC: Open DataBase Connectivity is a standard API to access DBMS} driver. Any interaction with a data source is handled by default with \textbf{VizQL} (Visual Query Language), which translates all of the drag-n-drop actions executed in the GUI to adequate queries to the data source, in order to get the desired results available for visualization.
+
+Tableau's connection to a data source is available in two different kinds: Live and Extract.
 
 \paragraph{Live}
 
-La connessione live prevede l'interrogazione da parte di Tableau direttamente al data source; per questo motivo l'efficienza e le performance sono strettamente dipendenti da quelle del database utilizzato. In questo modo è però possibile aggiornare le visualizzazioni ogni qualvolta i dati vengono modificati ottenendo un grafico che si aggiorna teoricamente in tempo reale.
+A Live connection queries directly the data source, making the performances of this connection strictly dependent from the performances of the database which is being used. With this kind of connection it's possible to refresh all the plots each time data is being updated, making the visualizations almost real time.
 
 \paragraph{Extract}
 
-La connessione extract prevede l'esecuzione della query sul data source e il salvataggio dei dati in un file Tableau Data Extract che verrà utilizzato per le successive interrogazioni. L'Extract può essere visto quindi come uno snapshot del database e, per questo motivo, le modifiche apportate non saranno visibili fino ad un aggiornamento del file. La creazione di un extract può richiedere diverso tempo ma il suo utilizzo si rileva estremamente efficiente data la struttura colonnare ottimizzata per il motore di esecuzione di Tableau.
+An Extract connection is a periodic query, which can be performed, for example, every day, which saves the results in a Tableau Data Extract file, which will be used for the following queries. The Extract may be considered a snapshot of the database and, for this very reason, any update in the database won't be seen until the next scheduled Extract File update. Even though the creation of an Extract File can take a long time, queries on it are very efficient because of its internal tabular structure, optimized for Tableau's own execution engine.
 
-\subsection{Creazione di una vista}
+\subsection{Visualization creation}
 
-Ad ogni campo della tabella caricata dal sorgente viene associato un ruolo: dimensione o misura. Una dimensione rappresenta un'informazione categorica discreta come, ad esempio, una stringa o una data; una misura è invece un'informazione numerica e quantitativa potenzialmente aggregabile. È comunque possibile cambiare liberamente il ruolo di ogni campo a seconda dell'esigenza, così come passare da valori discreti a continui. Tramite drag-and-drop si spostano dimensioni e misure su ascisse e ordinate e Tableau automaticamente interpreta le variabili per costruire il grafico più significativo. Affinché le viste siano facilmente interpretabili, Tableau consente solamente la costruzione di grafici bi-dimensionali; la facoltà di aggiungere dimensioni, e quindi informazione, è data dall'utilizzo dei colori, della size e delle forme. I grafici che possono essere usati sono svariati, a partire da quelli classici come le torte, gli istogrammi, i bar chart, fino ad arrivare a grafici complessi dati dalla combinazione, tramite la tecnica del dual axis, di grafici elementari. Una nota di riguardo si ha per i grafici basati sulle mappe geografiche; Tableau infatti gestisce e interpreta, grazie ad alcuni dataset interni, i campi come gli stati, le regioni, le città, gli aeroporti e i codici postali come dimensioni geografiche utilizzabili sulla mappa. Una volta completato il grafico è possibile inserire diverse tipologie di filtri; scelta la dimensione o la misura da filtrare è necessario scegliere il tipo di filtro da applicare, ad esempio a singola o multipla scelta per le dimensioni mentre a valore esatto o a range per le misure. Esiste una sezione dedicata per le date in cui è possibile usare filtri assoluti o relativi rispetto ad una data e scegliere la granularità da utilizzare, a partire dall'anno fino ad arrivare al singolo secondo. Dimensioni e misure possono essere combinate insieme per creare un nuovo campo, definito calculated field, utilizzando funzioni matematiche e logiche. L'ultimo elemento di base utilizzabile è il parametro che consente di creare un campo che cambia in maniera dinamica con l'interazione dell'utente.
+Each field loaded from the data source is assigned of two roles: dimension or measure. A \textbf{dimension} is used for categorized or discrete information such as strings or dates, while a \textbf{measure} corresponds to numeric information, potentially object of aggregations. It's possible to change freely the roles of each field, according to the needs. Drag-n-drop allows to move dimensions and measures on both plots' axes and Tableau is able to automatically interpret the new layout, constructing a more significant chart.
 
-\subsubsection{Table calculation}
+Tableau allows only for the creation of bi-dimensional plots, but still more dimensions can be visualized through the use of colours, sizes and shapes.
+The built-in charts include the classic pie chart, histogram, bar chart, but also more complex plots given by the combination in dual axis of the previous charts, and \textbf{geographical maps}, through Tableau's built-in management of countries, regions, cities, airports and zip codes. 
+Once a plot has been configured with its dimensions and measures, filters can be applied on it: a filter can be a single or multiple choice filter, if applied on a dimension, or an exact value or range filter if applied to a measure. Dates have their own filters where you can choose the granularity, ranging from the year to the second.
+Dimensions and measures can be combined together to create a \textit{calculated field} via mathematical functions.
+Additional elements useful in a chart creation are \textit{parameters}, which allow to create fields dynamically changing with the user interaction.
 
-La Table Calculation è una delle caratteristiche innovative presenti in Tableau \cite{tableCalculation_tableau}. A differenza di tutte le altre operazioni che sono eseguite a livello di data source, esse insistono sui dati aggregati che compongono la vista; il calcolo è quindi eseguito utilizzando la cache di Tableau, come mostrato in Figura \ref{fig:TableCalculation}.
+\subsubsection{Table calculations}
+
+\textbf{Table Calculations} are one of the main innovative features in Tableau: while all of the other operations are executed at the data source level, a table calculation is executed on the aggregated data composing the view, using this Tableau's cache like the Figure \ref{fig:TableCalculation} shows.
+
 
 \begin{figure}[ht]
     \begin{center}
         \includegraphics[width=0.8\linewidth]{Figures/TableCalculation.png}
     \end{center}
-    \caption{Flusso di esecuzione di una table calculation \protect\cite{tableauFlow_image}.}
+    \caption{Execution flow of a table calculation \protect\cite{tableauFlow_image}.}
     \label{fig:TableCalculation}
 \end{figure}
 
-Il software mette a disposizione una lunga serie di operazioni utilizzabili ma lascia anche la possibilità all'utente di scrivere la propria table calculation. Una volta scelta la misura da indagare tra le varie possibilità proposte ci sono:
+Tableau gives the user the possibility to use a great variety of operations, but it's also possible to write a custom table calculation, such as:
 
 \begin{itemize}
-    \item Calcolare il totale corrente (running total).
-    \item Calcolare le evoluzioni temporali sia in valore assoluto sia in percentuale.
-    \item Calcolare la media mobile o la percentile.
-    \item Classificare e/o ordinare secondo una funzione di ranking/sorting.
+    \item Computing the running total.
+    \item Computing time variance in both absolute values and percentage.
+    \item Computing the moving and percentile average.
+    \item Ranking or sorting according to specific functions.
 \end{itemize}
 
-\subsubsection{Analisi}
+\subsubsection{Analysis}
 
-Una seconda caratteristica che rende Tableau particolarmente interessante è l'opportunità di eseguire analisi statistiche attraverso modelli matematici pre-caricati in Tableau o, in aggiunta, è anche possibile integrare algoritmi scritti in linguaggio R o in MatLab \cite{analisi_tableau}. Le analisi che possono essere eseguite usando i modelli pre-esistenti sono principalmente di 3 tipi:
+Another innovative feature present in Tableau is the possibility to make statistical analyses through mathematical models built-in or use algorithms written in \textbf{R, Python or MatLab} \cite{analisi_tableau}. The main built-in models usable in Tableau are:
 
 \begin{itemize}
-    \item Linee di trend: Ogni linea di tendenza aggiunta al grafico rappresenta un modello statistico di regressione lineare; in particolare Tableau costruisce la curva migliore usando 4 diversi tipi di funzioni: lineare, logaritmica, esponenziale e polinomiale.
-    \item Previsioni (forecasting): Nel caso in cui sia presente una serie temporale, è possibile effettuare una previsione su un certo campo quantitativo utilizzando il metodo "exponential smoothing". Tale modello calcola i valori futuri sulla base di una funzione esponenziale che assegna i pesi al valore corrente e alla media dei valori passati; Tableau ricerca anche eventuali pattern ciclici in base al tipo di aggregazione eseguita, come ad esempio quella mensile o semestrale.
-    \item Clustering: I dati vengono raggruppati in cluster sulla base delle variabili scelte. L'algoritmo utilizzato da Tableau è il K-Means in cui il valore di K è assegnato in maniera automatica; è comunque possibile modificare manualmente il numero di cluster da utilizzare.
+    \item \textbf{Trend lines}: each trend line added to a chart represents a regression, which Tableau builds according to linear, logarithmic, exponential or polynomial models.
+    \item \textbf{Forecasting}: in case of the visualization of a time series, it's possible to use the "exponential smoothing" method to compute future values according to an exponential function weighing current value and past values' average; Tableau can also recognize periodic patterns in time series.
+    \item \textbf{Clustering}: Tableau uses K-Means algorithm to classify the data on the chosen variables and gives the user the possibility to change the value of K, that is the number of total clusters.
 \end{itemize}
 
 \section{Tableau Server}
 
-Tableau Server è un'applicazione server in grado di ospitare data source e workbook condivisi attraverso Tableau Desktop. Grazie al server, coloro che ne hanno diritto, sono in grado di vedere, interagire, scaricare, condividere e modificare un worksheet senza avere la necessità di installare Tableau Desktop sul proprio device; infatti è sufficiente utilizzare un browser web che supporti HTML5 o l'app mobile di Tableau. Inoltre, attraverso la condivisione del data source già autenticato, un utente è in grado di creare nuovi worksheet senza dover installare e mantenere i driver necessari ai connettori sul proprio computer. L'utilizzo di Tableau Server è però vincolato al possesso di un account.
+\textbf{Tableau Server} is a server application used to contain data and metadata of sources and shared workbooks. Through an Access Control List based on accounts, Tableau server allows users to view, interact, download, share and edit a worksheet without the need install Tableau Desktop. Additionally, through the sharing of an already present data source, a user can create new worksheets without installing the correspondent drivers.
 
-\subsection{Embedded Tableau}
+\subsection{Tableau Embedded}
 
-Tableau Server offre la possibilità di incorporare un worksheet in un sito internet o in un'applicazione web. In particolare, per quanto riguarda la web app, si utilizzano le Tableau JavaScript API che mettono a disposizione diverse funzioni e la possibilità di:
+Tableau Server offers the possibility to embed worksheets in a web application using Tableau JavaScript API, which allows for:
 
 \begin{itemize}
-    \item Visualizzare ed interagire con la vista condivisa.
-    \item Caricare e ridimensionare la vista in maniera dinamica.
-    \item Scaricare la vista come PDF o immagine.
+    \item Viewing and interacting with the shared view.
+    \item Loading and resizing the view dynamically.
+    \item Download the view as a PDF or an image.
 \end{itemize}
 
-Al primo tentativo di caricamento della vista è richiesto l'inserimento delle proprie credenziali in una finestra di login di Tableau Server. Tuttavia se vogliamo che ogni utente della web app sia in grado di visionare i grafici, nonostante non sia in possesso di un account Tableau, è possibile autenticare non il singolo utente ma il server che ospita l'applicazione. Per fare ciò è necessario seguire una procedura, denominata "Trusted Authentication", che sarà implementata nel caso di studio. 
+Corresponding user credentials would be required to view the shared charts and plots, but it's possible to use Tableau's \textit{Trusted Authentication} to authenticate the server hosting the application to allow all the web app user access to it.
