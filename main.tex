@@ -44,9 +44,15 @@ onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespa
 
 \usepackage[newfloat]{minted} % Code Highlighting
 \usepackage{caption}
+\usepackage{tcolorbox}
+\usepackage{etoolbox}
 
 \newenvironment{code}{\captionsetup{type=listing}}{}
 \SetupFloatingEnvironment{listing}{name=Snippet}
+
+\BeforeBeginEnvironment{minted}{\begin{tcolorbox}}%
+\AfterEndEnvironment{minted}{\end{tcolorbox}}%
+
 
 \setmainfont{Palatino Linotype}
 \setmonofont{Consolas}
@@ -96,7 +102,7 @@ onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespa
 }
 
 \begin{document}
-\hypersetup{hidelinks}
+\hypersetup{colorlinks, urlcolor=blue, linkcolor=blue}
 
 \frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
 
