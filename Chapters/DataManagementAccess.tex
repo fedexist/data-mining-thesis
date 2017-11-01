@@ -19,7 +19,7 @@ Exposing a File System built upon a cluster of many machines requires the techno
 The File System metadata, as previously stated, is managed by the \textbf{NameNode}. The \textbf{NameNode} uses a log to store persistently all the changes to these metadata, such as changing the replication factor, creating a new file, renaming an old one; the log, called EditLog, is stored in the host machine's File System. Similarly the state of the File System is stored on the machine's File System in a file called FsImage.\newline
 In case of HDFS failure, on restart the \textbf{NameNode} will load in memory the FsImage and then apply all the transactions stored on EditLog, to return to the last safe state it was before failure.
 \newline
-If no failures occur and the \textbf{NameNode} is not restarted, FsImage will become stale while EditLog's size will continue to increase to unmanagable size, to cope with this problem, HDFS uses a \textbf{Secondary NameNode} whose object is to query EditLogs to the \textbf{Primary NameNode} at regular intervals, to update its own copy of FsImage accordingly and to then send its copy to the \textbf{Primary NameNode}.
+If no failures occur and the \textbf{NameNode} is not restarted, FsImage will become stale while EditLog's size will continue to increase to unmanageable size, to cope with this problem, HDFS uses a \textbf{Secondary NameNode} whose object is to query EditLogs to the \textbf{Primary NameNode} at regular intervals, to update its own copy of FsImage accordingly and to then send its copy to the \textbf{Primary NameNode}.
 
 \subsection{Robustness}
 
@@ -76,24 +76,22 @@ The Capacity Scheduler supports the following features:
 
 \item \textbf{Capacity Guarantees} - Queues are allocated a fraction of the capacity of the grid in the sense that a certain capacity of resources will be at their disposal. All applications submitted to a queue will have access to the capacity allocated to the queue. Administrators can configure soft limits and optional hard limits on the capacity allocated to each queue.
 
-\item \textbf{Security} - Each queue has strict ACLs which controls which users can submit applications to individual queues. Also, there are safe-guards to ensure that users cannot view and/or modify applications from other users. Also, per-queue and system administrator roles are supported.
+\item \textbf{Security} - Each queue has strict ACLs\footnote{ACL: Access Control List, a data structure holding the permissions on an object for each user.} which controls which users can submit applications to individual queues. Also, there are safe-guards to ensure that users cannot view and/or modify applications from other users. Also, per-queue and system administrator roles are supported.
 
 \item \textbf{Elasticity} - Free resources can be allocated to any queue beyond its capacity. When there is demand for these resources from queues running below capacity at a future point in time, as tasks scheduled on these resources complete, they will be assigned to applications on queues running below the capacity (pre-emption is also supported). This ensures that resources are available in a predictable and elastic manner to queues, thus preventing artificial silos of resources in the cluster which helps utilization.
 
 \item \textbf{Multi-tenancy} - Comprehensive set of limits are provided to prevent a single application, user and queue from monopolizing resources of the queue or the cluster as a whole to ensure that the cluster isn't overwhelmed.
 
-\item Operability
+\item \textbf{Operability}
     \begin{itemize}
     \item Runtime Configuration - The queue definitions and properties such as capacity, ACLs can be changed, at runtime, by administrators in a secure manner to minimize disruption to users. Also, a console is provided for users and administrators to view current allocation of resources to various queues in the system. Administrators can add additional queues at runtime, but queues cannot be deleted at runtime.
     
     \item Drain applications - Administrators can stop queues at runtime to ensure that while existing applications run to completion, no new applications can be submitted. If a queue is in STOPPED state, new applications cannot be submitted to itself or any of its child queues. Existing applications continue to completion, thus the queue can be drained gracefully. Administrators can also start the stopped queues.
     \end{itemize}
 
-\item \textbf{Resource-based Scheduling} - Support for resource-intensive applications, where-in a application can optionally specify higher resource-requirements than the default, thereby accommodating applications with differing resource requirements. Currently, memory is the resource requirement supported.
-
 \item \textbf{Queue Mapping based on User or Group} - This feature allows users to map a job to a specific queue based on the user or group.
 
-\item \textbf{Priority Scheduling} - This feature allows applications to be submitted and scheduled with different priorities. Higher integer value indicates higher priority for an application. Currently Application priority is supported only for FIFO ordering policy.
+\item \textbf{Priority Scheduling} - This feature allows applications to be submitted and scheduled with different priorities. Higher integer value indicates higher priority for an application. Currently Application priority is supported only for FIFO\footnote{FIFO: First In First Out, a policy for the executions of jobs, the first job to come is the first to be served.} ordering policy.
 
 \end{itemize}
 
@@ -147,7 +145,7 @@ Hive architecture can be divided in five main components:
 
 \begin{itemize}
     \item \textbf{Shell/UI}: Beeline is the frontend tool for interactive querying on the database. Hive supports connections via its own JDBC driver, allowing easy integration with clients and user applications.
-    \item \textbf{Driver}: The component which receives the queries. This component implements the notion of session handles and provides execute and fetch APIs modeled on JDBC/ODBC interfaces.
+    \item \textbf{Driver}: The component which receives the queries. This component implements the notion of session handles and provides execute and fetch APIs\footnote{API: Application Programming Interface, a set of functions and protocols provided to developers.} modeled on JDBC/ODBC interfaces.
     \item \textbf{Metastore}: It stores metadata about HDFS file locations and the table schemas, but also column and column type information and the serializers and deserializers necessary to read and write data.
     \item \textbf{Compiler}: It manages query parsing, planning and optimization, does semantic analysis on the different query blocks and query expressions generating, eventually, an execution plan with the help of the table and partition metadata looked up from the metastore. For what concerns the parsing, HiveQL is a SQL extension, compliant with the SQL:2011 standard.
     \item \textbf{Execution Engine}: Hive uses Apache Tez as a default execution engine  which allows low latency querying through its LLAP (Low Latency Analytical Processing) daemons: persistent processes running on YARN enabling the system to avoid the overhead caused by the container deployment for query executions. Other execution engines usable by Hive are, as already mentioned, MapReduce and Spark. The first one is needed, as of Hive 2.1, in order to use Hive Streaming API, while the other uses its own LLAP daemons, similarly to Tez, and still lags behind, performance wise.
