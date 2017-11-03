@@ -80,7 +80,51 @@ stats.addSink(new RollingSink(path))
 	\label{fig:Dataflow}
 \end{figure}
 
+\paragraph{Event Time}
+
+Flink supports different notions of time in streaming programs and each of them can be useful for specific use cases.\\
+
+\textbf{Processing time} refers to the system time of the machine that is executing the respective operation.
+
+When a streaming program runs on processing time, all time-based operations (like time windows) will use the system clock of the machines that run the respective operator. For example, an hourly processing time window will include all records that arrived at a specific operator between the times when the system clock indicated the full hour.
+
+Processing time is the simplest notion of time and requires no coordination between streams and machines. It provides the best performance and the lowest latency. However, in distributed and asynchronous environments processing time does not provide determinism, because it is susceptible to the speed at which records arrive in the system (for example from the message queue), and to the speed at which the records flow between operators inside the system.\\
+
+\textbf{Event time} is the time that each individual event occurred on its producing device. This time is typically embedded within the records before they enter Flink and that event timestamp can be extracted from the record. An hourly event time window will contain all records that carry an event timestamp that falls into that hour, regardless of when the records arrive, and in what order they arrive.
+
+Event time gives correct results even on out-of-order events, late events, or on replays of data from backups or persistent logs. In event time, the progress of time depends on the data, not on any clock. Event time programs must specify how to generate Event Time Watermarks, which is the mechanism that signals progress in event time.
+
+Event time processing often incurs a certain latency, due to its nature of waiting a certain time for late events and out-of-order events. Because of that, event time programs are often combined with processing time operations.\\
+
+\textbf{Ingestion time} is the time that events enter Flink. At the source operator each record gets the source’s current time as a timestamp, and time-based operations (like time windows) refer to that timestamp.
+
+Ingestion time sits conceptually in between event time and processing time. Compared to processing time, it is slightly more expensive, but gives more predictable results. Because ingestion time uses stable timestamps (assigned once at the source), different window operations over the records will refer to the same timestamp, whereas in processing time each window operator may assign the record to a different window (based on the local system clock and any transport delay).
+
+Compared to event time, ingestion time programs cannot handle any out-of-order events or late data, but the programs don’t have to specify how to generate watermarks.
+
+Internally, ingestion time is treated much like event time, but with automatic timestamp assignment and automatic watermark generation.
+
+
 \paragraph{Windows}
+
+Windows are at the heart of processing infinite streams. Windows split the stream into \textit{buckets} of finite size, over which we can apply computations. The structure of a windowed Flink program differs when considering \textbf{keyed} and \textbf{non-keyed} streams: a keyed stream is split into multiple logical sub-streams and a window is applied to each one of them separately, differently from a non-keyed stream where the window is applied globally.
+
+A window is created as soon as the first element that should belong to this it arrives, and then is completely removed when the time (event or processing time) passes its end timestamp plus the user-specified \textbf{allowed lateness}. For example, with an event-time-based windowing strategy that creates tumbling windows every 5 minutes and has an allowed lateness of 1 min, Flink will create a new window for the interval between 12:00 and 12:05 when the first element with a timestamp that falls into this interval arrives, and it will remove it when the watermark passes the 12:06 timestamp.
+
+Each window will have a \textbf{Trigger} and a function (\texttt{WindowFunction}, \texttt{ReduceFunction} or \texttt{FoldFunction}) attached to it: the function will contain the computation to be applied to the contents of the window, while the Trigger specifies the conditions under which the window is considered ready for the function to be applied. A triggering policy might be something like "when the number of elements in the window is more than 4", or "when the watermark passes the end of the window". A trigger can also decide to purge a window’s contents any time between its creation and removal, leaving the window metadata untouched, to add new data to that window.
+
+It's possible specify an \textbf{Evictor} which will be able to remove elements from the window after the trigger fires and before and/or after the function is applied.
+
+There are four main window assigners usable in Flink:
+
+\begin{itemize}
+    \item \textbf{Tumbling Windows} are fixed size and non-overlapping windows, which are configured with a parameter controlling how much frequently a new window has to be started.
+    \item \textbf{Sliding Windows} are fixed size, similarly to tumbling windows, but are configured with an additional slide parameter, which controls how frequently a sliding window is started. Therefore they overlap and elements are assigned to multiple windows.
+    \item \textbf{Session Windows} group elements by sessions of activity. Session windows do not overlap and do not have a fixed start and end time, in contrast to tumbling windows and sliding windows. A session window closes when it does not receive elements for a certain period of time, i.e., when a gap of inactivity occurred.
+    \item \textbf{Global Windows} assign all elements with the same key to the same single global window. This windowing scheme is only useful if you also specify a custom trigger. 
+\end{itemize}
+
+
 
 \paragraph{Parallelism} \label{ParallelismFlink}
 
@@ -168,7 +212,7 @@ Operators that receive more than one input stream need to \textit{\textbf{align}
 
 \paragraph{Exactly Once vs. At Least Once}
 
-The alignment step previously described may add latency to the streaming program. Usually, this extra latency is on the order of a few milliseconds, but some applications' latency may increase noticeably. If consistent super low latencies (few milliseconds) for all records is a strict requirement, Flink has a switch to skip the stream alignment during a checkpoint. Checkpoint snapshots are still drawn as soon as an operator has seen the checkpoint barrier from each input.
+The alignment step previously described may add latency to the streaming program. Usually, this extra latency is on the order of a few milliseconds, but some applications' latency may increase noticeably. If consistent super low latencies (few milliseconds) for all records is a strict requirement, Flink has a switch to skip the stream alignment during a checkpoint. Snapshots are still drawn as soon as an operator has seen the checkpoint barrier from each input.
 
 When the alignment is skipped, an operator keeps processing all inputs, even after some checkpoint barriers for checkpoint $n$ arrived. That way, the operator also processes elements that belong to checkpoint $n+1$ before the state snapshot for checkpoint $n$ was taken. On a restore, these records will occur as duplicates, because they are both included in the state snapshot of checkpoint $n$, and will be replayed as part of the data after checkpoint $n$.
 \\
@@ -188,9 +232,11 @@ flink savepoint <jobId> [<savepointDirectory>] -yid <yarnAppId>
 
 \subsection{High Availability}
 
-A Flink's setup, being a standalone or a YARN cluster, is made of a Job Manager and one or more Task Managers, each one with one or more parallelism slots (cores usable for processing). Task Managers (TMs) handle jobs actual executions, while the Job Manager (JM) handles TM orchestration and monitoring and for this reason is a single point of failure. 
+A Flink's setup, whether a standalone cluster (being it containerized or physical) or using Distributed Resource Managers such as \nameref{YARN} or Mesos\footnote{\href{https://mesos.apache.org/}{MESOS} is a distributed cluster manager used to manage datacenters with a master-slave architecture. It's a lower level abstraction with respect to YARN and thus performs a different job more inclined towards machines management and task scheduling, than purely job's scheduling.}, is made of a Job Manager and one or more Task Managers, each one with one or more parallelism slots (cores usable for processing). Task Managers (TMs) handle jobs actual executions, while the Job Manager (JM) handles TM orchestration and monitoring and, for this reason, is a single point of failure, whose crash causes the entire Flink cluster to stop.
 
-.......
+The general idea of JM high availability for standalone clusters is that of the typical Active-Standby architecture (also used by HDFS Namenode e YARN Resource Manager HA set-ups) where a single leading JM is active, at any time, and multiple standby JMs to take over leadership in case the leader fails. This guarantees that there is no single point of failure and programs can make progress as soon as a standby JM has taken leadership. There is no explicit distinction between standby and master JM instances: all of the possible JMs are registered as masters to \textbf{Zookeeper}, which is going to handle failure scenarios.
+
+In case of YARN clusters configured in High Availability mode, a single JM, being the \textbf{Application Master}, is still run, but YARN itself will restart its container on failures. As additional configuration, the maximum number of attempts for the application masters needs to be configured in the YARN configuration.
 
 \subsection{Flink Extensions} \label{FlinkLibs}
 
