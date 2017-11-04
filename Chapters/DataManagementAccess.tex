@@ -54,13 +54,13 @@ YARN supports the notion of resource reservation via a \textbf{Reservation Syste
 
 \subsubsection{Schedulers}
 
-There are two possible schedulers that can be used in a YARN cluster: \textbf{Capacity Scheduler} and \textbf{Fair Scheduler}. While the first one allows for multiple-tenants to securely share a large cluster by allocating resources in a timely manner under capacity constraints, the other is useful allows for YARN application to share resources fairly.
+There are two possible schedulers that can be used in a YARN cluster: \textbf{Capacity Scheduler} and \textbf{Fair Scheduler}. While the first one allows for multiple-tenants to securely share a large cluster by allocating resources in a timely manner under capacity constraints, the other allows for YARN applications to share cluster resources fairly.
 
 \paragraph{Capacity Scheduler}
 
 The Capacity Scheduler is designed to run Hadoop applications as a shared, multi-tenant cluster in an operator-friendly manner while maximizing the throughput and the utilization of the cluster.
 
-Traditionally each organization has it own private set of computing resources that have sufficient capacity to meet the organization’s Service Level Agreement under peak or near-peak conditions. This generally leads to poor average utilization and overhead of managing multiple independent clusters, one per each organization. Sharing clusters between organizations is a cost-effective manner of running large Hadoop installations since this allows them to reap benefits of economies of scale without creating private clusters. However, organizations may be concerned about sharing a cluster because they are worried about others using the resources that are critical for their applications needs.
+Traditionally each organization has its own private set of computing resources that have sufficient capacity to meet the organization’s Service Level Agreement under peak or near-peak conditions. This generally leads to poor average utilization and overhead of managing multiple independent clusters, one per each organization. Sharing clusters between organizations is a cost-effective manner of running large Hadoop installations since this allows them to reap benefits of economies of scale without creating private clusters. However, organizations may be concerned about sharing a cluster because they are worried about others using the resources that are critical for their applications needs.
 
 The Capacity Scheduler is designed to allow sharing a large cluster while giving each organization capacity guarantees. The central idea is that the available resources in the Hadoop cluster are shared among multiple organizations who collectively fund the cluster based on their computing needs. There is an added benefit that an organization can access any excess capacity not being used by others. This provides elasticity for the organizations in a cost-effective manner.
 
@@ -84,9 +84,9 @@ The Capacity Scheduler supports the following features:
 
 \item \textbf{Operability}
     \begin{itemize}
-    \item Runtime Configuration - The queue definitions and properties such as capacity, ACLs can be changed, at runtime, by administrators in a secure manner to minimize disruption to users. Also, a console is provided for users and administrators to view current allocation of resources to various queues in the system. Administrators can add additional queues at runtime, but queues cannot be deleted at runtime.
+    \item \textbf{Runtime Configuration} - The queue definitions and properties such as capacity and ACLs can be changed, at runtime, by administrators in a secure manner to minimize disruption to users. Also, a console is provided for users and administrators to view current allocation of resources to various queues in the system. Administrators can add additional queues at runtime, but queues cannot be deleted at runtime.
     
-    \item Drain applications - Administrators can stop queues at runtime to ensure that while existing applications run to completion, no new applications can be submitted. If a queue is in STOPPED state, new applications cannot be submitted to itself or any of its child queues. Existing applications continue to completion, thus the queue can be drained gracefully. Administrators can also start the stopped queues.
+    \item \textbf{Drain applications} - Administrators can stop queues at runtime to ensure that while existing applications run to completion, no new applications can be submitted. If a queue is in STOPPED state, new applications cannot be submitted to itself or any of its child queues. Existing applications continue to completion, thus the queue can be drained gracefully. Administrators can also start the stopped queues.
     \end{itemize}
 
 \item \textbf{Queue Mapping based on User or Group} - This feature allows users to map a job to a specific queue based on the user or group.
@@ -130,7 +130,7 @@ In the meantime, AM needs to re-send the resource requests to RM because RM may 
 
 In order to guarantee automatic fail-over, it's possible to use both an existing \textbf{Zookeeper} cluster or the embedded \verb|ActiveStandbyElector|, acting as a failure detector and leader elector instead of a separate Zookeeper FailoverController daemon, to decide which RM should be the Active: when the Active goes down or becomes unresponsive, another RM is automatically elected to be the Active, taking then over.
 
-When there are multiple RMs, the configuration (\verb|yarn-site.xml|) used by clients and nodes is expected to list all the RMs. Clients, Application Masters and Nod eManagers try connecting to the RMs in a round-robin fashion until they hit the Active RM. If the Active goes down, they resume the round-robin polling until they hit the “new” Active. This retry logic can be overridden by a user-specified fail-over provider.
+When there are multiple RMs, the configuration (\verb|yarn-site.xml|) used by clients and nodes is expected to list all the RMs. Clients, Application Masters and Node Managers try connecting to the RMs in a round-robin fashion until they hit the Active RM. If the Active goes down, they resume the round-robin polling until they hit the “new” Active. This retry logic can be overridden by a user-specified fail-over provider.
 
 \subsection{Node Manager \& Application Manager}
 
@@ -168,7 +168,7 @@ With respect to the usual query execution, this architecture allows:
 	\item parallel and concurrent query execution, shared between all the daemons instances, taking also advantage of the In-Memory Cache of the single daemon, especially useful if different queries need to access the same data.
 \end{itemize}
 
-The introduction of LLAP/OLAP daemons provided Hive2 with an average 2600\% performance gain when compared to Hive1 using Tez, on a dataset of 1 TB.
+The introduction of LLAP/OLAP daemons provided Hive2 with an average 2600\% performance gain when compared to Hive1 using Tez, on a dataset of 1 TB \cite{hive2_on_tez}.
 
 \subsection{HiveQL}
 
@@ -205,7 +205,7 @@ HiveQL Data Manipulation Language allows to modify data in Hive through multiple
 \end{itemize}
 
 \subsection{Warehouse}
-HDFS is the default physical storage of database and tables in Hive, but support for S3 and any other HDFS compatible filesystems is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files.\\
+HDFS is the default physical storage of database and tables in Hive, but support for S3 and any other HDFS compatible filesystems is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files \cite{orc_format}.\\
 Hive has built-in direct serialization and deserialization of CSV, JSON, AVRO and Parquet files as row formats, and allows to easily add custom SerDe\footnote{SerDe: Serialization/Deserialization} components.
 
 \subsubsection{Hive Data Model}
@@ -220,11 +220,13 @@ Data in Hive is organized into 3 main abstractions: Tables, Partitions and Bucke
 Apart from primitive column types (integers, floating point numbers, generic strings, dates and booleans), Hive also supports arrays and maps. Additionally, users can compose their own types programmatically from any of the primitives, collections or other user-defined types. The typing system is closely tied to the SerDe and object inspector interfaces. Users can create their own types by implementing their own object inspectors, and using these object inspectors they can create their own SerDes to serialize and deserialize their data into HDFS files).\\
 These two interfaces provide the necessary hooks to extend the capabilities of Hive when it comes to understanding other data formats and richer types. Built-in object inspectors like \verb|ListObjectInspector|, \verb|StructObjectInspector| and \verb|MapObjectInspector| provide the necessary primitives to compose richer types in an extensible manner. For maps (associative arrays) and arrays useful built-in functions like size and index operators are provided. The dotted notation is used to navigate nested types.
 
-\subsection{Hive \& SQL Server 2016: Comparison}
+\subsection{Hive \& SQL Server 2016}
 
 When it comes to enterprise-level solutions, every data warehousing product needs to be compared with the de-facto standard of this sector. Considering a pure Windows environments, Microsoft's SQL Server is the most widely used RDBMS and data warehouse.\newline
 
-A comparison has been set up in order to compare the capabilities of Hive with respect to SQL Server, using Hortonworks' TPC-DS\footnote{TPC Benchmark DS is a decision support benchmark that models several generally applicable aspects of a decision support system, including queries and data maintenance. The benchmark provides a representative evaluation of performance as a general purpose decision support system. TPC-DS Version 2 enables emerging technologies, such as Big Data systems, to execute the benchmark.} Testbench implementation with a dataset of 30 GB, results averaged on 5 executions with machines with the following specifications and the following optimizations:
+\subsubsection{Comparison}
+
+A comparison has been set up in order to compare the capabilities of Hive with respect to SQL Server, using Hortonworks' TPC-DS\footnote{TPC Benchmark DS is a decision support benchmark that models several generally applicable aspects of a decision support system, including queries and data maintenance. The benchmark provides a representative evaluation of performance as a general purpose decision support system. TPC-DS Version 2 enables emerging technologies, such as Big Data systems, to execute the benchmark. Benchmark implementation: \href{https://github.com/hortonworks/hive-testbench}{https://github.com/hortonworks/hive-testbench}} Testbench implementation with a dataset of 30 GB, results averaged on 5 executions with machines with the following specifications and the following optimizations:
 \newline
 
 \begin{table}[!htb]
@@ -249,7 +251,7 @@ Note: Tez and Slider containers, as mentioned in the previous chapter don't actu
 
 For a total of 65 queries executed, Hive is faster (1.5 to 1200 times) for 38 of them, while SQL Server is better in 19 query executions (1.5 to 54 times), while the remaining 8 queries display similar performances, standing inside the neighbourhood of 1.5x ratio.
 
-Looking at the best results for both sides, we can see that Hive performs better with queries with many WHERE clauses and nested queries, while SQL Server performs better with queries with many GROUP BY, SORT BY and JOIN clauses.
+Looking at the best results for both sides, we can see that Hive performs better with queries with many WHERE clauses and nested queries, while SQL Server performs better with queries with many \texttt{GROUP BY}, \texttt{SORT BY} and \texttt{JOIN} clauses.
 
 \begin{table}[!htb]
     \begin{center}

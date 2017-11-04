@@ -33,7 +33,7 @@ A Live connection queries directly the data source, making the performances of t
 
 An Extract connection is a periodic query, which can be performed, for example, every day, which saves the results in a Tableau Data Extract file, which will be used for the following queries. The Extract may be considered a snapshot of the database and, for this very reason, any update in the database won't be seen until the next scheduled Extract File update. Even though the creation of an Extract File can take a long time, queries on it are very efficient because of its internal tabular structure, optimized for Tableau's own execution engine.
 
-\subsection{Visualization creation}
+\subsection{Views creation}
 
 Each field loaded from the data source is assigned of two roles: dimension or measure. A \textbf{dimension} is used for categorized or discrete information such as strings or dates, while a \textbf{measure} corresponds to numeric information, potentially object of aggregations. It's possible to change freely the roles of each field, according to the needs. Drag-n-drop allows to move dimensions and measures on both plots' axes and Tableau is able to automatically interpret the new layout, constructing a more significant chart.
 
