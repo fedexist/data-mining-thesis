@@ -132,7 +132,11 @@ In order to guarantee automatic fail-over, it's possible to use both an existing
 
 When there are multiple RMs, the configuration (\verb|yarn-site.xml|) used by clients and nodes is expected to list all the RMs. Clients, Application Masters and Node Managers try connecting to the RMs in a round-robin fashion until they hit the Active RM. If the Active goes down, they resume the round-robin polling until they hit the “new” Active. This retry logic can be overridden by a user-specified fail-over provider.
 
-\subsection{Node Manager \& Application Manager}
+\subsection{Node Manager}
+
+The \textbf{Node Manager} is the slave component in YARN architecture and is responsible for launching and managing containers on a node. The Node Manager runs services to determine the health of the node it is executing on. The services perform checks on the disk as well as any user specified tests. If any health check fails, the Node Manager marks the node as unhealthy and communicates this to the Resource Manager, as part of the heartbeat between the NM and the RM, which then stops assigning containers to the node.
+
+Just like the Resource Manager, the Node Manager has a \textbf{work-preserving restart} feature, that enables the Node Manager to be restarted without losing the active containers running on the node. At a high level, the NM stores any necessary state to a local state-store as it processes container-management requests. When the NM restarts, it recovers by first loading state for various subsystems and then letting those subsystems perform recovery using the loaded state. 
 
 \pagebreak
 \section{SQL: Hive}
