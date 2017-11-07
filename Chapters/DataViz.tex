@@ -21,7 +21,7 @@ Tableau is structured in a Microsoft Excel fashion, with workbooks and sheets: a
 
 \subsection{Data Source}
 
-The first step during the creation of a workbook is to link Tableau to a data source \cite{data_tableau}, either through a \textbf{File Connection}, which supports all of the main data formats available such as JSON, CSV, TSV, PDF and Excel sheets, or a \textbf{Server Connection}, to relational databases, such as Microsoft SQL Server and Hive, NoSQL databases, such as MongoDB or Cassandra, and data sources in cloud, such as Google Analytics, Amazon Redshift and Salesforce. If there's no optimized built-in driver, it's possible to use any ODBC\footnote{ODBC: Open DataBase Connectivity is a standard API to access DBMS} driver. Any interaction with a data source is handled by default with \textbf{VizQL} (Visual Query Language), which translates all of the drag-n-drop actions executed in the GUI to adequate queries to the data source, in order to get the desired results available for visualization.
+The first step during the creation of a workbook is to link Tableau to a data source \cite{LearningTableau}, either through a \textbf{File Connection}, which supports all of the main data formats available such as JSON, CSV, TSV, PDF and Excel sheets, or a \textbf{Server Connection}, to relational databases, such as Microsoft SQL Server and Hive, NoSQL databases, such as MongoDB or Cassandra, and data sources in cloud, such as Google Analytics, Amazon Redshift and Salesforce. If there's no optimized built-in driver, it's possible to use any ODBC\footnote{ODBC: Open DataBase Connectivity is a standard API to access DBMS} driver. Any interaction with a data source is handled by default with \textbf{VizQL} (Visual Query Language), which translates all of the drag-n-drop actions executed in the GUI to adequate queries to the data source, in order to get the desired results available for visualization.
 
 Tableau's connection to a data source is available in two different kinds: Live and Extract.
 
@@ -52,7 +52,7 @@ Additional elements useful in a chart creation are \textit{parameters}, which al
     \begin{center}
         \includegraphics[width=0.8\linewidth]{Figures/TableCalculation.png}
     \end{center}
-    \caption{Execution flow of a table calculation \protect\cite{tableauFlow_image}.}
+    \caption{Execution flow of a table calculation \protect\cite{LearningTableau}.}
     \label{fig:TableCalculation}
 \end{figure}
 
@@ -67,7 +67,7 @@ Tableau gives the user the possibility to use a great variety of operations, but
 
 \subsubsection{Analysis}
 
-Another innovative feature present in Tableau is the possibility to make statistical analyses through mathematical models built-in or use algorithms written in \textbf{R, Python or MatLab} \cite{analisi_tableau}. The main built-in models usable in Tableau are:
+Another innovative feature present in Tableau is the possibility to make statistical analyses through mathematical models built-in or use algorithms written in \textbf{R, Python or MatLab} \cite{LearningTableau}. The main built-in models usable in Tableau are:
 
 \begin{itemize}
     \item \textbf{Trend lines}: each trend line added to a chart represents a regression, which Tableau builds according to linear, logarithmic, exponential or polynomial models.

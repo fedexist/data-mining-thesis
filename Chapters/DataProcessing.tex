@@ -74,7 +74,7 @@ The \textbf{Job Tracker} is also responsible for the framework fault tolerance, 
 Conceived as a general multiplatform engine, Spark can run as standalone, on YARN or on Apache Mesos; can access data from standard File Systems, from HDFS or any distributed database and can be used for Batch Processing, Graph Processing (thanks to GraphX plugin) or Stream Processing.
 \\
 \\
-The problem the sparked its creation was MapReduce's inefficiency in applications that use the same working set of data on multiple parallel operations, among which are included: iterative machine learning algorithms and interactive data analysis tools\cite{Zaharia:2010:SCC:1863103.1863113}; Spark's aim is to support such applications while providing scalability and fault tolerance.
+The problem that sparked its creation was MapReduce's inefficiency in applications that use the same working set of data on multiple parallel operations, among which are included: iterative machine learning algorithms and interactive data analysis tools \cite{Zaharia:2010:SCC:1863103.1863113}; Spark's aim is to support such applications while providing scalability and fault tolerance.
 \\
 In order to do that, Spark uses a typical architecture with a \textbf{Driver Program} that runs the developer application's main() and executes parallel task on the clusters and its main abstraction: Resilient Distributed Dataset (RDD).
 \\
