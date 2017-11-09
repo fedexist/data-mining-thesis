@@ -49,6 +49,15 @@ This paradigm emphasizes the continuous flow of data between operators, defined 
 
 MapReduce is a framework, part of Apache Hadoop, named after its algorithm, engined to be run on YARN to deploy applications able to process data in batches from HDFS or distributed databases. \\
 
+\subsection{Structure}
+The framework's management is handled by two tracker components, the \textbf{Job Tracker} who acts as a master and the \textbf{Task Trackers} who run on the single nodes, act as slaves and carry out the tasks issued by the \textbf{Job Tracker}.
+
+The \textbf{Job Tracker} manages available resource and the MapReduce job's lifecycle.\\ It is responsible for the load distribution using a Data Locality policy, so that nodes are chosen to process data present in their file system if possible or at least from a machine in the same rack. This way the overhead caused by the sending of data is minimised.
+\\
+The \textbf{Job Tracker} is also responsible for the framework fault tolerance, checks the liveness of tasks and nodes and reschedules failed tasks.
+
+\subsection{Process Flow}
+
 A MapReduce job usually involves six steps:
 
 \begin{enumerate}
@@ -60,11 +69,6 @@ A MapReduce job usually involves six steps:
 	\item \textbf{Output handling}: The framework collects all outputs from Reduce nodes and writes it onto HDFS or a DB, usually the same whence the input data set came
 \end{enumerate}
 
-The framework's management is handled by two tracker components, the \textbf{Job Tracker} who acts as a master and the \textbf{Task Trackers} who run on the single nodes, act as slaves and carry out the tasks issued by the \textbf{Job Tracker}.
-
-The \textbf{Job Tracker} manages available resource and the MapReduce job's lifecycle.\\ It is responsible for the load distribution using a Data Locality policy, so that nodes are chosen to process data present in their file system if possible or at least from a machine in the same rack. This way the overhead caused by the sending of data is minimised.
-\\
-The \textbf{Job Tracker} is also responsible for the framework fault tolerance, checks the liveness of tasks and nodes and reschedules failed tasks.
  \pagebreak
  
 \section{Apache Spark} \label{Spark}
@@ -79,7 +83,61 @@ The problem that sparked its creation was MapReduce's inefficiency in applicatio
 In order to do that, Spark uses a typical architecture with a \textbf{Driver Program} that runs the developer application's main() and executes parallel task on the clusters and its main abstraction: Resilient Distributed Dataset (RDD).
 \\
 \\
+\subsection{Resilient Distributed Dataset}
 RDD is a collection of elements partitioned across the cluster's nodes in a fault tolerant way that can be processed in parallel, persisted in memory to be used iteratively and efficiently by parallel operations; an RDD is usually instantiated from an input file loaded from HDFS or a distributed database; operations are then processed on it through classical Map, Filter and Reduce functions, a series of these operations will produce a graph with the execution planned called \textbf{lineage}, from the \textbf{lineage} an RDD can be reinstated to its proper state even after failure.
+Beside these features RDD also has the following traits:
+\begin{itemize}
+	\item In-Memory, data inside RDD is stored for as long and as much as possible in memory (RAM), as opposed to the disk-oriented methods of MapReduce.
+	\item Immutable, RDDs do not change once created, and can only be transformed through the instantiation of a new RDD.
+	\item Lazily evaluated, data inside RDD is not available nor transformed until an action is executed that requires access to those data.
+	\item Cacheable, data can be held in a persistent storage like memory or, worse comes to worst, disk.
+	\item Parallel, RDD process data in parallel.
+	\item Typed, RDD records have types such as Int or String.
+	\item Partitioned, records are partitioned and distributed across several nodes.
+\end{itemize}
+
+\subsection{Extensions}
+\subsubsection{GraphX}
+
+GraphX is an extension of Spark for graphs and graph analysis. GraphX extends RDD adding a Graph abstraction implemented as a directed multigraph with properties attached to both vertices and edges and exposes typical graph operators, while also providing an optimized variant of the Pregel API.
+
+\paragraph{Property Graph}
+
+The Graph abstraction, or property graph is a directed multigraph with properties attached to each vertex and edge defined by the developer. A directed multigraph is defined as a directed graph where more than one edge can connect two nodes, as two nodes might have multiple relationships with different properties, (i.e. Annie and Barb are both colleagues and friends). \\ \\
+Property graphs, like RDDs, are immutable and to transform them a new one must be instantiated from the former through an operation, they are distributed across executors using vertex partitioning heuristics and are fault-tolerant thanks to the same lineage mechanism seen in RDDs.
+
+\paragraph{Graph Operations}
+
+Graphs implement several operators that can be divided in three classes
+
+\begin{itemize}
+	\item Property Operators: The Graph equivalent to RDD map, with the difference that you can choose to run map over the vertices, the edges, or the <source node, edge, destination node> triplets , to modify the properties of said components.
+	\item Structural Operators: Which act on the topology of the graph, an example would be reverse which, from a Graph, returns a new Graph where all edges' directions are reversed.
+	\item Join Operators: Used to join properties from different graphs or from external collections like RDDs.
+\end{itemize}
+
+
+\subsubsection{SparkStreaming}
+
+SparkStreaming in an extension of Spark developed to enable live data stream processing in the falut-tolerant and highly scalable framework provided by Spark while maintaining a high throughput.
+The ingested stream source can be any major Apache source like Kafka, Flume and Nifi; other streams like Amazon Kinesis, File Systems like HDFS or S3 and TCP sockets.
+The stream can be processed through the high-level functions like map, reduce and join and finally output to File System and Distributed Databases.
+
+\paragraph{DStream}
+
+DStream, short for Discretized Stream, is the main abstraction introduced by SparkStreaming, which represents a continuous stream of data. \\
+As for RDDs, DStreams can be instantiated from a stream source like Kafka, Flume and Kinesis, or by applying a transformation on another DStream like map. As it stands DStreams are in fact sequences of RDDs, maintaining therefore their properties of being Distributed and Fault-Tolerant.
+\\ \\
+Internally a continuous stream of data, splits the live flow into mini batches which are then sent to the Spark Engine that can then process them as batches and output them to processed batches as previously seen.
+
+\subsubsection{MLlib}
+
+Machine Learning Library, or MLlib for short is a set of APIs for Spark that expose several tools for Machine Learning using Spark as a backend taking advantage of Spark's efficiency in iterative algorithms.
+
+\\
+
+MLlib exposes a selection of Machine Learning algorithms for classification, regression, creation of decision trees and random forest, recommendation, clustering, topic modelling and pattern mining.
+It also offers other tools to transform features, to handle datasets and hyperparameters and to make computation with distributed linear algebra and statistics.
 
 \pagebreak
 \section{Apache Flink}\label{Flink}
