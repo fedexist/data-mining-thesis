@@ -81,8 +81,7 @@ Conceived as a general multiplatform engine, Spark can run as standalone, on YAR
 The problem that sparked its creation was MapReduce's inefficiency in applications that use the same working set of data on multiple parallel operations, among which are included: iterative machine learning algorithms and interactive data analysis tools \cite{Zaharia:2010:SCC:1863103.1863113}; Spark's aim is to support such applications while providing scalability and fault tolerance.
 \\
 In order to do that, Spark uses a typical architecture with a \textbf{Driver Program} that runs the developer application's main() and executes parallel task on the clusters and its main abstraction: Resilient Distributed Dataset (RDD).
-\\
-\\
+
 \subsection{Resilient Distributed Dataset}
 RDD is a collection of elements partitioned across the cluster's nodes in a fault tolerant way that can be processed in parallel, persisted in memory to be used iteratively and efficiently by parallel operations; an RDD is usually instantiated from an input file loaded from HDFS or a distributed database; operations are then processed on it through classical Map, Filter and Reduce functions, a series of these operations will produce a graph with the execution planned called \textbf{lineage}, from the \textbf{lineage} an RDD can be reinstated to its proper state even after failure.
 Beside these features RDD also has the following traits:
@@ -133,8 +132,6 @@ Internally a continuous stream of data, splits the live flow into mini batches w
 \subsubsection{MLlib}
 
 Machine Learning Library, or MLlib for short is a set of APIs for Spark that expose several tools for Machine Learning using Spark as a backend taking advantage of Spark's efficiency in iterative algorithms.
-
-\\
 
 MLlib exposes a selection of Machine Learning algorithms for classification, regression, creation of decision trees and random forest, recommendation, clustering, topic modelling and pattern mining.
 It also offers other tools to transform features, to handle datasets and hyperparameters and to make computation with distributed linear algebra and statistics.
