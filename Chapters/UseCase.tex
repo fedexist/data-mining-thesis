@@ -14,9 +14,99 @@ All of these VMs are part of an \textbf{Hortonworks} cluster featuring HDP 2.6.1
 
 The cluster has been made secure by the gatekeeping provided by Knox and the fact that access is only possible through the front-end machine, accessible only via passwordless SSH by operators and developers, which additionally implements iptables as firewall for prevent access to unwanted ports from external request.
 
-Note: additional 10 VMs have been provisioned in the same environment for a \textbf{MongoDB} cluster, used as an additional data sink after Flink processing.
+\textbf{Note:} additional 10 VMs have been provisioned in the same environment for a MongoDB cluster, used as an additional data sink after Flink processing.
 
 \section{Deployment \& Operations}
+
+As mentioned, the virtualised cluster has been provisioned in a \href{https://www.microsoft.com/it-it/cloud-platform/windows-azure-pack}{Azure Pack Cloud-On-Premise} environment, which allows to automate the virtual machines creation and management through \textbf{Azure Powershell} tools and its set of \textbf{cmdlets}\footnote{A \textit{cmdlet} is a lightweight command that is used in the Windows PowerShell environment within the context of automation scripts that are provided at the command line, executing an action and returning a Microsoft .NET Framework object to the next command in the pipeline.} to create, remove and, in general, manage Virtual Machine and their allocated resources.
+
+\subsection{Hadoop Cluster Deployment}
+
+After the virtualised cluster creation, Hadoop and other cluster services need to be installed. In order to do that, as a way to streamline a cluster installation, \textbf{Hortonworks HDP 2.6.1} hadoop distribution has been chosen (with Hadoop 2.7.3.2.6.1.0-129, from Hortonworks repositories), rather than installing all of the hadoop services one-by-one. When it comes to the cluster installation, HDP main feature is \textbf{Apache Ambari}\footnote{\href{https://ambari.apache.org/}{Apache Ambari} is a software for provisioning, managing, and monitoring Apache Hadoop clusters, providing an intuitive, easy-to-use Hadoop management web UI backed by its RESTful APIs.} and its Blueprint REST interface for a cluster installation which can be made through a single REST call. For this very reason, a script suite called \textbf{hw-install}\footnote{\href{https://github.com/fedexist/hw-install}{hw-install} is Python 2.7 script suite to automate an Hortonworks cluster installation} has been developed to take advantage of that functionality and automate the cluster preparation and configuration, before the actual deployment.
+
+\textbf{hw-install} is composed of two main packages: \texttt{hw\_install} and \texttt{\justify{hw\_add\_new\_host}}, while the first one handles the installation of an entire cluster given a proper configuration in YAML format, the second one handles the preparation of a new host to be added to an existing cluster via the Ambari Server UI.
+
+Both packages use the same core components for the preparation of cluster hosts:
+
+\begin{itemize}
+    \item Set-up of \textbf{passwordless SSH} communication between hosts with a common RSA key identifying the user executing \texttt{hw\_install}, by default and as recommended by Hortonworks Setup guide the user is \textbf{root};
+    \item Increase of the number of \textbf{file descriptors} available in the system;
+    \item Installation of the \textbf{NTP} (Network Time Protocol) service, for hosts time synchronization;
+    \item Disabling of \textbf{firewall and SELinux}, in order to allow hosts to communicate freely between each other;
+    \item Set-up of \textbf{hostnames, FQDNs}\footnote{Fully Qualified Domain Name} \textbf{and DNSs};
+    \item Installation on the selected host of the \textbf{Ambari Server}, together with the Ambari Agents, on all of the hosts
+\end{itemize}
+
+In addition, \texttt{hw\_install} actually uses \textbf{Ambari Blueprint} interface, passing the configuration file containing the needed services and their per-component configuration, if any (in absence of this per-component configuration, Ambari will apply default values), and then making a REST call to the Ambari Server which will take care of the installation of the needed components on the selected hosts.
+\\\\
+An example of a configuration file is:
+
+\begin{minted}[breaklines, breakafter="ambari/"]{YAML}
+cluster-name: cluster_name
+blueprint-name: blueprint_name
+ambari-repo: http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.5.1.0/ambari.repo
+Blueprints: # HDP version to be installed
+    stack_name: HDP
+    stack_version: 2.6
+ambari-server: # Host where Ambari Server will be installed
+    IP: 192.168.1.1
+    FQDN: master.localdomain
+hosts: # Other hosts in the cluster
+    - IP: 192.168.1.2
+      FQDN: slave.localdomain
+host-groups:
+    - name: master
+    hosts: # Hosts belonging to the 'master' host group
+        - fqdn: master.localdomain
+    components: # Services to be installed in 'master' host group
+        - name: YARN_CLIENT
+        - name: HDFS_CLIENT
+        - name: HIVE_SERVER
+        - name: HIVE_METASTORE
+        - name: NAMENODE
+        - name: ZOOKEEPER_CLIENT
+        - name: RESOURCE_MANAGER
+        - name: WEBHCAT_SERVER
+        - name: ZOOKEEPER_SERVER
+        - name: AMBARI_SERVER
+.....
+\end{minted}
+
+Once a cluster has been installed, it's easy to add another host to the cluster, using \texttt{hw\_add\_new\_host}: after adding the appropriate \texttt{new-hosts} entries to the configuration file of the cluster, executing this script allows to set-up the host before manually adding it to the cluster from the Ambari Server UI, where it's possible to select the new services to be installed.
+
+\subsection{Flink \& Cassandra Deployment}
+
+For the current use case, it's been chosen to use Flink running on top of YARN, so that there's no need to set up a standalone Flink cluster with its own configuration. In order to use Flink, it's then necessary to download the sources of the needed version, 1.4.0 in this case, and compile it against the hadoop version which was installed and selecting, if needed, the Scala version which is going to be used while developing the Flink applications.\\
+\\
+Cassandra deployment is rather straightforward, since, starting from a common \texttt{\justify{cassandra.yaml}} configuration file where all of the nodes have been noted as cluster \texttt{seeds}, it's possible, after importing its repository, to install it directly from CentOS package manager as a system daemon/service.
+
+\subsection{Deployed Software \& Versions}
+
+To sum up, the cluster has been provisioned with HDP 2.6.1, which includes:
+\begin{itemize}
+    \item Hadoop 2.7.3.2.6.1.0-129 (HDFS, YARN and MapReduce),
+    \item Tez 0.7.0,
+    \item Hive 1.2.1000, 
+    \item ZooKeeper 3.4.6,
+    \item Kafka 0.10.1,
+    \item Knox 0.12.0,
+    \item Ranger 0.7.0,
+    \item Spark 2.1.1,
+    \item NiFi 1.2.0,
+    \item Registry 0.3.0,
+    \item Slider 0.92.0.
+\end{itemize}
+
+In addition, it's been used Flink 1.4.0 for Scala 2.11 compiled from sources against hadoop 2.7.3.2.6.1.0-129 and Cassandra 3.11.
+\\
+\\
+The cluster is composed of seven machines:
+\begin{itemize}
+    \item \texttt{frontend}, with Knox and a Nginx reverse proxy installed, used as single point of entry for developers and cluster operators to access cluster services via SSH tunneling. Specifications: 1 core, 512 MB of RAM.
+    \item \texttt{master-1}, one of the two master components of the cluster, with an HDFS Namenode, a Zookeeper Server, a Registry MySQL database, a Kafka Broker, Hive Metastore and HiveServer 2 Interactive (support for Hive LLAP daemons), Ranger Admin and UserSync, a NiFi node and Spark2 History Server. Specifications: 4 core, 12 GB of RAM.
+    \item \texttt{master-2}, the other master component of the cluster, with the YARN Resource Manager and App Timeline Server, HDFS Secondary Namenode, a Zookeeper Server, a WebHCat Server and HiveServer2 for Hive, a Kafka Broker, a Nifi node, MapReduce2 History Server and Flink binaries. Specifications: 4 core, 12 GB of RAM.
+    \item Four slave machines, slave-1, slave-2, slave-3, slave-4, with a YARN Node Manager, HDFS DataNode and Cassandra nodes. Specifications: 4 core, 6 GB of RAM.
+\end{itemize}
 
 \section{Development}
 
