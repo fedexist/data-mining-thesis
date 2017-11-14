@@ -22,155 +22,34 @@ As mentioned, the virtualised cluster has been provisioned in a \href{https://ww
 
 \subsection{Hadoop Cluster Deployment}
 
-After the virtualised cluster creation, Hadoop and other cluster services need to be installed. In order to do that, as a way to streamline a cluster installation, \textbf{Hortonworks HDP 2.6.1} hadoop distribution has been chosen (with Hadoop 2.7.3.2.6.1.0-129, from Hortonworks repositories), rather than installing all of the hadoop services one-by-one. When it comes to the cluster installation, HDP main feature is \textbf{Apache Ambari}\footnote{\href{https://ambari.apache.org/}{Apache Ambari} is a software for provisioning, managing, and monitoring Apache Hadoop clusters, providing an intuitive, easy-to-use Hadoop management web UI backed by its RESTful APIs.} and its Blueprint REST interface for a cluster installation which can be made through a single REST call. For this very reason, a script suite called \textbf{hw-install}\footnote{\href{https://github.com/fedexist/hw-install}{hw-install} is Python 2.7 script suite to automate an Hortonworks cluster installation} has been developed to take advantage of that functionality and automate the cluster preparation and configuration, before the actual deployment.
-
-\textbf{hw-install} is composed of two main packages: \texttt{hw\_install} and \texttt{\justify{hw\_add\_new\_host}}, while the first one handles the installation of an entire cluster given a proper configuration in YAML format, the second one handles the preparation of a new host to be added to an existing cluster via the Ambari Server UI.
-
-Both packages use the same core components for the preparation of cluster hosts:
-
-\begin{itemize}
-    \item Set-up of \textbf{passwordless SSH} communication between hosts with a common RSA key identifying the user executing \texttt{hw\_install}, by default and as recommended by Hortonworks Setup guide the user is \textbf{root};
-    \item Increase of the number of \textbf{file descriptors} available in the system;
-    \item Installation of the \textbf{NTP} (Network Time Protocol) service, for hosts time synchronization;
-    \item Disabling of \textbf{firewall and SELinux}, in order to allow hosts to communicate freely between each other;
-    \item Set-up of \textbf{hostnames, FQDNs}\footnote{Fully Qualified Domain Name} \textbf{and DNSs};
-    \item Installation on the selected host of the \textbf{Ambari Server}, together with the Ambari Agents, on all of the hosts
-\end{itemize}
-
-In addition, \texttt{hw\_install} actually uses \textbf{Ambari Blueprint} interface, passing the configuration file containing the needed services and their per-component configuration, if any (in absence of this per-component configuration, Ambari will apply default values), and then making a REST call to the Ambari Server which will take care of the installation of the needed components on the selected hosts.
-\\\\
-An example of a configuration file is:
-
-\begin{minted}[breaklines, breakafter="ambari/"]{YAML}
-cluster-name: cluster_name
-blueprint-name: blueprint_name
-ambari-repo: http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.5.1.0/ambari.repo
-Blueprints: # HDP version to be installed
-    stack_name: HDP
-    stack_version: 2.6
-ambari-server: # Host where Ambari Server will be installed
-    IP: 192.168.1.1
-    FQDN: master.localdomain
-hosts: # Other hosts in the cluster
-    - IP: 192.168.1.2
-      FQDN: slave.localdomain
-host-groups:
-    - name: master
-    hosts: # Hosts belonging to the 'master' host group
-        - fqdn: master.localdomain
-    components: # Services to be installed in 'master' host group
-        - name: YARN_CLIENT
-        - name: HDFS_CLIENT
-        - name: HIVE_SERVER
-        - name: HIVE_METASTORE
-        - name: NAMENODE
-        - name: ZOOKEEPER_CLIENT
-        - name: RESOURCE_MANAGER
-        - name: WEBHCAT_SERVER
-        - name: ZOOKEEPER_SERVER
-        - name: AMBARI_SERVER
-.....
-\end{minted}
-
-Once a cluster has been installed, it's easy to add another host to the cluster, using \texttt{hw\_add\_new\_host}: after adding the appropriate \texttt{new-hosts} entries to the configuration file of the cluster, executing this script allows to set-up the host before manually adding it to the cluster from the Ambari Server UI, where it's possible to select the new services to be installed.
+\input{HadoopClusterDeploymentUseCase}
 
 \subsection{Flink \& Cassandra Deployment}
 
-For the current use case, it's been chosen to use Flink running on top of YARN, so that there's no need to set up a standalone Flink cluster with its own configuration. In order to use Flink, it's then necessary to download the sources of the needed version, 1.4.0 in this case, and compile it against the hadoop version which was installed and selecting, if needed, the Scala version which is going to be used while developing the Flink applications.\\
-\\
-Cassandra deployment is rather straightforward, since, starting from a common \texttt{\justify{cassandra.yaml}} configuration file where all of the nodes have been noted as cluster \texttt{seeds}, it's possible, after importing its repository, to install it directly from CentOS package manager as a system daemon/service.
+\input{FlinkCassandraDeploymentUseCase}
 
 \subsection{Deployed Software \& Versions}
 
-To sum up, the cluster has been provisioned with HDP 2.6.1, which includes:
-\begin{itemize}
-    \item Hadoop 2.7.3.2.6.1.0-129 (HDFS, YARN and MapReduce),
-    \item Tez 0.7.0,
-    \item Hive 1.2.1000, 
-    \item ZooKeeper 3.4.6,
-    \item Kafka 0.10.1,
-    \item Knox 0.12.0,
-    \item Ranger 0.7.0,
-    \item Spark 2.1.1,
-    \item NiFi 1.2.0,
-    \item Registry 0.3.0,
-    \item Slider 0.92.0.
-\end{itemize}
-
-In addition, it's been used Flink 1.4.0 for Scala 2.11 compiled from sources against hadoop 2.7.3.2.6.1.0-129 and Cassandra 3.11.
-\\
-\\
-The cluster is composed of seven machines:
-\begin{itemize}
-    \item \texttt{frontend}, with Knox and a Nginx reverse proxy installed, used as single point of entry for developers and cluster operators to access cluster services via SSH tunneling. Specifications: 1 core, 512 MB of RAM.
-    \item \texttt{master-1}, one of the two master components of the cluster, with an HDFS Namenode, a Zookeeper Server, a Registry MySQL database, a Kafka Broker, Hive Metastore and HiveServer 2 Interactive (support for Hive LLAP daemons), Ranger Admin and UserSync, a NiFi node and Spark2 History Server. Specifications: 4 core, 12 GB of RAM.
-    \item \texttt{master-2}, the other master component of the cluster, with the YARN Resource Manager and App Timeline Server, HDFS Secondary Namenode, a Zookeeper Server, a WebHCat Server and HiveServer2 for Hive, a Kafka Broker, a Nifi node, MapReduce2 History Server and Flink binaries. Specifications: 4 core, 12 GB of RAM.
-    \item Four slave machines, slave-1, slave-2, slave-3, slave-4, with a YARN Node Manager, HDFS DataNode and Cassandra nodes. Specifications: 4 core, 6 GB of RAM.
-\end{itemize}
+\input{DeployedSoftwareUseCase}
 
 \section{Development}
 
 \subsection{Ingestion}
 
+\input{IngestionUseCase}
+
 \subsection{Processing}
 
+\input{ProcessingUseCase}
+
 \subsection{Serving \& Security}
-Our infrastructure's security is handled on several layers by a variety of services striving to offer access on data and visualisations to the users and to let the developers maintain and upgrade the system while providing extensive security on the data and protection from unauthorized access.
 
-\\
-% Picture of the security diagram
-\\
+\input{ServingSecurityUseCase}
 
-We have structured the Security and Serving architecture through two main abstractions: the \textbf{cluster} and the \textbf{flows}.
-\subsubsection{Cluster}
-The \textbf{cluster} is our whole Big Data Infrastructure comprised of several nodes which for our purposes are divided as such:
-\begin{itemize}
-	\item One (or two in High Availability) Domain Controller, which handles user creation, update and authentication.
-	\item One (or two in High Availability) Front End node, which manages access to the cluster's services and data.
-	\item Several Inner Cluster nodes, the machines on which visualising, processing and storing is actually done.
-\end{itemize}
-
-\paragraph{Domain Controller}
-The Domain Controller is not accessible from outside the cluster and can communicate freely with the Front End and the Inner Cluster Nodes.\\
-It hosts Active Directory, a directory service by Microsoft comprised of several components for domain and security management such as LDAP, Kerberos, and DNS.\\ \\
-As a directory service, the Active Directory instance consists of a database containing an hierarchy of objects, objects are a very high abstraction that can represent a variety of things, but for our purposes can either be Users or Groups; Groups contain one or more Users and Users may be part of one or more Groups. \\Users are identified by a username and a strong password, thus the Domain Controller can authenticate an Agent thanks to this information. \\
-Through LDAP, authorized Users can access and modify Objects in the Active Directory. Each authentication, whether failed or successful is logged.\\ \\
-We have defined two groups: cluster\_users and cluster\_operators, the meaning of which is further specified down the line by each layer of protection.
-
-\paragraph{Front End}
-The Front End node is the only machine accessible from outside the cluster and can communicate with the Domain Controller and the Inner Cluster nodes. \\
-Access to the Front End from outside is possible through a selected number of ports and only with secure protocols (HTTPS, FTPS and SSH), this is obtained with the use of ACLs, implemented on CentOS through iptables. The Front End features Apache Knox and Nginx to route requests to the right services and stores RSA private keys of all the Inner Cluster nodes plus a public one for each developer's own private key, so that passwordless SSH connections can be established from developers' machines to Front End and from Front End to Inner Cluster nodes. \\
-\\
-Nginx is a HTTP and HTTPS reverse proxy that also supports TCP reverse proxying and can be used to route whatever HTTP request or TCP connection from the Front End machine to the proper Inner Cluster node's service. \\
-\\
-Apache Knox also serves as a reverse proxy, this time specifically for Hadoop cluster's services requiring authentication and authorization. Its topology is implemented so that an authorised Active Directory user called Knox.domain through LDAP can ask for authentication on an incoming request's sender and access to lists of Users and Groups.\\ If the user is authenticated, Knox can then grant access to the request, thanks to the information on Users and Groups, to the target service and route it accordingly or deny it. \\ Outcoming requests are bundled with the authenticated username, so that inside the Inner Cluster nodes other services can use that information securely. Requests at this stage are logged both denied and accepted with the name of the alleged requester to be investigated in case of failures or attempted breaches.\\ \\
-The topology is set so that all our custom services for access to MongoDB and Hive are available to all users belonging to the cluster\_users or cluster\_operators group, while the standard Hadoop services are available only to those in the latter.
-\\
-\\
-The Front End machine also hosts programs for data ingestion, an FTPS server and a NodeJS application that serves the WebApp.
-
-\paragraph{Inner Cluster Nodes}
-All the other nodes in the Cluster are considered Inner nodes as they are barred from outside and can only communicate with the Domain Controller and the Front End. \\
-These machines hold all processing services, databases and visualisation tools plus the interfaces to access their resources. Here requests incoming from the Front End have been already authenticated and given access, but each service can enact additional policies on those to add a layer of security and to protect from mistakes (i.e. DROP DATABASE). \\ \\
-While each service might manage its own policies, most Hadoop applications delegate this burden to Apache Ranger: Ranger, thanks to its Usersync agent synchronises its list of Users and Groups with the Active Directory's one, so that further authorisation policies can be defined on the same cluster\_users and cluster\_operators seen before. \\ \\
- Thus we have decided to give users in cluster\_users clearance for the use of SELECT on our Air-Traffic database, while deletions are forbidden to them, on the other end users in cluster\_operators are also able to update and delete records.
-\\ At this level requests are logged again, to log failed authorisations and to assign actions' responsibilities to the appropriate users.
-
-\subsubsection{Flow}
-We define the flow, in the context of the security of our system, as the path requests and responses travel from a class of external Actors to the cluster and back.
-\\ \\
-In general the flow starts from an Actor outside the cluster sending a request (i.e. A User through a MobileApp), the request is received by the Front End Node, accepted or denied; accepted requests are then forwarded and routed to the target Inner Node's service which handles the request and generates a response accordingly, the response is then set back following the same path backwards to the Actor.
-\\ \\
-We have distinguished three different flows each pertaining to a different Actor:
-\paragraph{User}
-A user, which is a person or agent requesting access to our stored data, can query our databases and view visualisations built upon stored data service through a WebApp or a Mobile App.\\
-Queries are sent to our custom REST APIs to Knox on the Front End machine; the user, who must be present in Active Directory and be part of cluster\_users, is authenticated and authorised to proceed with its request, this request now routed to the Inner Cluster is received by our REST servers, parsed into queries and sent to the appropriate database with the user's credentials, the query is received by MongoDB security or Apache Ranger for Hive, whatever the recipient its policies are enforced on the request; the result of the query is then sent back to the REST server which encapsulate it and send it back as a response to the user.
-\\ \\
-Visualisations are requested to the WebApp from outside the cluster, the WebApp requires a login for authentication an then authorises the user following its own policies as a Tableau user or operator, the WebApp then requests tokens to be consumed watching visualisations on behalf of the user and then responds with a HTML page embedding the visualisations and tokens. This method prevents the need of having to authenticate the same users multiple times.
-\paragraph{Developer}
-While able to access the cluster as clients, the developers can also connect to the Front End through a SSH client provided they have the Front End private key as username and password are disabled, while connected they can further their connections to all nodes to access the local file system. What's more, through tunneling several TCP connections can be forwarded through the SSH connection from the developer localhost to the Front End machine; there Nginx routes Front End local connections to several clusters' machines, providing a safe passage from the developer's machine to the required Dashboard or User Interface.
-\paragraph{Data Source}
-Lastly Data Sources must be able to send data to our secured clusters to be stored on the databases, in order to do that two options are available: an application on the Front End can pull data constantly on an endpoint (for example through HTTPS) or the providers can push data on a server on the Front End (for example through FTPS), then another application is responsible to transfer newly acquired data from the Front End to the Inner Cluster Nodes
 \subsection{Accessory Services}
 
-\subsection{Visualization}
+\input{AccessoryServicesUseCase}
+
+\subsection{Visualisation}
+
+\input{VisualisationUseCase}
