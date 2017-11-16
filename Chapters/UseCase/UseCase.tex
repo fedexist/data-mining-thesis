@@ -14,42 +14,26 @@ All of these VMs are part of an \textbf{Hortonworks} cluster featuring HDP 2.6.1
 
 The cluster has been made secure by the gatekeeping provided by Knox and the fact that access is only possible through the front-end machine, accessible only via passwordless SSH by operators and developers, which additionally implements iptables as firewall for prevent access to unwanted ports from external request.
 
-\textbf{Note:} additional 10 VMs have been provisioned in the same environment for a MongoDB cluster, used as an additional data sink after Flink processing.
+\textbf{Note:} additional 10 VMs have been provisioned in the same environment for a MongoDB cluster, used as an additional data sink after Flink processing. An additional Windows Server 2012 machine has been provisioned to host the domain controller for the cluster.
 
 \section{Deployment \& Operations}
 
 As mentioned, the virtualised cluster has been provisioned in a \href{https://www.microsoft.com/it-it/cloud-platform/windows-azure-pack}{Azure Pack Cloud-On-Premise} environment, which allows to automate the virtual machines creation and management through \textbf{Azure Powershell} tools and its set of \textbf{cmdlets}\footnote{A \textit{cmdlet} is a lightweight command that is used in the Windows PowerShell environment within the context of automation scripts that are provided at the command line, executing an action and returning a Microsoft .NET Framework object to the next command in the pipeline.} to create, remove and, in general, manage Virtual Machine and their allocated resources.
 
-\subsection{Hadoop Cluster Deployment}
+\input{Chapters/UseCase/HadoopClusterDeployment}
 
-\input{HadoopClusterDeploymentUseCase}
+\input{Chapters/UseCase/FlinkCassandraDeployment}
 
-\subsection{Flink \& Cassandra Deployment}
-
-\input{FlinkCassandraDeploymentUseCase}
-
-\subsection{Deployed Software \& Versions}
-
-\input{DeployedSoftwareUseCase}
+\input{Chapters/UseCase/DeployedSoftware}
 
 \section{Development}
 
-\subsection{Ingestion}
+\input{Chapters/UseCase/Ingestion}
 
-\input{IngestionUseCase}
+\input{Chapters/UseCase/Processing}
 
-\subsection{Processing}
+\input{Chapters/UseCase/ServingSecurity}
 
-\input{ProcessingUseCase}
+\input{Chapters/UseCase/AccessoryServices}
 
-\subsection{Serving \& Security}
-
-\input{ServingSecurityUseCase}
-
-\subsection{Accessory Services}
-
-\input{AccessoryServicesUseCase}
-
-\subsection{Visualisation}
-
-\input{VisualisationUseCase}
+\input{Chapters/UseCase/Visualisation}

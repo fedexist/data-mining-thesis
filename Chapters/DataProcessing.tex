@@ -180,8 +180,7 @@ stats.addSink(new RollingSink(path))
 
 \begin{figure}[h]
 	\centering
-	\def\svgwidth{\columnwidth}
-	\input{Figures/dataflow.pdf_tex}
+	\includegraphics[scale=0.75]{Figures/dataflow.pdf}
 	\decoRule
 	\caption[Streaming Dataflow]{DAG outlining the previous code snippet}
 	\label{fig:Dataflow}
@@ -242,7 +241,7 @@ The parallelism of a task is the parameter indicating the number of subtasks an 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics{Figures/parallel_dataflow.png}
+    \includegraphics[scale=0.75, trim=0.5cm 12cm 1cm 0.5cm]{Figures/parallel_dataflow.pdf}
     \decoRule
     \caption[Parallel Dataflow]{DAG with Parallelism=2}
     \label{fig:ParallelDataflow}

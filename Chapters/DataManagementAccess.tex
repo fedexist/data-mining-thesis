@@ -291,6 +291,14 @@ One of the most widely used NoSQL DBMS in Hadoop environments is \textbf{Cassand
 
 \subsection{Architecture}
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Figures/cassandra_arch}
+    \caption{An overview of Cassandra Architecture}
+    \label{fig:cassandraarch}
+\end{figure}
+
+
 Cassandra's architecture revolves around all of the cluster nodes being equal, thus eliminating the need of a master-slave architecture which implicitly introduces a point of failure in the availability. Cassandra’s design was influenced by \textbf{Staged Event-Driven Architecture}, SEDA. \textbf{SEDA} is a general architecture for highly concurrent Internet services \cite{Welsh:2001:SAW:502059.502057} where a single operation may start with one thread, which then hands off the work to another thread, which may hand it off to other threads. Work is subdivided into what are called stages, basic units of work, and the thread pool associated with the stage determines execution. This design means that Cassandra is better able to manage its own resources internally because different operations might require disk I/O, or they might be CPU-bound, or they might be network operations, so the pools can manage their work according to the availability of these resources.
 
 \paragraph{Data Center \& Racks} Cassandra is frequently used in systems spanning physically separate locations. Cassandra provides two levels of grouping that are used to describe the topology of a cluster: data center and rack. A rack is a logical set of nodes in close proximity to each other, on physical machines in a single rack of equipment. A data center is a logical set of racks, located in the same building and connected by reliable network. Out of the box, Cassandra leverages the information provided by the configuration of the cluster’s topology to determine where to store data, and how to route queries efficiently. Cassandra tries to store copies of data in multiple data centers to maximize availability and partition tolerance, while preferring to route queries to nodes in the local data center to maximize performance.
