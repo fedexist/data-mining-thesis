@@ -77,6 +77,20 @@ Kafka is often used for operational monitoring data, aggregating statistics from
 
 NiFi allows for the creation of a secure cluster where each node takes care of processing a fraction of the Flowfiles circulating inside the graph, load balancing in case of node failures. 
 
+\subsection{FlowFiles}
+
+The FlowFile represents a single piece of data in NiFi. A FlowFile is made up of two components: \textbf{FlowFile Attributes} and \textbf{FlowFile Content}. Content is the data that is represented by the FlowFile, its payload, while attributes are characteristics that provide information or context about the data, made up of key-value pairs. 
+
+All FlowFiles have the following standard attributes:
+
+\begin{itemize}
+    \item \textbf{uuid}: A unique identifier for the FlowFile
+    
+    \item \textbf{filename}: A human-readable filename that may be used when storing the data to disk or in an external service
+    
+    \item \textbf{path}: A hierarchically structured value that can be used when storing data to disk or an external service so that the data is not stored in a single directory
+\end{itemize}
+
 \subsection{Processors}
 
 As already mentioned a Processor is the basic block for the graph structure of a NiFi flow. There are a great variety of Processors built-in, ranging in function from database connections for insertions or queries and producers and consumers for queue processes such as Kafka, to object manipulation such as JSON or XML splitting and fetching and ingestion from sources like web sockets or filesystems.
