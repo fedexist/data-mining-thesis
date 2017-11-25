@@ -1,7 +1,13 @@
 \subsection{Serving \& Security}
 Our infrastructure's security is handled on several layers by a variety of services striving to offer access on data and visualisations to the users and to let the developers maintain and upgrade the system while providing extensive security on the data and protection from unauthorized access.
 \\
-% Picture of the security diagram
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.4]{Figures/SecurityStructureDiagram}
+	\decoRule
+	\caption[Security Structure Diagram]{A diagram to represent our Security Structure}
+	\label{fig:SecurityStructureDiagram}
+\end{figure}
 \\
 We have structured the Security and Serving architecture through two main abstractions: the \textbf{cluster} and the \textbf{flows}.
 \subsubsection{Cluster}

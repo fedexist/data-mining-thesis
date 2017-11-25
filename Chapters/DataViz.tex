@@ -33,15 +33,43 @@ A Live connection queries directly the data source, making the performances of t
 
 An Extract connection is a periodic query, which can be performed, for example, every day, which saves the results in a Tableau Data Extract file, which will be used for the following queries. The Extract may be considered a snapshot of the database and, for this very reason, any update in the database won't be seen until the next scheduled Extract File update. Even though the creation of an Extract File can take a long time, queries on it are very efficient because of its internal tabular structure, optimized for Tableau's own execution engine.
 
-\subsection{Views creation}
+\subsection{View Creation}
 
 Each field loaded from the data source is assigned of two roles: dimension or measure. A \textbf{dimension} is used for categorized or discrete information such as strings or dates, while a \textbf{measure} corresponds to numeric information, potentially object of aggregations. It's possible to change freely the roles of each field, according to the needs. Drag-n-drop allows to move dimensions and measures on both plots' axes and Tableau is able to automatically interpret the new layout, constructing a more significant chart.
 
-Tableau allows only for the creation of bi-dimensional plots, but still more dimensions can be visualized through the use of colours, sizes and shapes.
-The built-in charts include the classic pie chart, histogram, bar chart, but also more complex plots given by the combination in dual axis of the previous charts, and \textbf{geographical maps}, through Tableau's built-in management of countries, regions, cities, airports and zip codes. 
-Once a plot has been configured with its dimensions and measures, filters can be applied on it: a filter can be a single or multiple choice filter, if applied on a dimension, or an exact value or range filter if applied to a measure. Dates have their own filters where you can choose the granularity, ranging from the year to the second.
-Dimensions and measures can be combined together to create a \textit{calculated field} via mathematical functions.
-Additional elements useful in a chart creation are \textit{parameters}, which allow to create fields dynamically changing with the user interaction.
+\subsubsection{View Choice}
+The main focus of visual analytics is to represent data in an a fashion as to convey as much information at a glance.
+Tableau offers the possibility to create several kinds of visualisation, each one suitable for a specific use case. The three most common charts are without a doubt the bar graph for data comparisons, line graph for trends and pie charts to underline the share of different categories inside a single field.
+More advanced representation are also supported such as:
+
+\begin{itemize}
+	\item Scatter plot, used to investigate correlation between variables.
+	\item Gannt chart, used to describe scheduling in time.
+	\item Bullet graph, used to give focus to our goal and its gap with the current state of affairs
+	\item Box and Whisker plot, used to highlight data distribution.
+	\item Bubble chart, used to show the concentration of data.
+	\item Tree map, used to emphasize hierarchy in a set.
+	\item Geographical map, used to represent geocoded data.
+\end{itemize} 
+
+\paragraph{Dual Axis}
+While a graph may present more than one variable on a single axis, it is possible to place a secondary axis in a view to compare two variables along different scales. This technique is called dual axis and grants the ability to superimpose two independent visualisations upon the the same view.\\
+Furthermore, it is possible to use dual axis with different kinds of charts to realize heterogeneous visualisations.
+
+\subsection{Visual Analytics}
+
+The distinguishing features between a plain visualisation application and Visual Analytics solution are the possibility to create interactive view and to process complex analysis.\\
+Visual Analytics, in fact, describes a way to present information useful to spur visual thinking: data can highlighted, filtered and quickly represented through new charts. This gives us the chance to execute new analysis inspired by our natural inclination towards thinking visually.
+
+\subsubsection{Filtering}
+
+Filtering is one of our main tools in data analysis and can be implemented in various layer of the Tableau stack.
+A first filtering can be applied at the data source level: it is, in fact, possible to define a custom SQL query so that data is formatted from our archive into Tableau.\\
+Once loaded on Tableau, contextual filtering can polish data before chart processing, an example of this would be a limitation on the number of records used for visualisation.\\
+Lastly, filtering can be applied on measures and dimensions once the view has been constructed. This filtering can either be statically applied by the developer or dynamically offered to the end user, thanks to special user interfaces, to make the view interactive.
+\\
+In more detail, once the dimension or measure to filter is chosen, it is necessary to pick a type of filtering to apply such as single and multiple choice for dimension or exact value and range for measures. There is also a special section for dates which offers greater control over granularity.
+Finally it is possible to filter data directly from the view selecting the markers of our interest.
 
 \subsubsection{Table calculations}
 
