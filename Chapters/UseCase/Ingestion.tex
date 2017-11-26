@@ -66,3 +66,4 @@ which basically uses Satori APIs to create a client subscribing to the Air Traff
 \end{enumerate}
 
 Data ingestion continues, then, in Kafka. As previously mentioned, a single topic called \texttt{air\_traffic} is used, configured with a retention time of 24 hours, a single partition, since throughput is approximately of $20000$ records per minute, accounting to 4 MB per minute, being a relatively sparse stream, and two replicas handled by both the active Kafka brokers.
+\pagebreak

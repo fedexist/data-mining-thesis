@@ -1,14 +1,14 @@
 \subsection{Serving \& Security}
 Our infrastructure's security is handled on several layers by a variety of services striving to offer access on data and visualisations to the users and to let the developers maintain and upgrade the system while providing extensive security on the data and protection from unauthorized access.
-\\
-\begin{figure}
+
+\begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.4]{Figures/SecurityStructureDiagram}
 	\decoRule
 	\caption[Security Structure Diagram]{A diagram to represent our Security Structure}
 	\label{fig:SecurityStructureDiagram}
 \end{figure}
-\\
+
 We have structured the Security and Serving architecture through two main abstractions: the \textbf{cluster} and the \textbf{flows}.
 \subsubsection{Cluster}
 The \textbf{cluster} is our whole Big Data Infrastructure comprised of several nodes which for our purposes are divided as such:
@@ -23,7 +23,7 @@ The Domain Controller is not accessible from outside the cluster and can communi
 It hosts Active Directory, a directory service by Microsoft comprised of several components for domain and security management such as LDAP, Kerberos, and DNS.\\ \\
 As a directory service, the Active Directory instance consists of a database containing an hierarchy of objects, objects are a very high abstraction that can represent a variety of things, but for our purposes can either be Users or Groups; Groups contain one or more Users and Users may be part of one or more Groups. \\Users are identified by a username and a strong password, thus the Domain Controller can authenticate an Agent thanks to this information. \\
 Through LDAP, authorized Users can access and modify Objects in the Active Directory. Each authentication, whether failed or successful is logged.\\ \\
-We have defined two groups: cluster\_users and cluster\_operators, the meaning of which is further specified down the line by each layer of protection.
+We have defined two groups: \texttt{cluster\_users} and \texttt{cluster\_operators}, the meaning of which is further specified down the line by each layer of protection.
 
 \paragraph{Front End}
 The Front End node is the only machine accessible from outside the cluster and can communicate with the Domain Controller and the Inner Cluster nodes. \\

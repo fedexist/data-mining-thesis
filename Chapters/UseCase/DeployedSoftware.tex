@@ -22,5 +22,5 @@ The cluster is composed of seven machines:
     \item \texttt{frontend}, with Knox and a Nginx reverse proxy installed, used as single point of entry for developers and cluster operators to access cluster services via SSH tunneling. Specifications: 1 core, 512 MB of RAM.
     \item \texttt{master-1}, one of the two master components of the cluster, with an HDFS Namenode, a Zookeeper Server, a Registry MySQL database, a Kafka Broker, Hive Metastore and HiveServer 2 Interactive (support for Hive LLAP daemons), Ranger Admin and UserSync, a NiFi node and Spark2 History Server. Specifications: 4 core, 12 GB of RAM.
     \item \texttt{master-2}, the other master component of the cluster, with the YARN Resource Manager and App Timeline Server, HDFS Secondary Namenode, a Zookeeper Server, a WebHCat Server and HiveServer2 for Hive, a Kafka Broker, a Nifi node, MapReduce2 History Server and Flink binaries. Specifications: 4 core, 12 GB of RAM.
-    \item Four slave machines, slave-1, slave-2, slave-3, slave-4, with a YARN Node Manager, HDFS DataNode and Cassandra nodes. Specifications: 4 core, 6 GB of RAM.
+    \item Four slave machines, \texttt{slave-1}, \texttt{slave-2}, \texttt{slave-3}, \texttt{slave-4}, with a YARN Node Manager, HDFS DataNode and Cassandra nodes. Specifications: 4 core, 6 GB of RAM.
 \end{itemize}
