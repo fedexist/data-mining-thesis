@@ -81,7 +81,18 @@ event = event_with_id(element, id)
 return event
 \end{minted}
 
-It takes as input a Keyed Stream of \texttt{AirTrafficEvent}s and outputs an \texttt{AirTrafficEventWithId} stream: the ID is an integer counter which gets increased each time a new instance of a flight is being detected and used to create the actual id of the outputted objects concatenating the flight id with this integer ID (e.g. the first instance of flight \texttt{AZ775} will have id \texttt{AZ775-1}). The function handling the detection of a new instance of a flight is based off an heuristic strategy using the latest available information about the position, speed and time of the flight. This is needed because the stream may be inaccurate when it comes to inter-oceanic flights, passing over dead-zones, without any radar at range being able to catch their transponder signals. The heuristic is described by the following Scala snippet:
+It takes as input a \texttt{KeyedStream} of \texttt{AirTrafficEvent}s and outputs an \texttt{AirTrafficEventWithId} stream: the ID is an integer counter which gets increased each time a new instance of a flight is being detected and used to create the actual id of the outputted objects concatenating the flight id with this integer ID (e.g. the first instance of flight \texttt{AZ775} will have id \texttt{AZ775-1}). 
+
+\begin{code}
+    \begin{minted}{Scala}
+    val streamWithId : DataStream[AirTrafficEventWithId]= stream
+        .keyBy(_.flightInfo.flight)
+        .process(new UpdateIdFunction())
+    \end{minted}
+\captionof{listing}{A KeyedStream of AirTrafficEvent processed into an AirTrafficEventWithId stream}
+\end{code}
+
+The function handling the detection of a new instance of a flight is based off an heuristic strategy using the latest available information about the position, speed and time of the flight. This is needed because the stream may be inaccurate when it comes to inter-oceanic flights, passing over dead-zones, without any radar at range being able to catch their transponder signals. The heuristic is described by the following Scala snippet:
 
 \begin{minted}[breaklines]{Scala}
 val activeUpperBound = Time.minutes(5) // 5 minutes
@@ -191,7 +202,7 @@ def buildCluster(builder: Cluster.Builder): Cluster = {
 }).build()
 \end{minted}
 
-On Cassandra's cluster, composed as already mentioned previously by the four slave nodes, has been specified an \texttt{air\_traffic} keyspace, configured with a replication factor of 3 via the replication strategy \texttt{SimpleStrategy}. Within this keyspace the following table has been defined:
+On Cassandra's cluster, composed as already mentioned previously, by the four slave nodes, has been specified an \texttt{air\_traffic} keyspace, configured with a replication factor of 3 via the replication strategy \texttt{SimpleStrategy}. Within this keyspace the following table has been defined:
 
 \begin{minted}{SQL}
 CREATE TABLE air_traffic.active (
@@ -212,7 +223,7 @@ CREATE TABLE air_traffic.active (
 
 in order to contain all of the active aircrafts currently flying. All of the default configurations have been mantained, except for the TTL of the records which has been configured to 10 minutes and the interval of the garbage collection of the table tombstones (expired records after the TTL) which has been set to 1 hour, instead of 1 day.
 \\\\
-Notifications sinks are rather simple \texttt{SinkFunction}s which take as input the \texttt{Alert} and make an async \texttt{POST} request, through a \href{https://dispatchhttp.org/Dispatch.html}{Dispatch} async http client, to the local notification server, implemented using Firebase FCM, about which we'll talk about later on.
+Notifications sinks are rather simple \texttt{SinkFunction}s which take as input the \texttt{Alert} and make an async \texttt{POST} request, through a \href{https://dispatchhttp.org/Dispatch.html}{Dispatch} asynchronous HTTP client, to the local notification server, implemented using Firebase FCM, about which we'll talk about later on.
 \\\\
 Hive is not the direct destination of the Flink sink. As a matter of fact, an HDFS sink is used to write all of the records in JSON format, partitioned in folders according to their timestamp. As a result, each event will be bucketed in the appropriate folder and this folder will be considered as a partition of an Hive external table configured using the \textbf{JsonSerDe} to read all of the files.
 
@@ -258,7 +269,7 @@ To sum up, there are three tables stored in Hive:
 \begin{itemize}
     \item \texttt{json\_dump}, external table reading the Json files written by Flink;
     \item \texttt{raw} in \texttt{air\_traffic} database, containing an optimized version, for storage and query purposes, of \texttt{json\_dump} 
-    \item \texttt{history} in \texttt{air\_traffic} database, aggregating \texttt{raw} creating a single record for each flight
+    \item \texttt{history} in \texttt{air\_traffic} database, aggregating \texttt{raw} creating a single record for each flight.
 \end{itemize}
 
 The raw table is defined to use ORC as storage format, to use Hive partitioning on the date and to be clustered in 100 buckets, in order to make sure that, if needed, a query concerning a certain subset of flights wouldn't read all of the files composing the table.

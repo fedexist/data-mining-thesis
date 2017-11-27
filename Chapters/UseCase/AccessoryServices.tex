@@ -2,30 +2,30 @@
 
 While not strictly related to Big Data, the results we archive and process may be used for several different endeavours; we wanted to add an additional feature for presentation, other than the aforementioned REST APIs and Visualisations, targeted for mobile devices in the form of push notifications.
 \\ \\
-To show the capabilities of this system we have decided to send Push Notifications whenever a plane departs and is directed towards one of our airports of interest.
+To show the capabilities of this system, we have decided to send Push Notifications whenever a plane departs and is directed towards one of our airports of interest or whenever a plane is approaching its destination, descending below 37000 feet of altitude.
 \\ \\
 To offer this service we have implemented a solution based on one of the many components of the Google Mobile Platform: Firebase Notifications.
 
 \subsubsection{Firebase Notifications}
 
-Firebase Notifications is a service for mobile and browser push notifications offered by a through a REST API listening on Google Firebase servers; the requests sent to this API are formatted in JSON specifying information on the message sent and on the receivers.
-What's more the Firebase Server assigns to each device attached to our application a unique and expiring token to identify what devices will be receiving each notification.
+Firebase Notifications is a service for mobile and browser push notifications offered through a REST API listening on Google Firebase servers; the requests sent to this API are formatted in JSON specifying information on the message sent and on the receivers.
+What's more, the Firebase Server assigns to each device attached to our application a unique and expiring token to identify what devices will be receiving each notification.
 \\
-In more detail Firebase Notifications supports two different ways to send messages.
+In more detail, Firebase Notifications supports two different ways to send messages.
 
 \begin{itemize}
-	\item Token based messaging: The request for the notification includes a list of the tokens assigned to the recipient devices. 
-	\item Topic based messaging: The devices are required to subscribe to topics, requests are sent specifying the topic of which the notification is part of, so that subscribers can receive it.
+	\item \textbf{Token based messaging}: The request for the notification includes a list of the tokens assigned to the recipient devices. 
+	\item \textbf{Topic based messaging}: The devices are required to subscribe to topics, requests are sent specifying the topic of which the notification is part of, so that subscribers can receive it.
 \end{itemize}  
 
-Seen that our topic in this case would have been airports whose list is giant and ever growing, we have concluded that topic based messaging would be highly impractical and therefore chosen to use the token based solution and to handle the routing of notifications through a filtering application.
+Seen that our topic in this case would have been airports, whose list is giant and ever growing, we have concluded that topic based messaging would be highly impractical and therefore chosen to use the token based solution and to handle the routing of notifications through a filtering application.
 
 \subsubsection{Local Server}
-To handle users' data, filtering of notifications and the construction of requests to be forwarded to Firebase we have implemented a middleware server in JavaScript, listening on internal nodes, which offers a REST API customised for our needs.
+To handle users' data, filtering of notifications and the construction of requests to be forwarded to Firebase, we have implemented a middleware server in JavaScript, listening on internal nodes, which offers a REST API customised for our needs.
 \\
-The server, manages users' data, keeping a table on Hive representing the connection between Device Unique ID, Notifire Token and a list of airports the user is subscribed to. Changes to this table can be issued by the users through a request to the server, it is mandatory for the mobile application to send an update after obtaining a new token from Firebase, so that the table is always up to date.
+The server manages users' data, keeping a table on Hive representing the connection between Device Unique ID, Notifire Token and a list of airports the user is subscribed to. Changes to this table can be issued by the users through a request to the server, it is mandatory for the mobile application to send an update after obtaining a new token from Firebase, so that the table is always up to date.
 The table is also cached in memory for performance's reasons.
 \\ \\
-As mentioned the server offers a REST service to ingest notifications and forward it to Firebase, in more detail, the server expects a JSON containing information on a departing plane such as: airport of origin, airport of destination, type of aircraft, flight number and other spatial or temporal values.
+As mentioned the server offers a REST service to ingest notifications and forward it to Firebase. In more detail, the server expects a JSON containing information on a departing plane such as: airport of origin, airport of destination, type of aircraft, flight number and other spatial or temporal values.
 \\ \\
-For each received and accepted JSON the server writes a list of tokens that are subscribed to the airport of destination and creates a message informing of the departure, it then creates a request with those data and send it to the Firebase server which in turn sends the actual notification to all target devices and responds back to our server with a report of the action.
+For each received and accepted JSON, the server writes a list of tokens that are subscribed to the airport of destination and creates a message informing of the departure. It then creates a request with those data and send it to the Firebase server which in turn sends the actual notification to all target devices and responds back to our server with a report of the action.
