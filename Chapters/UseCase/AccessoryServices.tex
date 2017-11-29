@@ -41,7 +41,7 @@ As for REST APIs we have implemented two servers written in Python with the use 
 Arnia accepts calls to its address in this form from within the cluster (Knox handles calls from outside in HTTPS converting them to the proper inner call and managing authentication of <user>): 
 
 \begin{code}
-	\begin{minted}[breaklines]{Python}
+	\begin{minted}[breaklines]{Bash}
 http://<host.inner.ip>:<arnia_port>/query?query=<query>&user.name=<user>
 	\end{minted}
 \end{code}
@@ -49,7 +49,7 @@ http://<host.inner.ip>:<arnia_port>/query?query=<query>&user.name=<user>
 To make this template a more reasonable example:
 
 \begin{code}
-	\begin{minted}[breaklines, breakafter=&]{Python}
+	\begin{minted}[breaklines, breakafter=&]{Bash}
 http://10.0.0.24:8888/query?query=SELECT+*+FROM+history_aggregated+limit+2&user.name=dummy_user
 	\end{minted}
 \end{code}
@@ -133,7 +133,7 @@ db.active.aggregate([{$group:{_id:"$aircraft",speed:{"$avg":"$speed"}}}])
 Which in URL form with some encoding would translate to:
 
 \begin{code}
-	\begin{minted}[breaklines, breakafter=speed]{Python}
+	\begin{minted}[breaklines, breakafter=speed]{Bash}
 http://10.0.0.24:8889/query?query=db.active.aggregate%28%5B%7B%27%24group%27%3A%7B%27_id%27%3A%27%24aircraft%27%2C%27speed%27%3A%7B%27%24avg%27%3A%27%24speed%27%7D%7D%7D%5D%29&user.name=airtraffic
 	\end{minted}
 \end{code}

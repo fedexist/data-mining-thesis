@@ -47,7 +47,7 @@ This paradigm emphasizes the continuous flow of data between operators, defined 
 
 \section{MapReduce} \label{MapReduce}
 
-MapReduce is a framework, part of Apache Hadoop, named after its algorithm, engined to be run on YARN to deploy applications able to process data in batches from HDFS or distributed databases. \\
+MapReduce \cite{hadoop_doc} is a framework, part of Apache Hadoop, named after its algorithm, engined to be run on YARN to deploy applications able to process data in batches from HDFS or distributed databases. \\
 
 \subsection{Structure}
 The framework's management is handled by two tracker components, the \textbf{Job Tracker} who acts as a master and the \textbf{Task Trackers} who run on the single nodes, act as slaves and carry out the tasks issued by the \textbf{Job Tracker}.
@@ -71,9 +71,9 @@ A MapReduce job usually involves six steps:
 
  \pagebreak
  
-\section{Apache Spark} \label{Spark}
+\section{Spark} \label{Spark}
 
-\href{https://spark.apache.org/}{Apache Spark} is an open source distributed computational framework originally developed at Berkeley and now maintained by the Apache Software Foundation.
+\href{https://spark.apache.org/}{Apache Spark} \cite{spark_doc} is an open source distributed computational framework originally developed at Berkeley and now maintained by the Apache Software Foundation.
 \\
 Conceived as a general multiplatform engine, Spark can run as standalone, on YARN or on Apache Mesos; can access data from standard File Systems, from HDFS or any distributed database and can be used for Batch Processing, Graph Processing (thanks to GraphX plugin) or Stream Processing.
 \\
@@ -137,9 +137,9 @@ MLlib exposes a selection of Machine Learning algorithms for classification, reg
 It also offers other tools to transform features, to handle datasets and hyperparameters and to make computation with distributed linear algebra and statistics.
 
 \pagebreak
-\section{Apache Flink}\label{Flink}
+\section{Flink}\label{Flink}
 
-\href{https://flink.apache.org/}{Apache Flink} is an open source framework developed for the continuous and distributed processing of data flows. Based on the Dataflow Programming model, it provides a set of abstractions specifically designed for real time stream processing.
+\href{https://flink.apache.org/}{Apache Flink} \cite{flink_doc} is an open source framework developed for the continuous and distributed processing of data flows. Based on the Dataflow Programming model, it provides a set of abstractions specifically designed for real time stream processing.
 
 \subsection{Abstraction levels}  \label{AbstractionLevels}
 

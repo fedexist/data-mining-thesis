@@ -2,23 +2,23 @@
 
 When it comes to using data coming from one or more sources, being them sensors or user activities from a website, there needs to be adequate tools for handling, gathering and routing them inside the cluster where they will be processed.
 
-\section{Apache Kafka}
+\section{Kafka}
 
-\textbf{Apache Kafka} is a distributed streaming platform which lets you publish and subscribe to streams of records, similar to a message queue or enterprise messaging system, store streams of records in a fault-tolerant way and optionally process them as they occur. 
+\textbf{Apache Kafka} \cite{kafka_doc} is a distributed streaming platform which allows publishing and subscription to streams of records, similar to a message queue or messaging systems, and stores streams of records in a fault-tolerant way and optionally process them as soon as they enter the system. 
 
 It is mainly used for building real-time streaming data pipelines that reliably get data between systems or applications and real-time streaming applications that transform or react to the streams of data.
 
-Kafka is run on one or more servers as a cluster which stores streams of \textit{records} in categories called \textit{topics}. Each record consists of a key, a value and a timestamp.
+Kafka is run on one or more servers as a cluster, storing streams of \textit{records} in categories called \textit{topics}. Each record consists of a key, a value and a timestamp.
 
 It has two main core APIs, \textbf{Producer and Consumer API}, the basic blocks to create streams, but it's possible to use two more sets of APIs: the Streams API, which can be used to process the records and transform them from between two or more topics, and the Connector API, which allows to run producers and consumers that connect to other applications or data systems.
 
 \subsection{Topics}
 
-A topic is a category or feed name to which records are published. Topics in Kafka are always multi-subscriber; that is, a topic can have zero, one, or many consumers that subscribe to the data written to it.
+A topic is a category or feed name where records are published. Topics in Kafka are always multi-subscriber, since a topic can exist regardless of the actual consuming of the records, with zero, one, or many consumers that subscribe to the data written to it.
 
-For each topic, the Kafka cluster maintains a partitioned log, where each partition is an ordered, immutable sequence of records that is continually appended to. The records in the partitions are each assigned a sequential id number called \textit{offset} that uniquely identifies each record within the partition.
+For each topic, the Kafka cluster maintains a partitioned log, where each partition is an ordered, immutable sequence of records that is continually appended to. A sequential id number called \textit{offset} is assigned to each record in a partition as a unique identifier.
 
-The Kafka cluster retains all published records, whether or not they have been consumed, using a configurable retention period. For example, if the retention policy is set to two days, then for the two days after a record is published, it is available for consumption, after which it will be discarded to free up space. Kafka's performance is effectively constant with respect to data size so storing data for a long time is not a cause of concerns.
+The Kafka cluster, through a configurable retention period, retains all published records, whether or not they have been consumed, so that if the retention policy is set to three days, then for the three days following a published record, it is available for consumption, after which it will be discarded to free up space. Taking this in consideration, Kafka's performance is constant with respect to the size of the data stored, causing no actual concern if there's the need to store data for a long time.
 
 
 \begin{figure}[h]
@@ -28,17 +28,17 @@ The Kafka cluster retains all published records, whether or not they have been c
     \label{fig:loganatomy}
 \end{figure}
 
-The only metadata retained on a per-consumer basis is the offset or position of that consumer in the log. This offset is controlled by the consumer: normally it would advance its offset linearly as it reads records, but, in fact, it could consume records in any order it prefers. For example, a consumer can reset to an older offset to reprocess data from the past or skip ahead to the most recent record and start consuming from the latest.
+Only the offset or position of a consumer is retained as metadata, on a per-consumer basis. This offset is completely controllable by the consumer, so that if normally it would advance linearly, the consumer could consume records in any possible order. For example, a consumer can reset to an older offset or, conversely, skip ahead to consume data from the latest record, according to its own policy.
 
-The partitions in the log serve several purposes. Firstly, they allow the log to scale beyond a size that will fit on a single server. Each individual partition must fit on the servers that host it, but a topic may have many partitions so it can handle an arbitrary amount of data. Secondly, they act as the unit of parallelism. This way, it's possible to increase the number of partitions of a topic as needed, according to the required throughput.
+The partitions in the log allow scaling beyond a size that could fit on a single server, since a topic can handle an arbitrary amount of data, but each individual partition must fit on the servers that host it, and act as the unit of parallelism, so that it's possible to increase the number of partitions of a topic as needed, according to the required throughput.
 
 \subsection{Producers and Consumers}
 
-\paragraph{Producers} They are the components that publish the data to the topics of their choice. They handle the assignment of each record to the partitions within the topic. This can be done following a round-robin scheduling, to balance load, or a semantic partition function (such it may be the key of a record).
+\paragraph{Producers} They are the components that publish the data to the topics of their choice. They handle the assignment of each record to the partitions within the topic. This is usually done according to a round-robin scheduling, to balance load, or otherwise with a semantic partition function (such it may be the key of a record).
 
-\paragraph{Consumers} They are labelled with a \textit{consumer group} name, and each record published to a topic is delivered to one consumer instance within each subscribing consumer group. Consumer instances can be in separate processes or on separate machines.
+\paragraph{Consumers} They are labelled with a \textit{consumer group} name, and each record published to a topic is consumed by one consuming instance within each subscribing consumer group. Each instance can be in separate processes or even on separate machines.
 
-A common configuration has topics with a small number of consumer groups, one for each "logical subscriber". Each group is composed of many consumer instances for scalability and fault tolerance, analogous to simple publish-subscribe semantics where the subscriber is a cluster of consumers instead of a single process.
+A common configuration has topics with a small number of consumer groups, one for each "logical subscriber", where each group, for scalability and fault tolerance purposes, is composed of many consumer instances.
 
 \begin{figure}[h]
     \centering
@@ -48,30 +48,30 @@ A common configuration has topics with a small number of consumer groups, one fo
 \end{figure}
 
 
-The way consumption is implemented in Kafka is by dividing up the partitions in the log over the consumer instances so that each instance is the exclusive consumer of a "fair share" of partitions at any point in time. This process of maintaining membership in the group is handled by Kafka dynamically, so that if new instances join the group they will take over some partitions from other members of the group, while if an instance dies, its partitions will be distributed to the remaining instances.
+The way Kafka implements consumption is by dividing up the partitions in the log over the consumer instances so that each instance "fair share" of partitions reserved at any point in time. If new instances join the group, Kafka will handle dynamically this type of fair sharing, giving away some partitions from other members of the group. Otherwise, if an instance dies, its partitions will be distributed to the remaining instances.
 
-Kafka only provides a total order over records within a partition, not between different partitions in a topic. Per-partition ordering combined with the ability to partition data by key is sufficient for most applications. However, if a total order over records a topic that has only one partition is required, though this means only one consumer process per consumer group. 
+A total order over records is provided only within a partition, and not between different partitions in a topic. However, if a total order over records within a topic is required, than a single partition is needed, consequently meaning that there can only be one consumer process per consumer group. 
 
 \subsection{Use cases}
 
 \paragraph{Messaging}
 
-Kafka can be used as a replacement for a more traditional message broker, used for reasons such as decoupling processing from data producers and buffering unprocessed messages. In comparison to most messaging systems, Kafka has better throughput, built-in partitioning, replication, and fault-tolerance which makes it a good solution for large scale message processing applications.
+Kafka can be used as a replacement for a more traditional message broker, used for reasons such as decoupling processing from data producers and buffering unprocessed messages. In comparison to most messaging systems, Kafka provides replication, better throughput, built-in partitioning and fault-tolerance, being then a very good solution for large scale message processing applications.
 
-In this domain Kafka is comparable to traditional messaging systems such as ActiveMQ or RabbitMQ. 
+In this domain, Kafka is comparable to  \href{https://www.rabbitmq.com/}{RabbitMQ} and \href{http://activemq.apache.org/}{ActiveMQ}, two of most used traditional messaging systems.
 
 \paragraph{Log Aggregation}
 
-Log aggregation typically collects physical log files off servers and puts them in a central place (a file server or HDFS perhaps) for processing. Kafka abstracts away the details of files and gives a cleaner abstraction of log or event data as a stream of messages. This allows for lower-latency processing and easier support for multiple data sources and distributed data consumption. In comparison to log-centric systems like Flume, Kafka offers equally good performance, stronger durability guarantees due to replication, and much lower end-to-end latency. 
+Log aggregation usually collects log files off servers and puts them in a central place, such as a file server or HDFS, for processing. Kafka gives a cleaner abstraction of log or event data as a stream of messages, abstracting away the details of files, allowing, in addition, for lower-latency processing and easier support for multiple data sources and distributed data consumption. In comparison to log-centric systems like Flume, Kafka offers a much lower end-to-end latency and stronger durability guarantees due to replication, while providing equally good performances. 
  
 \paragraph{Activity Tracking \& Metrics}
 
-The original use case for Kafka was to be able to rebuild a user activity tracking pipeline as a set of real-time publish-subscribe feeds. This means site activity (page views, searches, or other actions users may take) is published to central topics with one topic per activity type. These feeds are available for subscription for a range of use cases including real-time processing, real-time monitoring, and loading into Hadoop or any data warehousing system for offline processing and reporting.
+The original use case for Kafka was to rebuild a user activity tracking pipeline as a set of real-time publish-subscribe feeds. Thus decomposing site activity, such as page views, searches, or other actions users may take, publishing records to one topic per activity type. These feeds are available for subscription for  real-time processing or monitoring, and loading into any data warehousing system for offline processing and reporting.
 
-Kafka is often used for operational monitoring data, aggregating statistics from distributed applications to produce centralized feeds of operational data and thus can be used as base component for a low latency fault-tolerant monitoring pipeline.
+Kafka is often used for aggregating statistics from distributed applications to produce centralized feeds for operational monitoring purposes, providing a fault-tolerant monitoring pipeline with low latency.
 
 
-\section{Apache NiFi}
+\section{NiFi}
 
 \textbf{Apache NiFi} is a distributed system for centralising, processing and distributing streams of data across a cluster. Its main feature is a web GUI allowing to visually structure the data flow directly from the sources through the definition of graphs where each vertex is called \textbf{Processor} and each edge in-between is a queue in which the \textbf{Flowfiles}, objects wrapping a single records, wait if the processor is busy.
 
@@ -79,7 +79,7 @@ NiFi allows for the creation of a secure cluster where each node takes care of p
 
 \subsection{FlowFiles}
 
-The FlowFile represents a single piece of data in NiFi. A FlowFile is made up of two components: \textbf{FlowFile Attributes} and \textbf{FlowFile Content}. Content is the data that is represented by the FlowFile, its payload, while attributes are characteristics that provide information or context about the data, made up of key-value pairs. 
+A \textbf{FlowFile} represents a single piece of data in NiFi. A FlowFile is made up of two components: \textbf{FlowFile Attributes} and \textbf{FlowFile Content}. Content is the actual payload, the data that is represented by the FlowFile, while attributes are characteristics that provide information or context about that data, made up of key-value pairs. 
 
 All FlowFiles have the following standard attributes:
 
@@ -93,6 +93,6 @@ All FlowFiles have the following standard attributes:
 
 \subsection{Processors}
 
-As already mentioned a Processor is the basic block for the graph structure of a NiFi flow. There are a great variety of Processors built-in, ranging in function from database connections for insertions or queries and producers and consumers for queue processes such as Kafka, to object manipulation such as JSON or XML splitting and fetching and ingestion from sources like web sockets or filesystems.
+As already mentioned a \textbf{Processor} is the basic block for the graph structure of a NiFi flow. There are a great variety of Processors built-in, ranging in function from database connections for insertions or queries and producers and consumers for queue processes such as Kafka, to object manipulation such as JSON or XML splitting and fetching and ingestion from sources like web sockets or filesystems.
 
 A single processor can be scheduled to run periodically or continuously and can be configured with the number of concurrent threads that can be used for the execution. Each Processor has different output ports according to the results of the Flowfile processing: \textit{success}, \textit{failure} or other processor-specific routes (e.g. \textit{\textbf{SplitText}} processor, used to split text according to user-specified rules has \textit{original} and \textit{splits} as additional output ports, used to convey in different routes Flowfiles both before and after being split).

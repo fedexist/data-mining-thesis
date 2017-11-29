@@ -12,9 +12,9 @@ Thirdly, a service must provide Auditing for all requests, whether denied or all
 
 \pagebreak
 
-\section{Apache Knox}
+\section{Knox}
 
-Apache Knox is an Application Gateway, part of the Hadoop environment, that offers several security functionalities for a Hadoop Cluster right after the first layer provided by the ACL and acts as a Reverse Proxy with policy enforcement.
+\textbf{Apache Knox} \cite{knox_doc} is an Application Gateway, part of the Hadoop environment, that offers several security functionalities for a Hadoop Cluster right after the first layer provided by the ACL and acts as a Reverse Proxy with policy enforcement.
 \subsection{Authentication and Acces Control}
 The Knox gateway exposes a single secure access point for all REST\footnote{REST: REpresentational State Transfer, a type of stateless software architecture whose aim is to provide access to resource in an interoperable way through the web} APIs and HTTP interactions with the cluster.\newline
 All client requests to RESTful APIs and webUIs are sent to Knox through HTTPS with their respective user credentials, Knox authenticates the user with the help of an authentication provider such as Kerberos or LDAP, then thanks to an authorisation provider offers Access Control to the single services, if access is allowed, the request is routed to the target service.
@@ -32,9 +32,9 @@ For each service listed in the Topology, two files are needed:
 \end{itemize}
 Knox comes packaged with several files for common Hadoop services and permits the definition of custom ones. 
 
-\section{Apache Ranger}
+\section{Ranger}
 
-Apache Ranger is a comprehensive framework to manage data security, authorisation, data governance and audit in Hadoop clusters.
+\textbf{Apache Ranger} \cite{ranger_doc}is a comprehensive framework to manage data security, authorisation, data governance and audit in Hadoop clusters.
 
 Ranger provides a centralised security administration able to manage in one place most of the security related tasks inside the cluster, with a high granularity thanks to its customization for Hadoop services.
 
