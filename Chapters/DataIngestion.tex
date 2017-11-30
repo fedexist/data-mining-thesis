@@ -24,7 +24,7 @@ The Kafka cluster, through a configurable retention period, retains all publishe
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.7\linewidth]{Figures/log_anatomy}
-    \caption[How partition works in kafka a topic]{How partitioning works in a kafka topic}
+    \caption[How partition works in kafka a topic]{How partitioning works in a kafka topic. Source: \cite{kafka_doc}}
     \label{fig:loganatomy}
 \end{figure}
 
@@ -43,7 +43,7 @@ A common configuration has topics with a small number of consumer groups, one fo
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.7\linewidth]{Figures/consumer-groups}
-    \caption[Consumer groups subscribing to a Kafka Cluster]{Consumer groups subscribing to a Kafka Cluster}
+    \caption[Consumer groups subscribing to a Kafka Cluster]{Consumer groups subscribing to a Kafka Cluster. Source: \cite{kafka_doc}}
     \label{fig:consumer-groups}
 \end{figure}
 
@@ -58,7 +58,7 @@ A total order over records is provided only within a partition, and not between 
 
 Kafka can be used as a replacement for a more traditional message broker, used for reasons such as decoupling processing from data producers and buffering unprocessed messages. In comparison to most messaging systems, Kafka provides replication, better throughput, built-in partitioning and fault-tolerance, being then a very good solution for large scale message processing applications.
 
-In this domain, Kafka is comparable to  \href{https://www.rabbitmq.com/}{RabbitMQ} and \href{http://activemq.apache.org/}{ActiveMQ}, two of most used traditional messaging systems.
+In this domain, Kafka can be compared to  \href{https://www.rabbitmq.com/}{RabbitMQ} and \href{http://activemq.apache.org/}{ActiveMQ}, two of most used traditional messaging systems.
 
 \paragraph{Log Aggregation}
 
@@ -79,7 +79,7 @@ NiFi allows for the creation of a secure cluster where each node takes care of p
 
 \subsection{FlowFiles}
 
-A \textbf{FlowFile} represents a single piece of data in NiFi. A FlowFile is made up of two components: \textbf{FlowFile Attributes} and \textbf{FlowFile Content}. Content is the actual payload, the data that is represented by the FlowFile, while attributes are characteristics that provide information or context about that data, made up of key-value pairs. 
+A \textbf{FlowFile} represents a single piece of data in NiFi. A FlowFile is made up of two components: \textbf{FlowFile Attributes} and \textbf{FlowFile Content}.The FlowFile Content is the actual payload, the data that is represented by the FlowFile, while the attributes are characteristics that provide information or context about that data, consisting of key-value pairs. 
 
 All FlowFiles have the following standard attributes:
 

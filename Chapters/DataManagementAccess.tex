@@ -34,7 +34,7 @@ As for \textbf{NameNode} problems, the secondary \textbf{Secondary NameNode} man
 \pagebreak
 \section{YARN} \label{YARN}
 
-\textbf{YARN (Yet Another Resource Negotiator)} \cite{hadoop_doc} is Hadoop's cluster and resource manager, whose fundamental principle is to split up the functionalities of resource management, job scheduling and monitoring into separate daemons: a global daemon, the \textbf{Resource Manager (RM)}, and a daemon for each application, being it a single job or a DAG of jobs, \textbf{Application Master (AM)}.
+\textbf{YARN (Yet Another Resource Negotiator)} \cite{yarn_doc} is Hadoop's cluster and resource manager, whose fundamental principle is to split up the functionalities of resource management, job scheduling and monitoring into separate daemons: a global daemon, the \textbf{Resource Manager (RM)}, and a daemon for each application, being it a single job or a DAG of jobs, \textbf{Application Master (AM)}.
 \newline\newline
 The \textbf{Resource Manager}, together with the \textbf{Node Manager (NM)}, forms the data computation framework: the first one is the authority that arbitrates and manages resources among all the applications in the cluster, while the other is the per-machine framework agent who is responsible for containers, monitoring their resource usage and reporting it to the Resource Manager.
 \newline\newline
@@ -46,7 +46,7 @@ The \textbf{Resource Manager}, the master component in YARN architecture, has tw
 
 The \textbf{Scheduler} is responsible for allocating resources to the various running applications subject to constraints of capacities, queues etc. It performs no actual monitoring or status tracking for the application and takes no part in offering guarantees about restarting failed tasks due to failures. 
 
-Scheduling is performed starting from the base concept of a \textbf{Container}, a basic computation unit incorporating elements such as memory, CPU, disk, network etc. and representing the resource requirements of the applications. The Scheduler has a pluggable policy which is responsible for partitioning the cluster resources among the various queues, applications etc. There are two current default implementations of scheduling policies: the \textit{Capacity Scheduler} and the \textit{Fair Scheduler}.
+Scheduling is performed starting from the base concept of a \textbf{Container}, a basic computation unit incorporating elements such as memory, CPU, disk, network etc. and representing the requirements of the applications in terms of those resources. The Scheduler has a pluggable policy which is responsible for partitioning the cluster resources among the various queues, applications etc. There are two current default implementations of scheduling policies: the \textit{Capacity Scheduler} and the \textit{Fair Scheduler}.
 
 The \textbf{Applications Manager} is responsible for accepting job-submissions and negotiating the first container for executing the application specific Application Master. Additionally, it provides the service for restarting the Application Master container in case of failure. The Application Master has the responsibility of negotiating appropriate resource containers from the Scheduler, tracking their status and monitoring for progress.
 
@@ -88,7 +88,7 @@ A rich set of limits is provided from the Capacity Scheduler in order to ensure 
     \item \textbf{Drain applications} - When a queue needs to be stopped, administrators can do so at runtime, ensuring that no new applications can be submitted and existing applications continue to completion, allowing a graceful drain of the queue.
     \end{itemize}
 
-\item \textbf{Priority Scheduling} - This feature allows applications to be submitted and scheduled with different priorities, where the higher the integer value assigned, the higher the priority for a certain application. Currently only FIFO\footnote{FIFO: First In First Out, a policy for the executions of jobs, the first job to come is the first to be served.} ordering policy is supported as Application priority.
+\item \textbf{Priority Scheduling} - This feature allows applications to be submitted and scheduled with different priorities, where the higher the integer value assigned, the higher the priority for a certain application. Currently only FIFO\footnote{FIFO: First In First Out, a policy for the executions of jobs, the first job to come is the first to be served.} ordering policy is supported as Application priority \cite{yarn_CapSched}.
 
 \end{itemize}
 
@@ -104,7 +104,7 @@ All queues descend from a queue named “root”. Available resources are distri
 
 Additionally, the fair scheduler allows setting a different custom policy for each queue to allow sharing the queue’s resources in any which way the user wants: FifoPolicy, FairSharePolicy (default), and DominantResourceFairnessPolicy are built-in and can be readily used, but a custom policy can be specified by extending \texttt{\justify{SchedulingPolicy}} class. 
 
-All applications are allowed to run, by default, but it's possible to the number of running apps per user and per queue, useful when a user must submit hundreds of apps at once, or in general to improve performance if running too many apps at once would cause too much intermediate data to be created or too much context-switching.
+All applications are allowed to run, by default, but it's possible to the number of running apps per user and per queue, useful when a user must submit hundreds of apps at once, or in general to improve performance if running too many apps at once would cause too much intermediate data to be created or too much context-switching \cite{yarn_FairSched}.
 
 \subsubsection{Fault tolerance \& High Availability}
 
@@ -211,7 +211,7 @@ Hive has built-in direct serialization and deserialization of CSV, JSON, AVRO an
 
 \subsubsection{Hive Data Model}
 
-Data in Hive is organized into 3 main abstractions: Tables, Partitions and Buckets.
+Data in Hive is organized into 3 main abstractions: Tables, Partitions and Buckets \ref{hive_design}.
 
 \paragraph{Tables} Analogous to Tables in Relational Databases, they can be filtered, projected, unioned and joined. Additionally, all the data of a table is stored in a directory in its default warehouse, usually HDFS. The rows in a table are organized into typed columns much similarly to Relational Databases.
 \paragraph{Partitions} Each Table can have one or more partition keys determining how the data is stored: a table \texttt{T} with a date partition column \texttt{dt} has files with data for a particular date stored in the \texttt{<table location>/dt=<date>} folder in HDFS. Partitions allow the system to optimize data inspection based on query predicates, such that a query that is interested in rows from \texttt{T} satisfying the predicate \texttt{\justify{T.dt='2017-11-01'}} would only have to look at files in \texttt{\justify{<table location>/dt=2017-11-01/}} directory in HDFS.
@@ -227,7 +227,7 @@ When it comes to enterprise-level solutions, every data warehousing product need
 
 \subsubsection{Comparison}
 
-A comparison has been set up in order to compare the capabilities of Hive with respect to SQL Server, using Hortonworks' TPC-DS\footnote{TPC Benchmark DS is a decision support benchmark that models several generally applicable aspects of a decision support system, including queries and data maintenance. The benchmark provides a representative evaluation of performance as a general purpose decision support system. TPC-DS Version 2 enables emerging technologies, such as Big Data systems, to execute the benchmark. Benchmark implementation: \href{https://github.com/hortonworks/hive-testbench}{https://github.com/hortonworks/hive-testbench}} Testbench implementation with a dataset of 30 GB, results averaged on 5 executions with machines with the following specifications and the following optimizations:
+A comparison has been set up in order to compare the capabilities of Hive with respect to SQL Server, using Hortonworks' TPC-DS\footnote{"TPC Benchmark DS is a decision support benchmark that models several generally applicable aspects of a decision support system, including queries and data maintenance. The benchmark provides a representative evaluation of performance as a general purpose decision support system. TPC-DS Version 2 enables emerging technologies, such as Big Data systems, to execute the benchmark" \cite{tpcds} . Benchmark implementation: \href{https://github.com/hortonworks/hive-testbench}{https://github.com/hortonworks/hive-testbench}} Testbench implementation with a dataset of 30 GB, results averaged on 5 executions with machines with the following specifications and the following optimizations:
 \newline
 
 \begin{table}[!htb]
