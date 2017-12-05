@@ -6,7 +6,7 @@ The stack uses as a visualization tool \textbf{Tableau}, and in this chapter wil
 
 \section{Introduction}
 
-Tableau is a software dedicated to the creation of visualizations for the Business Intelligence. Tableau offers an highly intuitive and interactive way to the access, manipulation and analysis of data, without any need for coding, positioning itself among the first three product leaders in the sector \cite{gartner_tableau}. Tableau's main features include easiness and intuitiveness in the software use, data sources management and some innovative features such as table calculations and the possibility to use data analysis techniques directly on the plots.
+Tableau is a software dedicated to the creation of visualisations for the Business Intelligence. Tableau offers an highly intuitive and interactive way to the access, manipulation and analysis of data, without any need for coding, positioning itself among the first three product leaders in the sector \cite{gartner_tableau}. Tableau's main features include easiness and intuitiveness in the software use, data sources management and some innovative features such as table calculations and the possibility to use data analysis techniques directly on the plots.
 
 Tableau On Premise version is composed of two elements:
 
@@ -21,13 +21,13 @@ Tableau is structured in a Microsoft Excel fashion, with workbooks and sheets: a
 
 \subsection{Data Source}
 
-The first step during the creation of a workbook is to link Tableau to a data source \cite{LearningTableau}, either through a \textbf{File Connection}, which supports all of the main data formats available such as JSON, CSV, TSV, PDF and Excel sheets, or a \textbf{Server Connection}, to \textbf{relational databases}, such as Microsoft SQL Server and Hive, \textbf{NoSQL databases}, such as MongoDB or Cassandra, and \textbf{data sources in cloud}, such as Google Analytics, Amazon Redshift and Salesforce. If there's no optimized built-in driver, it's possible to use any ODBC\footnote{ODBC: Open DataBase Connectivity is a standard API to access DBMS} driver. Any interaction with a data source is handled by default with \textbf{VizQL} (Visual Query Language), which translates all of the drag-n-drop actions executed in the GUI to adequate queries to the data source, in order to get the desired results available for visualization.
+The first step during the creation of a workbook is to link Tableau to a data source \cite{LearningTableau}, either through a \textbf{File Connection}, which supports all of the main data formats available such as JSON, CSV, TSV, PDF and Excel sheets, or a \textbf{Server Connection}, to \textbf{relational databases}, such as Microsoft SQL Server and Hive, \textbf{NoSQL databases}, such as MongoDB or Cassandra, and \textbf{data sources in cloud}, such as Google Analytics, Amazon Redshift and Salesforce. If there's no optimized built-in driver, it's possible to use any ODBC\footnote{ODBC: Open DataBase Connectivity is a standard API to access DBMS} driver. Any interaction with a data source is handled by default with \textbf{VizQL} (Visual Query Language), which translates all of the drag-n-drop actions executed in the GUI to adequate queries to the data source, in order to get the desired results available for visualisation.
 
 Tableau's connection to a data source is available in two different types: Live and Extract.
 
 \paragraph{Live}
 
-A Live connection queries directly the data source, making the performances of this connection strictly dependent from the performances of the database being used. With this kind of connection it's possible to refresh all the plots each time data is being updated, making the visualizations almost real time.
+A Live connection queries directly the data source, making the performances of this connection strictly dependent from the performances of the database being used. With this kind of connection it's possible to refresh all the plots each time data is being updated, making the visualisations almost real time.
 
 \paragraph{Extract}
 
@@ -35,7 +35,7 @@ An Extract connection is a periodic query, which can be performed, for example, 
 
 \subsection{View Creation}
 
-Each field loaded from the data source is assigned one of two roles: dimension or measure. A \textbf{dimension} is used for categorized or discrete information, such as strings or dates, while a \textbf{measure} corresponds to numeric information, potentially object of aggregations. It's possible to change freely the roles of each field, according to the needs. Drag-n-drop allows to move dimensions and measures on both plots' axes and Tableau is able to automatically interpret the new layout, constructing a more significant chart.
+Each field loaded from the data source is assigned one of two roles: dimension or measure. A \textbf{dimension} is used for categorised or discrete information, such as strings or dates, while a \textbf{measure} corresponds to numeric information, potentially object of aggregations. It's possible to change freely the roles of each field, according to the needs. Drag-n-drop allows to move dimensions and measures on both plots' axes and Tableau is able to automatically interpret the new layout, constructing a more significant chart.
 
 \subsubsection{View Choice}
 The main focus of visual analytics is to represent data in a fashion so that it conveys as much information as possible at a glance.
@@ -45,10 +45,10 @@ More advanced representations are also supported such as:
 \begin{itemize}
 	\item Scatter plot, used to investigate correlation between variables.
 	\item Gannt chart, used to describe scheduling in time.
-	\item Bullet graph, used to give focus to our goal and its gap with the current state of affairs
+	\item Bullet graph, used to give focus to our goal and its gap with the current state of affairs.
 	\item Box and Whisker plot, used to highlight data distribution.
 	\item Bubble chart, used to show the concentration of data.
-	\item Tree map, used to emphasize hierarchy in a set.
+	\item Tree map, used to emphasise hierarchy in a set.
 	\item Geographical map, used to represent geo-coded data.
 \end{itemize} 
 
@@ -58,8 +58,8 @@ Furthermore, it is possible to use dual axis with different kinds of charts to r
 
 \subsection{Visual Analytics}
 
-The distinguishing features between a plain visualisation application and a Visual Analytics solution are the possibility to create interactive view and to process complex analysis.\\
-Visual Analytics, in fact, describes a way to present information useful to spur visual thinking: data can be highlighted, filtered and quickly represented through new charts. This gives us the chance to execute new analysis inspired by our natural inclination towards thinking visually.
+The feature that distinguishes a Visual Analytics solution from a plain visualisation application is the possibility to create interactive views and to process complex analyses.\\
+Visual Analytics, in fact, describes a way to present information useful to spur visual thinking: data can be highlighted, filtered and quickly represented through new charts. This gives us the chance to execute new analyses inspired by our natural inclination towards thinking visually.
 
 \subsubsection{Filtering}
 
@@ -84,7 +84,7 @@ Finally it is possible to filter data directly from the view selecting the marke
     \label{fig:TableCalculation}
 \end{figure}
 
-Tableau gives the user the possibility to use a great variety of operations, but allows for writing a custom table calculation, such as:
+Tableau gives the user the possibility to use a great variety of operations and allows for writing a custom table calculation, such as:
 
 \begin{itemize}
     \item Computing the running total.
@@ -99,7 +99,7 @@ Another innovative feature available in Tableau is the possibility to make stati
 
 \begin{itemize}
     \item \textbf{Trend lines}: each trend line added to a chart represents a regression, which Tableau builds according to linear, logarithmic, exponential or polynomial models.
-    \item \textbf{Forecasting}: in case of the visualization of a time series, it's possible to use the \textit{exponential smoothing} method to compute future values according to an exponential function weighing current value and past values' average; Tableau can also recognize periodic patterns in time series.
+    \item \textbf{Forecasting}: in case of the visualisation of a time series, it's possible to use the \textit{exponential smoothing} method to compute future values according to an exponential function, weighing current value and past values' average; Tableau can also recognize periodic patterns in time series.
     \item \textbf{Clustering}: Tableau uses K-Means algorithm to classify the data on the chosen variables and gives the user the possibility to change the value of K, that is the number of total clusters.
 \end{itemize}
 

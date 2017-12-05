@@ -16,7 +16,7 @@ In the ever changing environment of our digital world, floating in a widespread 
 
 \paragraph{Variety}
 
-With the rapid increase of published information, known as information explosion, data has begun to diversify more and more, and it is now unrealistic to expect just structured textual information such as classical Database tables; the new data flow includes unstructured data such as images, audio, PDFs and raw text files. The infrastructure must be able to extract information from heterogeneous sources.
+With the rapid increase of published information, known as information explosion, data has begun to diversify more and more, and it is now unrealistic to expect just structured textual information such as classical database tables; the new data flow includes unstructured data such as images, audio, PDFs and raw text files. The infrastructure must be able to extract information from heterogeneous sources.
 
 
 \section{A Big Data Infrastructure}
@@ -42,15 +42,15 @@ The machines are tied together in a single network each to one another, so that 
 Over the first layer of software provided by each machine's Operating System, the cluster needs an interface, so that from an higher point of view, like that of a developer or of an application, the whole system may seem a single entity. \newline
 That interface, provided by the Data \& Cluster Management layer, must offer: 
 \begin{itemize}
-	\item A distributed File System, able to be accessed like a standard one while providing high fault tolerance thanks to the replication of data on the different machines of the cluster.
+	\item A distributed filesystem, able to be accessed like a standard one while providing high fault tolerance thanks to the replication of data on the different machines of the cluster.
 	\item A distributed Operating System, able to manage access to resources on the whole cluster and to schedule application jobs.
 \end{itemize}
 
 \paragraph{Data Access}
 
 Having reached a more unified view on the cluster thanks to the previous layer, we can forget about the details of the single machines.\newline
-As we would use Databases on a normal computer, so we add, on top of the data access layer, a distributed Database able to store our data efficiently and for easy access on the distributed File System.
-Distributed Databases come in different shapes and styles, ranging from the familiar relational ones to non-relational document stores and key-value row based stores.
+As we would use databases on a normal computer, so we add, on top of the data access layer, a distributed database able to store our data efficiently and for easy access on the distributed filesystem.
+Distributed databases come in different shapes and styles, ranging from the familiar relational ones to non-relational document stores and key-value row based stores.
 
 \paragraph{Data Quality}
 
@@ -64,13 +64,13 @@ Therefore, data must go through the Data Quality layer in order to be ready for 
 
 \paragraph{Data Processing}
 
-Over all the previous strata, we can finally run some applications on the Data Processing layer; those applications, executed in jobs scheduled and managed by the distributed Operating System, process the clean data stored on the distributed Database or on the distributed File System.\newline
+Over all the previous strata, we can finally run some applications on the Data Processing layer; those applications, executed in jobs scheduled and managed by the distributed Operating System, process the clean data stored on the distributed database or on the distributed filesystem.\newline
 This layer provides for distributed processing frameworks where applications can be deployed and run seamlessly on the cluster as a whole, in-memory or on disk, in batches or in real time.\newline
-Processed data can then be stored again on the File System or on the Database, formatted or enriched in information for later visualisation or further elaboration.
+Processed data can then be stored again on the filesystem or on the database, formatted or enriched in information for later visualisation or further elaboration.
 
 \paragraph{Data Visualisation}
 
-The topmost layer of the main part of the stack is the Data Visualisation layer which supplies a Visualizing software, whose job is to load data stored on the Database or File System, processed and enriched in the previous layer, and make its information intelligible to humans through the use of images, which can convey several dimensions on a 2D plot thanks to their geometric shape, position and size and their colours.
+The topmost layer of the main part of the stack is the Data Visualisation layer which supplies a visualising software, whose job is to load data stored on the database or filesystem, processed and enriched in the previous layer, and make its information intelligible to humans through the use of images, which can convey several dimensions on a 2D plot thanks to their geometric shape, position and size and their colours.
 
 \paragraph{Data Ingestion}
 
