@@ -1,6 +1,6 @@
 \chapter{Data Processing}
 
-Data Processing is the layer immediately following the Data Quality: once data have been formatted and cleansed, adapted then to our needs, we can start analysing and processing them through the use of adequate frameworks, in order to extract from, transform and enrich them for visualization purposes.\\
+Data Processing is the layer immediately following the Data Quality: once data have been formatted and cleansed, adapted then to our needs, we can start analysing and processing them using adequate frameworks, in order to extract from, transform and enrich them for visualization purposes.\\
 
 \section{Data Processing Techniques}
 
@@ -9,7 +9,7 @@ Data Processing is the layer immediately following the Data Quality: once data h
 Batch data processing is the most classical data processing mode and is characterised by the delayed execution and the simultaneous processing of data in chunks (batches) loaded from a dataset.
 \\
 \newline
-The processing is divided in three phases, at first data are collected for an extended period of time, after that period the batch of collected data is loaded to the processing component where it is modified concurrently as a whole, with transformation like Map and Reduce; finally the processed batch is written again on the database.
+The processing is divided in three phases: at first data are collected for an extended period of time, after which the batch of collected data is loaded to the processing component where it is modified concurrently as a whole, with transformation like Map and Reduce; finally the processed batch is written again on the destination storage.
 \newline
 \\
 The main advantages of this method are that it efficiently processes high volumes of data and transactions, and that processing can be scheduled at fixed times or when the machines' load is light; the main drawback is that it is not suited for real time applications which are becoming more and more prominent.
@@ -19,24 +19,24 @@ The main advantages of this method are that it efficiently processes high volume
 A graph in data science is a representation of entities and their relationships.\newline
 Entities are represented as nodes, the vertices, and the relationships as edges between those nodes.\newline
 \\
-Data represented in such way is useful to represent information where connection is as important as the entity, such as people's friends networks or the world wide web; and requires a very different processing model in respect to other structured data.\newline
+Data represented in such way is useful to represent information where connection is as important as the entity, such as people's friends networks or the world wide web; and requires a very different processing model with respect to other structured data.\newline
 \\
 A widely used Graph processing system is Apache Giraph used for Facebook friends' networks, which implements the architecture described in Google's project Pregel paper for large-scale graph computing\cite{Malewicz:2010:PSL:1807167.1807184}.
 \\
-Both Apache Spark and Flink feature plugins for the support of graph analytics.
+Both Apache Spark and Flink feature plugins for the support of graph analysis.
 
 \subsection{Stream Processing} \label{StreamProc}
 
 Streaming data processing differentiates itself from the classic data processing for its use of unbounded datasets, that is a continuous and endless data flow which needs adequate abstractions in order to be able to apply operators or transformations like Map, Reduce and Filter operations. \\ 
 
-Generally, there are 2 execution models usable when to approach an unbounded dataset:
+Generally, there are 2 execution models usable when approaching an unbounded dataset:
 
 \begin{itemize}
     \item \textbf{Streaming}: continuous elaboration as long as data are being produced.
     \item \textbf{(Micro-)Batch}: finite time execution, which releases resources when the batch processing ends.
 \end{itemize}
 
-A Batch based execution is feasible when requirements on the state management, in-order consuming and windowing are not present or very relaxed and, thus, a Streaming approach is generally favoured because of the conceptual paradigm which defines it: Dataflow Programming.
+A Batch based execution is feasible when requirements on the state management, in-order consuming and windowing are not present or very relaxed and, thus, a Streaming approach is generally favoured because of the conceptual paradigm which defines it: \textbf{Dataflow Programming}.
 
 \paragraph{Dataflow Programming}  \label{DataflowProg}
 
@@ -47,10 +47,10 @@ This paradigm emphasizes the continuous flow of data between operators, defined 
 
 \section{MapReduce} \label{MapReduce}
 
-\textbf{MapReduce} \cite{hadoop_doc} is a framework, part of Apache Hadoop, named after its algorithm, engined to be run on YARN to deploy applications able to process data in batches from HDFS or distributed databases. \\
+\textbf{MapReduce} \cite{hadoop_doc} is a framework, part of Apache Hadoop, named after its processing  abstractions, engined to be run on YARN to deploy applications able to process data in batches from HDFS or distributed databases. \\
 
 \subsection{Structure}
-The framework's management is handled by two tracker components, the \textbf{Job Tracker} who acts as a master and the \textbf{Task Trackers} who run on the single nodes, act as slaves and carry out the tasks issued by the \textbf{Job Tracker}.
+The framework's management is handled by two tracker components, the \textbf{Job Tracker} who acts as a master and the \textbf{Task Trackers} who run on the single nodes, acting as slaves and carrying out the tasks issued by the \textbf{Job Tracker}.
 
 The \textbf{Job Tracker} manages available resource and the MapReduce job's lifecycle.\\ It is responsible for the load distribution using a Data Locality policy, so that nodes are chosen to process data present in their file system if possible or at least from a machine in the same rack. This way the overhead caused by the sending of data is minimised.
 \\
@@ -66,7 +66,7 @@ A MapReduce job usually involves six steps:
 	\item \textbf{Mapping}: Each Map node applies the Map function defined by the developer to the list of key, value pair in its batch and outputs a transformed list of key, value pairs
 	\item \textbf{Shuffling}: The framework sorts and shuffles the pairs output by the Mapping so that pairs with the same key are sent to the same Reduce node.
 	\item \textbf{Reducing}: Each Reduce node applies the Reduce function defined by the developer to the Mapped list of key, value pair and for each key aggregates all values and produces one or more transformed pairs.
-	\item \textbf{Output handling}: The framework collects all outputs from Reduce nodes and writes it onto HDFS or a DB, usually the same whence the input data set came
+	\item \textbf{Output handling}: The framework collects all outputs from Reduce nodes and writes it onto HDFS or a DB, usually the same where the input data set came from.
 \end{enumerate}
 
  \pagebreak
@@ -75,15 +75,15 @@ A MapReduce job usually involves six steps:
 
 \href{https://spark.apache.org/}{\textbf{Apache Spark}} \cite{spark_doc} is an open source distributed computational framework originally developed at Berkeley and now maintained by the Apache Software Foundation.
 \\
-Conceived as a general multiplatform engine, Spark can run as standalone, on YARN or on Apache Mesos; can access data from standard File Systems, from HDFS or any distributed database and can be used for Batch Processing, Graph Processing (thanks to GraphX plugin) or Stream Processing.
+Conceived as a general multiplatform engine, Spark can run in a standalone cluster, on YARN or on Apache Mesos\footnote{\href{https://mesos.apache.org/}{Mesos} is a distributed cluster manager used to manage datacenters with a master-slave architecture. It's a lower level abstraction with respect to YARN and thus performs a different job more inclined towards machines management and task scheduling, than purely job's scheduling.}. It can access data from standard File Systems, from HDFS or any distributed database and can be used for Batch Processing, Graph Processing (thanks to GraphX plugin) or Stream Processing.
 \\
 \\
 The problem that sparked its creation was MapReduce's inefficiency in applications that use the same working set of data on multiple parallel operations, among which are included: iterative machine learning algorithms and interactive data analysis tools \cite{Zaharia:2010:SCC:1863103.1863113}; Spark's aim is to support such applications while providing scalability and fault tolerance.
 \\
-In order to do that, Spark uses a typical architecture with a \textbf{Driver Program} that runs the developer application's main() and executes parallel task on the clusters and its main abstraction: Resilient Distributed Dataset (RDD).
+In order to do that, Spark uses a typical architecture with a \textbf{Driver Program} that runs the developer application's main() and executes parallel tasks on the cluster through its main abstraction: Resilient Distributed Dataset (RDD).
 
 \subsection{Resilient Distributed Dataset}
-RDD is a collection of elements partitioned across the cluster's nodes in a fault tolerant way that can be processed in parallel, persisted in memory to be used iteratively and efficiently by parallel operations; an RDD is usually instantiated from an input file loaded from HDFS or a distributed database; operations are then processed on it through classical Map, Filter and Reduce functions, a series of these operations will produce a graph with the execution planned called \textbf{lineage}, from the \textbf{lineage} an RDD can be reinstated to its proper state even after failure.
+An RDD is a collection of elements partitioned across a cluster's nodes in a fault tolerant way that can be processed in parallel, persisted in memory to be used iteratively and efficiently by parallel operations; an RDD is usually instantiated from an input file loaded from HDFS or any other distributed database; operations are then applied on it through classical Map, Filter and Reduce functions, producing a graph with the execution planned called \textbf{lineage}, from which an RDD can be reinstated to its proper state even after failure.
 Beside these features RDD also has the following traits:
 \begin{itemize}
 	\item In-Memory, data inside RDD is stored for as long and as much as possible in memory (RAM), as opposed to the disk-oriented methods of MapReduce.
@@ -98,40 +98,40 @@ Beside these features RDD also has the following traits:
 \subsection{Extensions}
 \subsubsection{GraphX}
 
-GraphX is an extension of Spark for graphs and graph analysis. GraphX extends RDD adding a Graph abstraction implemented as a directed multigraph with properties attached to both vertices and edges and exposes typical graph operators, while also providing an optimized variant of the Pregel API.
+GraphX is a Spark extension for graphs and graph analysis. GraphX extends RDD adding a Graph abstraction implemented as a directed multigraph with properties attached to both vertices and edges and exposes typical graph operators, while also providing an optimized variant of the Pregel API.
 
 \paragraph{Property Graph}
 
-The Graph abstraction, or property graph is a directed multigraph with properties attached to each vertex and edge defined by the developer. A directed multigraph is defined as a directed graph where more than one edge can connect two nodes, as two nodes might have multiple relationships with different properties, (i.e. Annie and Barb are both colleagues and friends). \\ \\
-Property graphs, like RDDs, are immutable and to transform them a new one must be instantiated from the former through an operation, they are distributed across executors using vertex partitioning heuristics and are fault-tolerant thanks to the same lineage mechanism seen in RDDs.
+The Graph abstraction, or property graph is a directed multigraph with properties attached to each vertex and edge, defined by the developer. A directed multigraph is defined as a directed graph where more than one edge can connect two nodes, as two nodes might have multiple relationships with different properties, (e.g. Annie and Barb are both colleagues and friends). \\ \\
+Property graphs, like RDDs, are immutable and to transform them a new one must be instantiated from the former through an operation, they are distributed across executors using vertex partitioning heuristics and are fault-tolerant, thanks to the same lineage mechanism seen in RDDs.
 
 \paragraph{Graph Operations}
 
-Graphs implement several operators that can be divided in three classes
+Graphs implement several operators that can be divided in three classes:
 
 \begin{itemize}
-	\item Property Operators: The Graph equivalent to RDD map, with the difference that you can choose to run map over the vertices, the edges, or the <source node, edge, destination node> triplets , to modify the properties of said components.
-	\item Structural Operators: Which act on the topology of the graph, an example would be reverse which, from a Graph, returns a new Graph where all edges' directions are reversed.
-	\item Join Operators: Used to join properties from different graphs or from external collections like RDDs.
+	\item \textbf{Property Operators}: the Graph equivalent to RDD map, with the difference that you can choose to map over the vertices, the edges, or the \texttt{<source node, edge, destination node>} triplets , to modify the properties of said components.
+	\item \textbf{Structural Operators}: acting on the topology of the graph, an example would be reverse which, from a Graph, returns a new Graph where all edges' directions are reversed.
+	\item \textbf{Join Operators}: used to join properties from different graphs or from external collections like RDDs.
 \end{itemize}
 
 
 \subsubsection{SparkStreaming}
 
-SparkStreaming in an extension of Spark developed to enable live data stream processing in the falut-tolerant and highly scalable framework provided by Spark while maintaining a high throughput.
-The ingested stream source can be any major Apache source like Kafka, Flume and Nifi; other streams like Amazon Kinesis, File Systems like HDFS or S3 and TCP sockets.
-The stream can be processed through the high-level functions like map, reduce and join and finally output to File System and Distributed Databases.
+\textbf{SparkStreaming} in a Spark extension developed to enable live data stream processing in the fault-tolerant and highly scalable framework provided by Spark while maintaining a high throughput.
+The ingested stream source can be any major source like Kafka, Flume and NiFi; other streams like Amazon Kinesis, filesystems like HDFS or S3 and TCP sockets.
+The stream can be processed through the high-level functions like map, reduce and join and finally output to any filesystem, distributed databases or further stream outputs.
 
 \paragraph{DStream}
 
 DStream, short for Discretized Stream, is the main abstraction introduced by SparkStreaming, which represents a continuous stream of data. \\
-As for RDDs, DStreams can be instantiated from a stream source like Kafka, Flume and Kinesis, or by applying a transformation on another DStream like map. As it stands DStreams are in fact sequences of RDDs, maintaining therefore their properties of being Distributed and Fault-Tolerant.
+As for RDDs, DStreams can be instantiated from a stream source like Kafka, Flume and Kinesis, or by applying a transformation on another DStream like map. As it stands, DStreams are in fact sequences of RDDs, maintaining therefore their properties of being distributed and fault-tolerant.
 \\ \\
-Internally a continuous stream of data, splits the live flow into mini batches which are then sent to the Spark Engine that can then process them as batches and output them to processed batches as previously seen.
+Internally a continuous stream of data, DStream splits the live flow into mini batches which are then sent to the Spark engine that can then process them as batches and output them to processed batches as previously seen.
 
 \subsubsection{MLlib}
 
-Machine Learning Library, or MLlib for short is a set of APIs for Spark that expose several tools for Machine Learning using Spark as a backend taking advantage of Spark's efficiency in iterative algorithms.
+Machine Learning Library, or \textbf{MLlib} for short is a set of APIs for Spark that exposes several tools for Machine Learning, using Spark as a backend taking advantage of Spark's efficiency in iterative algorithms.
 
 MLlib exposes a selection of Machine Learning algorithms for classification, regression, creation of decision trees and random forest, recommendation, clustering, topic modelling and pattern mining.
 It also offers other tools to transform features, to handle datasets and hyperparameters and to make computation with distributed linear algebra and statistics.
@@ -146,8 +146,8 @@ It also offers other tools to transform features, to handle datasets and hyperpa
 \begin{itemize}
 	\item \textbf{Stateful Streaming}: It's the lowest abstraction layer, which allows developers to freely manage data flows and their processing, use fault-tolerant states and callback registration on events.
 	\item \textbf{Core API}: it's the basic API, which is divided between \textbf{DataStream API}, specifically conceived for bounded and unbounded dataset processing, and \textbf{DataSet API}, implemented as a special case of the first API set, used only for bounded datasets. These 2 APIs offer transformations and operations like unions, aggregations, windowing and state management, needed for the data flow upon which they are applied.
-	\item \textbf{Table API}: it's a declarative DSL \footnote{Domain Specific Language: a language with a limited expressiveness which focuses on a given domain of use.} which follows the extended relational model and offers the possibility to model a data stream like a table upon which it's possible to execute operations like projections, aggregations and groupings. Despite being less expressive with respect to the Core API, they allow for a greater compactness when it comes to describing the operations to be executed on the data.
-	\item \textbf{SQL}: it's the highest level of abstraction offered by Flink and interacts directly with the Table APIs in order to provide a representation of the application being developed through SQL queries. It can be executed on the tables defined by the Table API, directly on the data.
+	\item \textbf{Table API}: it's a declarative DSL \footnote{Domain Specific Language: a language with a limited expressiveness which focuses on a given domain of use.} which follows the extended relational model and offers the possibility to model a data stream like a table upon which it's possible to execute operations like projections, aggregations and groupings. Despite being less expressive with respect to the Core API, it allows for a greater compactness when it comes to describing the operations to be executed on the data.
+	\item \textbf{SQL}: it's the highest level of abstraction offered by Flink and interacts directly with the Table APIs in order to provide a representation of the application being developed through SQL queries. It can be executed on the tables defined by the Table API, thus directly on the data.
 \end{itemize}
 
 \subsection{Programs Dataflows}  \label{ProgramsDataflows}
@@ -188,22 +188,22 @@ stats.addSink(new RollingSink(path))
 
 \paragraph{Event Time}
 
-Flink supports different notions of time in streaming programs \cite{flink_eventtime} and each of them can be useful for specific use cases:
+Flink supports different notions of time in streaming programs \cite{flink_eventtime}, each of them useful for specific use cases:
 
 \begin{itemize}
     \item \textbf{Processing time} refers to the system time of the machine that is executing the respective operation.
     
-    When it is being used, the system clock of the machines will be used to run all time-based operations. Being the simplest notion of time, no coordination between streams and machines is required, providing, this way, the best performance with the lowest latency. However, since the entire environment is distributed and can work asynchronously, processing time does not provide determinism, because of its susceptibility to the speed at which records arrive in the system and flow between each pair of operator inside the system.
+    When it is being used, the system clock of the machines will be used to run all time-based operations. Being the simplest notion of time, no coordination is required between streams and machines, providing, this way, the best performance with the lowest latency. However, since the entire environment is distributed and might work asynchronously, processing time does not provide determinism, because of its susceptibility to the speed at which records arrive in the system and flow between each pair of operators inside the system.
     
-    \item \textbf{Event time} is the time embedded within a record, representing when it occurred on its producing device. This time is typically assigned before records enter Flink and it can be extracted directly from the record. An event time window of an hour will contain only records carrying an event timestamp within that hour, regardless of their actual time and order of arrival.
+    \item \textbf{Event time} is the time embedded within a record, representing when it occurred on its producing device. This time is typically assigned before records enter Flink and it can be extracted directly from the record at the Source level. An event time window of an hour will contain only records carrying an event timestamp within that hour, regardless of their actual time and order of arrival.
     
-    Event time is especially useful when dealing with out-of-order or late events, and even on replays of data from persistent logs or backups. When using event time, the progress of time is discretized based on the data, rather than the clock and, for this reason, the generation of the Event Time Watermarks, central to the mechanism that signals progress in event time,  must be specified internally to the program.
+    Event time is especially useful when dealing with out-of-order or late events, and even on replays of data from persistent logs or backups. When using event time, the progress of time is discretized based on the data, rather than the clock, and the generation of the Event Time Watermarks, central to the mechanism that signals progress in event time,  must be specified internally to the program.
     
-    Event time processing causes inherently a certain latency, due to its waiting for late and out-of-order events.
+    Event time processing inherently causes a certain latency, due to its waiting for late and out-of-order events.
     
     \item \textbf{Ingestion time} is the time that events enter Flink. The source operator assigns to each record its current time as a timestamp, which all time-based operations refer to.
     
-    Ingestion time can be considered an alternative sitting, conceptually speaking, in between event time and processing time: it is more expensive than processing time, while providing deterministic results, as it uses stable timestamps, assigned once at the source, used by all of the following time-based operations, but cannot handle any out-of-order events or late data, with respect to event time, even though there's no need to specify the watermarks generation.
+    Ingestion time can be considered an alternative, conceptually speaking, in between event time and processing time: it is more expensive than processing time, while providing deterministic results, as it uses stable timestamps assigned once at the source and used by all of the following time-based operations, but cannot handle any out-of-order events or late data, with respect to event time, even though there's no need to specify the watermarks generation.
 \end{itemize}
 
 
@@ -211,7 +211,7 @@ Flink supports different notions of time in streaming programs \cite{flink_event
 
 Windows are the core mechanism within a stream processing framework. They allow the application of operations after splitting the stream into \textit{buckets} of finite size. The structure of a windowed Flink program differs when considering \textbf{keyed} and \textbf{non-keyed} streams: a keyed stream is split into multiple logical sub-streams and a window is applied to each one of them separately, differently from a non-keyed stream where the window is applied globally and within a single task \cite{flink_windows}.
 
-A Window lifecycle starts as soon as the first element belonging to it arrives and ends, being completely removed, when the time, event or processing time, passes its end timestamp plus any user-specified \textbf{allowed lateness}. For example, in an event-time-based Flink application where a tumbling window is created every 5 minutes with an allowed lateness of 1 minute, a new window will be created for the interval between 11:30 and 11:35, as soon as a record with a timestamp falling into that interval arrives, and will be removed when the watermark passes the 11:36 timestamp.
+A Window lifecycle starts as soon as the first element belonging to it arrives, ending, by being completely removed, when the time, event or processing time, passes its end timestamp plus any user-specified \textbf{allowed lateness}. For example, in an event-time-based Flink application where a tumbling window is created every 5 minutes with an allowed lateness of 1 minute, a new window will be created for the interval between 11:30 and 11:35, as soon as a record with a timestamp falling into that interval arrives, and will be removed when the watermark passes the 11:36 timestamp.
 
 For each window must be specified a \textbf{Trigger} and a function (\texttt{WindowFunction}, \texttt{ReduceFunction} or \texttt{FoldFunction}) attached to it: the Trigger is used to specify the conditions under which the window is considered ready or complete for the function to be applied, while the function will contain the operation to be applied to the contents of the window. The triggering policy is completely customizable and can even decide to purge a window’s contents, leaving the window metadata untouched, in order to add new data to that window.
 
@@ -220,8 +220,8 @@ It's possible specify an \textbf{Evictor}, used to remove elements from the wind
 There are four main window assigners usable in Flink:
 
 \begin{itemize}
-    \item \textbf{Tumbling Windows} are fixed size and non-overlapping windows, which are configured with a parameter controlling how much frequently a new window has to be started.
-    \item \textbf{Sliding Windows} are fixed size, similarly to tumbling windows, but are configured with an additional slide parameter, which controls how frequently a sliding window is started. Therefore they overlap and elements are assigned to multiple windows.
+    \item \textbf{Tumbling Windows} are fixed size and non-overlapping windows, configured with a parameter controlling how much frequently a new window has to be started.
+    \item \textbf{Sliding Windows} are fixed size, similarly to tumbling windows, but are configured with an additional slide parameter, which controls how frequently a sliding window is started. Therefore they may overlap, with elements assigned to multiple windows.
     \item \textbf{Session Windows} group elements by sessions of activity. Session windows do not overlap and do not have a fixed start and end time, in contrast to tumbling windows and sliding windows. A session window closes when it does not receive elements for a certain period of time, i.e., when a gap of inactivity occurred.
     \item \textbf{Global Windows} assign all elements with the same key to the same single global window. This windowing scheme is only useful if you also specify a custom trigger. 
 \end{itemize}
@@ -243,18 +243,18 @@ The parallelism of a task is the parameter indicating the number of subtasks an 
 
 Streams can transport data between a pair of operators following two different patterns: One-to-one pattern and redistributing pattern:
 \begin{itemize}
-	\item \textbf{One-to-one streams} preserve the stream partitioning and the order of the elements passed to the following operator. For example, the subtask[0] of a map() operator will get to see the same elements produced by the subtask[0] of the previous Source operator.
+	\item \textbf{One-to-one streams} preserve the stream partitioning and the order of the elements passed to the following operator. For example, the subtask[0] of a \texttt{map()} operator will get to see the same elements produced by the subtask[0] of the previous Source operator.
    
-    \item \textbf{Redistributing streams} change their partitioning, sending the data to different subtasks, based on the transformation being applied. For example, a keyBy() operator repartitions the stream using the hash of the chosen key. In this case, the elements' order will be preserved only between neighbouring operations pairs, and won't be ever guaranteed being the same in the following operators.
+    \item \textbf{Redistributing streams} change their partitioning, sending the data to different subtasks, based on the transformation being applied. For example, a \texttt{keyBy()} operator repartitions the stream using the hash of the chosen key. In this case, the elements' order will be preserved only between neighbouring operations pairs, and won't be ever guaranteed being the same in the following operators.
 \end{itemize}
 
 \subsection{Data Streaming Fault Tolerance}
 
 Flink offers built-in guarantees in case of failures, so that there's minimum disruption on the processing jobs and a consistent recovery of the data streaming applications' state. The two main features which allows recovery from errors or runtime exceptions are \textbf{Checkpoints} and \textbf{Savepoints}.
 
-In case of a program failure (due to machine-, network-, or software failure), Flink stops the distributed streaming dataflow, restarting the operators and resetting them to the latest successful checkpoint, while also resetting the input streams to that same point of the state snapshot. Any records processed as part of the restarted parallel dataflow are guaranteed to not have been part of the previously checkpointed state.
+In case of a program failure (due to machine-, network-, or software failure), Flink stops the distributed streaming dataflow, restarting the operators and resetting them to the latest successful checkpoint, while also resetting the input streams to that same point of the state. Any records processed as part of the restarted parallel dataflow are guaranteed to not have been part of the previously checkpointed state.
 
-For this mechanism to realize its full guarantees, the data stream source, being it a message queue or a broker, needs to be able to rewind the stream to a defined recent point. Apache Kafka, thanks to its offsets, has this ability and Flink’s connector to Kafka makes use of that ability.
+For this mechanism to realize its full guarantees, the data stream source needs to be able to rewind the stream to a defined recent point. Apache Kafka, thanks to its offsets, has this ability and Flink’s connector to Kafka makes use of it.
 
 \subsubsection{Checkpoints}
 
@@ -297,7 +297,7 @@ A core element in Flink’s distributed checkpointing are the \textit{stream bar
 \\
 Let's call $S_n$ the point in the stream where the barriers for snapshot $n$ are injected, representing the position up to which the snapshot covers the data, reported to the checkpoint coordinator, Flink’s JobManager.
 \\\\
-Flowing downstream, each intermediate operator must receive a barrier for snapshot $n$ from all of its input streams before, then, emitting a barrier for the same snapshot into all of its outgoing streams, until a sink operator is reached. Once a sink has received a barrier $n$, from all of its input streams, the snapshot $n$ is acknowledged to the checkpoint coordinator and the checkpoint is considered complete.
+Flowing downstream, each intermediate operator must receive a barrier for snapshot $n$ from all of its input streams before emitting a barrier for the same snapshot into all of its outgoing streams, until a sink operator is reached. Once a sink has received a barrier $n$, from all of its input streams, the snapshot $n$ is acknowledged to the checkpoint coordinator and the checkpoint is considered complete.
 
 At the completion of snapshot $n$, the job will never ask the sources to replay the records from before $S_n$, since they all went through the topology.
 \\\\
@@ -332,14 +332,14 @@ flink savepoint <jobId> [<savepointDirectory>] -yid <yarnAppId>
     \captionof{listing}{Savepoint triggering from the Flink CLI}
 \end{code}~\\
 
-\textbf{Savepoints}, just like checkpoints, serve the purpose to save the state of a Flink application in case of cancellation or failures. Differently from checkpoints, they can only be performed manually from Flink CLI, but support parallelism rescaling and they're the go-to choice when Flink's application computational capabilities must be improved by setting an higher parallelism factor or when an upgrade to a more recent version of Flink must be performed. Savepoint's mechanism works such that it associates each application's stateful operator, to its own state in a map-like structure: for this very reason, in order to successfully preserve state when upgrading a Flink application, each stateful operator needs to have its own \texttt{uid} set.
+\textbf{Savepoints}, just like checkpoints, serve the purpose to save the state of a Flink application in case of cancellation or failures. Differently from checkpoints, they can only be performed manually from the Flink CLI, but support parallelism rescaling and they're the go-to choice when Flink's application computational capabilities must be improved by setting an higher parallelism factor or when an upgrade to a more recent version of Flink must be performed. Savepoint's mechanism works such that it associates each application's stateful operator, to its own state in a map-like structure: for this very reason, in order to successfully preserve state when upgrading a Flink application, each stateful operator needs to have its own \texttt{uid} set.
 
 \subsection{High Availability}
 
-A Flink's setup, whether a standalone cluster (being it containerized or physical) or using Distributed Resource Managers such as \nameref{YARN} or Mesos\footnote{\href{https://mesos.apache.org/}{Mesos} is a distributed cluster manager used to manage datacenters with a master-slave architecture. It's a lower level abstraction with respect to YARN and thus performs a different job more inclined towards machines management and task scheduling, than purely job's scheduling.}, is made of a Job Manager and one or more Task Managers, each one with one or more parallelism slots (cores usable for processing). Task Managers (TMs) handle jobs actual executions, while the Job Manager (JM) handles TM orchestration and monitoring and, for this reason, is a single point of failure, whose crash causes the entire Flink cluster to stop.
-follows the principles of a Active-Standby architecture (also used by HDFS Namenode e YARN Resource Manager HA set-ups) where a single leading JM is active, while multiple JMs standby, ready to take over leadership in case the leader failure. This guarantees that there is no single point of failure and programs can make progress as soon as a standby JM has taken leadership. There is no explicit distinction between standby and master JM instances: all of the possible JMs are registered as masters to \textbf{Zookeeper}, which is going to handle failure scenarios.
+A Flink's setup, whether a standalone cluster (being it containerized or physical) or using Distributed Resource Managers such as \nameref{YARN} or Mesos, is made of a Job Manager and one or more Task Managers, each one with one or more parallelism slots (cores usable for processing). Task Managers (TMs) handle jobs actual executions, while the Job Manager (JM) handles TM orchestration and monitoring and, for this reason, is a single point of failure, whose crash causes the entire Flink cluster to stop.
+Flink High Availability setup follows the principles of a Active-Standby architecture (also used by HDFS Namenode e YARN Resource Manager HA set-ups) where a single leading JM is active, while multiple JMs standby, ready to take over leadership in case the leader failure. This guarantees that there is no single point of failure and programs can make progress as soon as a standby JM has taken leadership. There is no explicit distinction between standby and master JM instances: all of the possible JMs are registered as masters to \textbf{Zookeeper}, which is going to handle failure scenarios.
 
-In case of YARN clusters configured in High Availability mode, a single JM, being the \textbf{Application Master}, is still run, but YARN itself will restart its container on failures. As additional configuration, the maximum number of attempts for the application masters needs to be configured in the YARN configuration.
+In case of YARN clusters configured in High Availability mode, a single JM, the \textbf{Application Master}, is run, but YARN itself will restart its container on failures. As additional configuration, the maximum number of attempts for the application masters needs to be configured in the YARN configuration.
 
 \subsection{Flink Extensions} \label{FlinkLibs}
 
@@ -368,7 +368,7 @@ val result: DataStream[Alert] = patternStream.select(createAlert(_))
 In FlinkCEP, a \textbf{Pattern}, similarly to a pattern of a Regular Expression, can be \textbf{single} or \textbf{iterative}. For example, in a pattern like \texttt{"a b+ c? d"}, \texttt{a}, \texttt{c?} e \texttt{d} are single patterns, while \texttt{b+} is iterative.
 \\
 
-In a Pattern there can be, analogously to Regular Expressions, Quantifiers and Conditions.
+In a Pattern there can be, analogously to regular expressions, \textbf{quantifiers} and \textbf{conditions}.
 
 \paragraph{Quantifiers}
 
@@ -437,10 +437,10 @@ On this new stream \texttt{select} or \texttt{flatSelect} operations need to be 
 
 \subsubsection{Other extensions: Flink Gelly and FlinkML}
 
-In addition to the aforementioned library for complex event handling, Flink makes specific sets of API available, which provide useful tools when it comes to enable advanced processing on data.
+In addition to the aforementioned library for complex event handling, Flink makes available specific sets of API, which provide useful tools when it comes to enable advanced processing on data.
 
-\paragraph{Flink Gelly} is an API based on the Flink \texttt{Dataset}s API specifically developed for Graph Processing. Graphs are stored as a finite set of vertices and edges, a special case of a \texttt{Dataset}. This library allows the application of operators like Map, Filter, Intersect and Union, Mutations like edge and vertex removal, but also advanced techniques belonging to Graph Theory like \textit{Iterative Graph Processing} (Vertex-centric, Scatter-Gather and Gather-Sum-Apply), \textit{Single Source Shortest Paths}, \textit{Clustering} and Similarity analysis.
+\paragraph{Flink Gelly} is an API based on the Flink \texttt{Dataset}s API specifically developed for Graph Processing. Graphs are stored as a finite set of vertices and edges, a special case of a \texttt{Dataset}. This library allows the application of operators like Map, Filter, Intersect and Union, mutations like edge and vertex removal, but also advanced techniques belonging to Graph Theory like \textit{Iterative Graph Processing} (Vertex-centric, Scatter-Gather and Gather-Sum-Apply), \textit{Single Source Shortest Paths}, \textit{Clustering} and \textbf{Similarity Analysis}.
 
-\paragraph{FlinkML} is a set of tools which allows the application of Machine Learning techniques on Flink data streams, including both algorithmic implementations for supervised (\textit{SVMs} and \textit{Multiple Linear Regressors}) and unsupervised (\textit{K-nearest neighbours}) learning, Data Preprocessing and Recommendation (\textit{ALS}).
+\paragraph{FlinkML} is a set of tools which allows the application of Machine Learning techniques over Flink data sets, including both algorithmic implementations for supervised (\textit{SVMs} and \textit{Multiple Linear Regressors}) and unsupervised (\textit{K-nearest neighbours}) learning, Data Preprocessing and Recommendation (\textit{ALS}).
 
 
