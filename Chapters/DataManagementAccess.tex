@@ -2,39 +2,39 @@
 
 \section{HDFS}
 
-The Hadoop Distributed File System, or HDFS for short, is a distributed File System engineered to run on any kind of hardware and to be easily scalable into huge clusters. Originally developed for Apache Nutch is now part of the Hadoop project, providing high fault-tolerance thanks to data replication and high throughput access to application data, making it suitable for Big Data applications \cite{hadoop_doc}.
+The Hadoop Distributed File System, or HDFS for short, is a distributed File System engineered to run on any kind of hardware and to be easily scalable into huge clusters. Originally developed for Apache Nutch, it is now part of the Hadoop project, providing high fault-tolerance thanks to data replication and high throughput access to application data, making it suitable for Big Data applications \cite{hadoop_doc}.
 
 \subsection{Architecture} 
 
-HDFS has a master-slave architecture, comprised of two main components: a single \textbf{NameNode} which functions as a master and is in charge of the File System namespace management and the access control on its data by the clients and a list of \textbf{DataNodes} spread among the cluster's machines which handle the storage on the node they run on.\newline
-HDFS interface, managed by the \textbf{NameNode} exposes a File System namespace and allows users to store data in files within a directory-based hierarchy, much like the regular File Systems used in general purpose machines; under the surface the file is split in one or more blocks which are then stored on a subset of \textbf{DataNodes} called rack.\newline The \textbf{NameNode} stores the metadata of the content of the whole File System and is responsible for the File System namespace operations over the files and directories and determines how blocks are mapped to the \textbf{DataNodes}.
-The \textbf{DataNodes} serve the read and write requests sent by the File System's clients and can perform basic operations on the block (creation, deletion, copy) when so instructed by the \textbf{NameNode}.
+HDFS has a master-slave architecture, comprised of two main components: a single \textbf{NameNode} which functions as a master and is in charge of the filesystem namespace management and the access control on its data by the clients and a list of \textbf{DataNodes} spread among the cluster's machines which handle the storage on the node they run on.\newline
+HDFS interface, managed by the NameNode exposes a filesystem namespace and allows users to store data in files within a directory-based hierarchy, much like a regular filesystem used in general purpose machines; under the surface, the file is split in one or more blocks which are then stored on a subset of DataNodes called rack.\newline The NameNode stores the metadata of the content of the whole filesystem and is responsible for the filesystem namespace operations over the files and directories and determines how blocks are mapped to the DataNodes.
+The DataNodes serve the read and write requests sent by the filesystem's clients and can perform basic operations on the block (creation, deletion, copy) when so instructed by the NameNode.
 
 \subsection{Replication} 
 
-Exposing a File System built upon a cluster of many machines requires the technology to be reliable in case of a malfunction, since the chance of failure of the whole system is inherently greater if its functions depend on any of the single machines that comprise it. \newline Therefore to make sure that data is always available to clients, whenever a file is stored on the File System namespace and the \textbf{NameNode} chooses where to store the single blocks, it actually stores the same block on more than one \textbf{DataNode} (the number depends on a configuration aptly named Replication Factor), in such a way that if any of those nodes become inaccessible for any reason, among all the others will always be a reachable copy of each block stored on it.
+Using a filesystem built upon a cluster of many machines requires the technology to be reliable in case of a malfunction, since the chance of failure of the whole system is inherently greater if its functions depend on any of the single machines that comprise it. \newline Therefore, to make sure that data is always available to clients, whenever a file is stored on the filesystem namespace and the NameNode chooses where to store the single blocks, it actually stores the same block on more than one DataNode (the number depends on a configuration aptly named \textit{Replication Factor}), in such a way that if any of those nodes become inaccessible for any reason, among all the others will always be a reachable copy of each block stored on it.
 
 \subsection{Persistence}
 
-The File System metadata, as previously stated, is managed by the \textbf{NameNode}. The \textbf{NameNode} uses a log to store persistently all the changes to these metadata, such as changing the replication factor, creating a new file, renaming an old one; the log, called EditLog, is stored in the host machine's File System. Similarly the state of the File System is stored on the machine's File System in a file called FsImage.\newline
-In case of HDFS failure, on restart the \textbf{NameNode} will load in memory the FsImage and then apply all the transactions stored on EditLog, to return to the last safe state it was before failure.
+The filesystem metadata, as previously stated, is managed by the NameNode. The NameNode uses a log to store persistently all the changes to these metadata, such as changing the replication factor, creating a new file, renaming an old one; the log, called \textbf{EditLog}, and the filesystem state, called \textbf{FsImage}, are stored in the host machine's local filesystem.\newline
+In case of HDFS failure, on restart the NameNode will load in memory the FsImage and then apply all the transactions stored on EditLog, returning to the last safe state before failure.
 \newline
-If no failures occur and the \textbf{NameNode} is not restarted, FsImage will become stale while EditLog's size will continue to increase to unmanageable size, to cope with this problem, HDFS uses a \textbf{Secondary NameNode} whose object is to query EditLogs to the \textbf{Primary NameNode} at regular intervals, to update its own copy of FsImage accordingly and to then send its copy to the \textbf{Primary NameNode}.
+If no failures occur and the NameNode is not restarted, FsImage will become stale while EditLog's size will continue to increase to unmanageable size, to cope with this problem, HDFS uses a \textbf{Secondary NameNode} whose purpose is to query EditLogs to the \textbf{Primary NameNode} at regular intervals, to update its own copy of FsImage accordingly and to then send its copy to the \textbf{Primary NameNode}.
 
 \subsection{Robustness}
 
-HDFS is designed to be reliable in the event of the three most common failures: \textbf{NameNode} failures, \textbf{DataNode} failure and network failures.
+HDFS is designed to be reliable in the event of the three most common failures: NameNode failures, DataNode failure and network failures.
 
-Each \textbf{DataNode} sends a heartbeat regularly to the \textbf{NameNode} to prove its liveness, the latter considers the \textbf{DataNodes} without recent heartbeats dead and stop sending read and write requests to them until a new heartbeat arrives.\newline
-While \textbf{DataNodes} failures may cause them to be dead, Network failures can cause alive \textbf{DataNodes} to lose their heartbeats and be considered dead.\newline
-Whatever the root of the problem, the \textbf{NameNode} tracks the blocks that are now under replicated and marks them to be replicated as soon as it has available space on a machine that doesn't already have a copy of them.\newline
+Each DataNode regularly sends a heartbeat to the NameNode to prove its liveness: the latter considers dead the DataNodes without recent heartbeats and stop sending read and write requests to them until a new heartbeat arrives.\newline
+While DataNodes failures may cause them to be dead, network failures can cause alive DataNodes to lose their heartbeats and be considered dead.\newline
+Whatever the root of the problem, the NameNode tracks the blocks that are now under replicated and marks them to be replicated as soon as it has available space on a machine that doesn't already have a copy of them.\newline
 Checksums for each block of stored files make sure that corruption caused by faults in Nodes are spotted and their corrupted blocks rejected.\newline
-As for \textbf{NameNode} problems, the \textbf{Secondary NameNode} manages a consistent copy of FsImage and EditLog that functions as a backup in case of the corruption of the original ones. Nevertheless the \textbf{NameNode} is a single point of failure in the whole system; this is solved through High Availability, by providing another \textbf{NameNode}, which serves as a \textbf{Secondary NameNode} during downtime and as a \textbf{Primary NameNode} if the main one is not available.
+As for NameNode problems, the Secondary NameNode manages a consistent copy of FsImage and EditLog that functions as a backup in case of the corruption of the original ones. Nevertheless the NameNode is a single point of failure in the whole system; this is solved through \textbf{High Availability}, by providing another NameNode, which serves both as a Secondary NameNode during uptime and as a Primary NameNode if the main one is not available.
 
 \pagebreak
 \section{YARN} \label{YARN}
 
-\textbf{YARN (Yet Another Resource Negotiator)} \cite{yarn_doc} is Hadoop's cluster and resource manager, whose fundamental principle is to split up the functionalities of resource management, job scheduling and monitoring into separate daemons: a global daemon, the \textbf{Resource Manager (RM)}, and a daemon for each application, being it a single job or a DAG of jobs, \textbf{Application Master (AM)}.
+\textbf{YARN (Yet Another Resource Negotiator)} \cite{yarn_doc} is Hadoop's cluster and resource manager, whose fundamental principle is to split up the functionalities of resource management, job scheduling and monitoring into separate daemons: a global daemon, the \textbf{Resource Manager (RM)}, and a daemon for each application, either a single job or a DAG of jobs, \textbf{Application Master (AM)}.
 \newline\newline
 The \textbf{Resource Manager}, together with the \textbf{Node Manager (NM)}, forms the data computation framework: the first one is the authority that arbitrates and manages resources among all the applications in the cluster, while the other is the per-machine framework agent who is responsible for containers, monitoring their resource usage and reporting it to the Resource Manager.
 \newline\newline
@@ -66,7 +66,7 @@ The Capacity Scheduler delivers capacity guarantees to each organization, while 
 
 For this kind of guarantees, there needs to be a strong support for multi-tenancy in order to ensure that a single rogue application, user or sets thereof, don't monopolise the resources. This is provided by the Capacity Scheduler through a stringent set of limits including \textbf{queues} resource-bounded and limits on initialized and pending applications in order to ensure fairness and stability of the cluster.
 
-The primary abstraction provided by the Capacity Scheduler is the concept of queues, typically set up by administrators to reflect the economics of the shared cluster in terms of vCPUs and memory.
+The primary abstraction provided by the Capacity Scheduler is the concept of queues, typically set up by administrators to reflect the economics of the shared cluster, in terms of vCPUs and memory.
 
 The Capacity Scheduler supports the following features:
 
@@ -96,15 +96,15 @@ A rich set of limits is provided from the Capacity Scheduler in order to ensure 
 
 Fair scheduling is a method of assigning resources to applications such that all of them get, on average, an equal share of resources over time. Fair Scheduler, by default, bases its scheduling decisions on memory, but can be configured to use both memory and CPU. As a consequence of Fair Scheduling principles, a single application running uses the entire cluster and, whenever a new application is submitted, resources free up and gets assigned to the new one. Unlike default Hadoop scheduling, which forms a queue of applications, fair scheduling allows short apps to finish faster, while not starving long-lived apps. Fair sharing can also work with priorities, used as weights to determine the fraction of the total resources to be allocated to each application.
 
-Fair Scheduler, just like Capacity Scheduler, has the concept of queue: resources are thus shared fairly between all available queues. By default, there exists a \textit{default} queue, but an application can specifically list a queue in a container resource request and the request is thus submitted to that queue. Queues can also be assigned based on the user name included with the request. Within each queue, an apt scheduling policy is used to share resources allocated to that queue among all of the applications. Memory-based fair sharing is the default policy, but FIFO and multi-resource with Dominant Resource Fairness \cite{Ghodsi:2011:DRF:1972457.1972490} can also be configured. Hierarchical queues are supported and can be configured with weights to the cluster in specific proportions. 
+Fair Scheduler, just like Capacity Scheduler, has the concept of queue: resources are thus shared fairly between all available queues. By default, there exists a \textit{default} queue, but an application can specifically list a queue in a container resource request and the request is thus submitted to that queue. Queues can also be assigned based on the user name included with the request. Within each queue, an apt scheduling policy is used to share resources allocated to that queue among all of the applications. Memory-based fair sharing is the default policy, but FIFO and multi-resource with Dominant Resource Fairness \cite{Ghodsi:2011:DRF:1972457.1972490} can also be configured. Hierarchical queues are supported and can be configured with weights to divide the cluster in specific proportions. 
 
-While providing fair sharing, queues can be guaranteed minimum shares to ensure that certain users or applications always get sufficient resources. This way, while containing an application, a queue gets at least its minimum share, but when there's no need for that share, the excess is split among other running apps. This allows an efficient utilization of resources, guaranteeing capacity for queues in need.
+While providing fair sharing, queues can be guaranteed minimum shares to ensure that certain users or applications always get sufficient resources. This way, while containing an application, a queue gets at least its minimum share, but when there's no need for that share, the excess is split among other running apps. This allows for an efficient utilization of resources, guaranteeing capacity for queues in need.
 
 All queues descend from a queue named “root”. Available resources are distributed among the children of the root queue in a fair scheduling fashion. The children distribute the resources assigned to them to their children in the same fashion, and so on, for each level of the hierarchy. Applications may only be scheduled on leaf queues.
 
-Additionally, the fair scheduler allows setting a different custom policy for each queue to allow sharing the queue’s resources in any which way the user wants: FifoPolicy, FairSharePolicy (default), and DominantResourceFairnessPolicy are built-in and can be readily used, but a custom policy can be specified by extending \texttt{\justify{SchedulingPolicy}} class. 
+Additionally, the fair scheduler allows setting a different custom policy for each queue to allow sharing the queue’s resources in any way the user wants: \textit{FifoPolicy}, \textit{FairSharePolicy} (default), and \textit{DominantResourceFairnessPolicy} are built-in and can be readily used, but a custom policy can be specified by extending the \texttt{\justify{SchedulingPolicy}} class. 
 
-All applications are allowed to run, by default, but it's possible to the number of running apps per user and per queue, useful when a user must submit hundreds of apps at once, or in general to improve performance if running too many apps at once would cause too much intermediate data to be created or too much context-switching \cite{yarn_FairSched}.
+All applications are allowed to run, by default, but it's possible to limit the number of running apps per user and per queue, which comes useful when a user must submit hundreds of apps at once, or in general to improve performance if running too many apps at once would cause too much intermediate data to be created or too much context-switching \cite{yarn_FairSched}.
 
 \subsubsection{Fault tolerance \& High Availability}
 
@@ -114,26 +114,26 @@ There needs to be functionalities that provide for down-time invisibility to end
 
 \paragraph{Non-work-preserving RM restart} RM will save the application metadata, together with credentials like security keys and tokens, when clients submit an application in a pluggable state-store, storing its status and diagnostics at completion. In case of RM outage, as long as the required information is available in the state-store, at restart, the RM can pick up the application metadata and re-submit the applications if they weren't already completed (failed, killed, or finished) before RM went down.
 
-During the down-time of RM, Node Managers and clients will keep polling RM until it comes up. Once it does, a re-sync command is sent by the RM, killing all NM's managed containers, re-registering with RM and shutting down this way all the Application Masters. After RM restarts and loads all the application metadata, it will create a new attempt (i.e. Application Master) for each application not yet completed, re-kicking that application as usual.
+During the down-time of RM, Node Managers and clients will keep polling RM until it comes up. Once it does, a re-sync command is sent by the RM, killing all NM's managed containers, re-registering with RM and shutting down, this way, all the Application Masters. After RM restarts and loads all the application metadata, it will create a new attempt (i.e. Application Master) for each application not yet completed, re-kicking that application as usual.
 
 \paragraph{Work-preserving RM restart} This type of restart focuses on re-constructing the running state of RM by combining the container status from Node Managers and container requests from Application Masters on restart: running applications won't be killed after RM restarts, and so applications will not lose their work because of RM outage. 
 
 RM ensures the persistence of application state, reloading it on recovery and re-constructing the entire running state of the YARN cluster, whose major information comes from the RM scheduler which keeps track of all containers' life-cycle, applications' headroom and resource requests and queues' resource usage. 
 Applications can simply re-sync back with RM and resume from where they were left off: RM recovers its own running state by taking advantage of the containers statuses sent from all NMs on re-registration, reconstructing the container instances and the associated applications' scheduling status by absorbing this information. 
 
-In the meantime, AM needs to re-send the resource requests to RM because RM may lose the unfulfilled requests when it shuts down.
+In the meantime, AM needs to re-send the resource requests to RM because RM may lose the unfulfilled requests when shutting down.
 
-\paragraph{High Availability} Resource Manager HA is realized through an Active/Standby architecture: at any point of time, only one of the RMs is Active, and one or more RMs are in Standby mode waiting to take over should anything happen to the Active. The trigger to transition-to-active comes from either the admin (through CLI) or through the integrated failover-controller when automatic-failover is enabled. When automatic fail-over is not enabled, admins have to manually transition one of the RMs to Active, using the \texttt{yarn rmadmin} CLI, first transitioning the Active-RM to Standby and then the Standby-RM to Active.
+\paragraph{High Availability} Resource Manager HA is realized through an Active/Standby architecture with multiple RMs: at any point in time, only one of the RMs is Active, and one or more RMs are in Standby mode waiting to take over should anything happen to the Active. The trigger to transition-to-active comes from either the admin (through CLI) or through the integrated failover-controller when automatic-failover is enabled. When automatic fail-over is not enabled, admins have to manually transition one of the RMs to Active, using the \texttt{yarn rmadmin} CLI, first transitioning the Active-RM to Standby and then the Standby-RM to Active.
 
-In order to guarantee automatic fail-over, it's possible to use both an existing \textbf{Zoo\-keeper} cluster or the embedded \texttt{ActiveStandbyElector}, acting as a failure detector and leader elector, instead of a separate Zookeeper daemon, to decide which RM should be the Active: when the Active goes down or becomes unresponsive, another RM is automatically elected to be the Active, taking then over.
+In order to guarantee automatic fail-over, it's possible to use either an existing \textbf{Zoo\-keeper} cluster or the embedded \texttt{ActiveStandbyElector}, acting as a failure detector and leader elector, instead of a separate Zookeeper daemon, to decide which RM should be the Active: when the Active goes down or becomes unresponsive, another RM is automatically elected to be the Active, taking then over.
 
 When there are multiple RMs, the configuration (\texttt{yarn-site.xml}) used by clients and nodes is expected to list all the RMs. Clients, Application Masters and Node Managers try connecting to the RMs in a round-robin fashion until they hit the Active RM. If the Active goes down, they resume the round-robin polling until they hit the “new” Active. This retry logic can be overridden by a user-specified fail-over provider.
 
 \subsection{Node Manager}
 
-The \textbf{Node Manager} is the slave component in YARN architecture and is responsible for launching and managing containers on a node. The Node Manager runs services to determine the health of the node it is executing on. The services perform checks on the disk as well as any user specified tests. If any health check fails, the Node Manager marks the node as unhealthy and communicates this to the Resource Manager, as part of the heartbeat between the NM and the RM, which then stops assigning containers to the node.
+The \textbf{Node Manager} is the slave component in YARN architecture and is responsible for launching and managing containers on a cluster node. The Node Manager runs services to determine the health of the node it is executing on. The services perform checks on the disk as well as any user specified tests. If any health check fails, the Node Manager marks the node as unhealthy and communicates this to the Resource Manager, as part of the heartbeat between the NM and the RM, which then stops assigning containers to the node.
 
-Just like the Resource Manager, the Node Manager has a \textbf{work-preserving restart} feature, that enables the Node Manager to be restarted without losing the active containers running on the node. At a high level, the NM stores any necessary state to a local state-store as it processes container-management requests. This state will then be loaded, while performing recovery, by NMs subsystems which will then allow the full recovery of the NMs and its containers.
+Just like the Resource Manager, the Node Manager has a \textbf{work-preserving restart} feature, that enables the Node Manager to be restarted without losing the active containers running on the node. At a high level, the NM stores any necessary state in a local state-store as it processes container-management requests. This state will then be loaded, while performing recovery, by NMs subsystems which will then allow the full recovery of the NMs and its containers.
 
 \pagebreak
 \section{Hive}
@@ -146,20 +146,20 @@ Hive architecture can be divided in five main components:
 
 \begin{itemize}
     \item \textbf{Shell/UI}: Beeline is the frontend tool for interactive querying on the database. Hive supports connections via its own JDBC driver, allowing easy integration with clients and user applications.
-    \item \textbf{Driver}: The component which receives the queries. This component implements the notion of session handles and provides execute and fetch APIs\footnote{API: Application Programming Interface, a set of functions and protocols provided to developers.} modeled on JDBC/ODBC interfaces.
+    \item \textbf{Driver}: The component which receives the queries. This component implements the notion of session handles and provides \textit{execute and fetch APIs}\footnote{API: Application Programming Interface, a set of functions and protocols provided to developers.} modeled on JDBC/ODBC interfaces.
     \item \textbf{Metastore}: It stores metadata about HDFS file locations and the table schemas, but also column and column type information and the serializers and deserializers necessary to read and write data.
-    \item \textbf{Compiler}: It manages query parsing, planning and optimization, does semantic analysis on the different query blocks and query expressions generating, eventually, an execution plan with the help of the table and partition metadata looked up from the metastore. For what concerns the parsing, HiveQL is a SQL extension, compliant with the SQL:2011 standard.
-    \item \textbf{Execution Engine}: Hive uses Apache Tez as a default execution engine  which allows low latency querying through its LLAP (Low Latency Analytical Processing) daemons: persistent processes running on YARN enabling the system to avoid the overhead caused by the container deployment for query executions. Other execution engines usable by Hive are, as already mentioned, MapReduce and Spark. The first one is needed, as of Hive 2.1, in order to use Hive Streaming API, while the other uses its own LLAP daemons, similarly to Tez, and still lags behind, performance wise.
+    \item \textbf{Compiler}: It manages query parsing, planning and optimization, does semantic analysis on the different query blocks and query expressions generating, eventually, an execution plan with the help of the table and partition metadata looked up from the metastore. For what concerns the parsing, HiveQL is a SQL extension, compliant with the \textbf{SQL:2011 standard}.
+    \item \textbf{Execution Engine}: Hive uses \textbf{Apache Tez} as a default execution engine  which allows low latency querying through its LLAP (Low Latency Analytical Processing) daemons: persistent processes running on YARN enabling the system to avoid the overhead caused by the container deployment for query executions. Other execution engines usable by Hive are, as already mentioned, MapReduce and Spark. The first one is needed, as of Hive 2.1, in order to use Hive Streaming API, while the other uses its own LLAP daemons, similarly to Tez, and still lags behind, performance wise.
 \end{itemize}
 
 \subsection{Hive Low Latency Processing on Tez}
 
-Starting from Hive2, OLAP, OnLine Analytical Processing support has been introduced as default mode for query execution on top of Apache Tez.\\  
+Starting from Hive2, OLAP, OnLine Analytical Processing support has been introduced as the default mode for query execution on top of \textbf{Apache Tez}.\\  
 This functionality has been implemented on top of YARN where, while deploying the endpoint for the clients queries (HiveServer2), two applications are deployed: 
 
 \begin{itemize}
     \item a Tez query coordinator application, which deals with a single query execution planning, a series of Map and Reduce operations, but also the concurrency of many queries, if needed;
-    \item a Slider \footnote{\href{https://slider.incubator.apache.org/}{Apache Slider} is an application which allows dynamic deployment and monitoring of YARN applications} application that, together with the persistent daemons containers, deals with the actual processing of the single operation that needs to be executed.
+    \item a \textbf{Slider} \footnote{\href{https://slider.incubator.apache.org/}{Apache Slider} is an application which allows dynamic deployment and monitoring of YARN applications} application that deals with the deployment of the persistent daemons containers.
 \end{itemize}
 
 With respect to the usual query execution, this architecture allows:
@@ -177,8 +177,8 @@ HiveQL, which stands for Hive Query Language, is a SQL:2011 compliant language u
 
 \subsubsection{Data Definition Language}
 
-HiveQL Data Definition Language allows creation and alteration of databases, tables and indices.\\When it comes to DBs, the classic statements \texttt{CREATE}, \texttt{ALTER} \& \texttt{DROP} are available for creation, alteration and deletion of databases, together with the possibility to specify ownership, filesystem location and other custom properties.\\
-Concerning tables, Hive DDL provides the ability to define external tables, which can be read and queried like a normal table but it is located in a filesystem location other than the default warehouse. In addition, it is possible to define constraints on column keys, such as foreign and primary keys, partitioning, bucketing, skewing and sorting for optimization purposes. It allows to define the kind of deserialization Hive needs to use in order to read the data stored, according to their file format with the \texttt{ROW FORMAT} clause.
+HiveQL Data Definition Language allows creation and alteration of databases, tables and indices.\\When it comes to DBs, the classic statements \texttt{CREATE}, \texttt{ALTER} and \texttt{DROP} are available for creation, alteration and deletion of databases, together with the possibility to specify ownership, filesystem location and other custom properties.\\
+Concerning tables, Hive DDL provides the ability to define external tables, which can be read and queried like a normal table while being located in a filesystem location other than the default warehouse. In addition, it is possible to define constraints on column keys, such as foreign and primary keys, partitioning, bucketing, skewing and sorting for optimization purposes. It allows to define the kind of deserialization Hive needs to use in order to read the data stored, according to their file format with the \texttt{ROW FORMAT} clause.
 
 For example, the statement
 
@@ -191,7 +191,7 @@ For example, the statement
     STORED AS ORC;
 \end{minted}
 
-creates a table named "log\_table", using the default database, stored in ORC format partitioned according to a certain user-input string "date", in 10 ORC files sorted in descending order, where values are skewed on the id values 3, 4 and 10.
+creates a table named "log\_table", using the default database, stored in ORC format, partitioned according to a certain user-input string "date", in 10 ORC files per partition sorted in descending order, where values are skewed on the id values 3, 4 and 10.
 
 \subsubsection{Data Manipulation Language}
 
@@ -206,7 +206,7 @@ HiveQL Data Manipulation Language allows to modify data in Hive through multiple
 \end{itemize}
 
 \subsection{Warehouse}
-HDFS is the default physical storage of database and tables in Hive, but support for S3 and any other HDFS compatible filesystems is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files \cite{orc_format}.\\
+HDFS is the default physical storage of database and tables in Hive, but support for S3 and any other HDFS compatible filesystem is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files \cite{orc_format}.\\
 Hive has built-in direct serialization and deserialization of CSV, JSON, AVRO and Parquet files as row formats, and allows to easily add custom SerDe\footnote{SerDe: Serialization/Deserialization} components.
 
 \subsubsection{Hive Data Model}
@@ -214,8 +214,8 @@ Hive has built-in direct serialization and deserialization of CSV, JSON, AVRO an
 Data in Hive is organized into 3 main abstractions: Tables, Partitions and Buckets \cite{hive_design}.
 
 \paragraph{Tables} Analogous to Tables in Relational Databases, they can be filtered, projected, unioned and joined. Additionally, all the data of a table is stored in a directory in its default warehouse, usually HDFS. The rows in a table are organized into typed columns much similarly to Relational Databases.
-\paragraph{Partitions} Each Table can have one or more partition keys determining how the data is stored: a table \texttt{T} with a date partition column \texttt{dt} has files with data for a particular date stored in the \texttt{<table location>/dt=<date>} folder in HDFS. Partitions allow the system to optimize data inspection based on query predicates, such that a query that is interested in rows from \texttt{T} satisfying the predicate \texttt{\justify{T.dt='2017-11-01'}} would only have to look at files in \texttt{\justify{<table location>/dt=2017-11-01/}} directory in HDFS.
-\paragraph{Buckets} Data in each partition may be further divided into Buckets based on the hash of a column in the table. Each bucket is stored as a separate file in its partition folder. The system can efficiently evaluate queries depending on a sample of data (e.g. queries using the \texttt{SAMPLE} clause on the table).
+\paragraph{Partitions} Each Table can have one or more partition keys determining how the data is stored: a table \texttt{T} with a date partition column \texttt{dt} has files with data for a particular date stored in the \texttt{<table location>/dt=<date>} folder in HDFS. Partitions allow the system to optimize data inspection based on query predicates, so that if a query is interested in rows from \texttt{T} satisfying the predicate \texttt{\justify{T.dt='2017-11-01'}}, there would only be the need to look at files in \texttt{\justify{<table location>/dt=2017-11-01/}} directory in HDFS.
+\paragraph{Buckets} Data in each partition may be further divided into Buckets based on the hash of a column value in the table. Each bucket is stored as a separate file in its partition folder. The system can efficiently evaluate queries depending on a sample of data (e.g. queries using the \texttt{SAMPLE} clause on the table).
 \newline
 \par
 Apart from primitive column types (integers, floats, strings, dates and booleans), Hive also supports complex types such as arrays, structs and maps. Users can compose their own types programmatically starting from any of the collections, primitives or other user-defined types and additionally can implement their own object inspectors to create specific SerDes to serialize and deserialize their data into HDFS files.\\
@@ -223,11 +223,11 @@ Object inspectors like the built-in \texttt{ListObjectInspector}, \texttt{Struct
 
 \subsection{Hive \& SQL Server 2016}
 
-When it comes to enterprise-level solutions, every data warehousing product needs to be compared with the de facto standard of this sector. Considering a pure Windows environments, Microsoft's SQL Server is the most widely used RDBMS and data warehouse.\newline
+When it comes to enterprise-level solutions, every data warehousing product needs to be compared with the de facto standard of this sector. Considering a pure Windows environment, Microsoft's SQL Server is the most widely used RDBMS and data warehouse.\newline
 
 \subsubsection{Comparison}
 
-A comparison has been set up in order to compare the capabilities of Hive with respect to SQL Server, using Hortonworks' TPC-DS\footnote{"TPC Benchmark DS is a decision support benchmark that models several generally applicable aspects of a decision support system, including queries and data maintenance. The benchmark provides a representative evaluation of performance as a general purpose decision support system. TPC-DS Version 2 enables emerging technologies, such as Big Data systems, to execute the benchmark" \cite{tpcds} . Benchmark implementation: \href{https://github.com/hortonworks/hive-testbench}{https://github.com/hortonworks/hive-testbench}} Testbench implementation with a dataset of 30 GB, results averaged on 5 executions with machines with the following specifications and the following optimizations:
+A comparison has been set up in order to compare the capabilities of Hive with respect to SQL Server, using Hortonworks' TPC-DS\footnote{TPC Benchmark DS is a decision support benchmark that models several generally applicable aspects of a decision support system, including queries and data maintenance. The benchmark provides a representative evaluation of performance as a general purpose decision support system. TPC-DS Version 2 enables emerging technologies, such as Big Data systems, to execute the benchmark \cite{tpcds} . Benchmark implementation: \href{https://github.com/hortonworks/hive-testbench}{https://github.com/hortonworks/hive-testbench}} Testbench implementation with a dataset of 30 GB, results averaged on 5 executions with machines with the following specifications and the following optimizations:
 \newline
 
 \begin{table}[!htb]
@@ -284,7 +284,7 @@ More often than not, in a big data environment, the classic relational model is 
 
 Many NoSQL data stores compromise consistency (in the sense of the \textbf{CAP theorem} \cite{Gilbert:2002:BCF:564585.564601}) in favor of availability, partition tolerance, and speed, while offering a concept of "eventual consistency" in which database changes are propagated to all nodes \textit{eventually} (typically within milliseconds) so queries for data might not return updated data immediately or might result in reading data that is not accurate, a problem known as \textit{stale reads}.
 
-One of the most widely used NoSQL DBMS in Hadoop environments is \textbf{Apache Cassandra} \cite{CassandraDefinitive}, a wide column data store which favours Availability and Partition Tolerance, in spite of Tunable Consistency, highly scalable and with \textit{no single point of failure} \cite{Lakshman:2010:CDS:1773912.1773922}. Other NoSQL solutions are \textbf{HBase} a wide column key-value data store distributed on HDFS, which favours strong consistency in spite of availability, and \textbf{MongoDB}, a distributed document store.
+One of the most widely used NoSQL DBMS in Hadoop environments is \textbf{Apache Cassandra} \cite{CassandraDefinitive}, a wide column data store which favours \textit{Availability} and \textit{Partition Tolerance}, while offering \textit{Tunable Consistency}, highly scalable and with \textit{no single point of failure} \cite{Lakshman:2010:CDS:1773912.1773922}. Other NoSQL solutions are \textbf{HBase} a wide column key-value data store distributed on HDFS, which favours strong consistency in spite of availability, and \textbf{MongoDB}, a distributed document store.
 
 \subsection{Architecture}
 
@@ -307,7 +307,7 @@ An additional component in Cassandra architecture is the \textbf{Snitch}, which 
 
 \paragraph{Consistency Levels} Cassandra's tunable consistency make it so that database performances could span from a strong consistency, where each node need to acknowledge each write, to weak consistency, where a single node is sufficient to confirm a write. A consistency level is specified for each read or write query: the higher level of consistency the higher number of nodes or replicas must be acknowledged to the client. Levels go from \texttt{ANY}, \texttt{ONE}, \texttt{TWO} and \texttt{THREE}, considered weak consistency, to \texttt{QUORUM} and \texttt{ALL}, considered strong.
 
-\paragraph{Caching and Tables} Cassandra stores data both in memory and on disk to provide both high performance and durability. When a write operation is performed, it’s immediately written to a \textbf{commit log}, a mechanism for crash-recovery to support Cassandra’s durability goals. A write will not be considered successful until it’s written to the commit log in order to ensure that, if a write operation does not make it to  the \textbf{Memtables}, the in-memory store, it will still be possible to recover the data. 
+\paragraph{Caching and Tables} Cassandra stores data both in memory and on disk to provide both high performance and durability. When a write operation is performed, it’s immediately written to a \textbf{commit log}, a mechanism for crash-recovery to support Cassandra’s durability goals. A write will not be considered successful until it’s written to the commit log to ensure that, if a write operation does not make it to the \textbf{Memtables}, the in-memory store, it will still be possible to recover the data. 
 \\Each memtable contains data for a specific table and when the number of objects stored in the memtable reaches a threshold, the contents of the memtable are flushed to disk in a file called an \textbf{SSTable}, a compacted representation of the memtable, creating then a new memtable.
 
 Cassandra provides three different caches: the \textbf{key cache}, storing a map of partition keys to row index entries, to allow faster read access into SSTables stored on disk; the \textbf{row cache}, containing entire rows, that can greatly speed up read access for frequently accessed rows, at the cost of more memory usage, and the \textbf{counter cache} used to improve counter performance by reducing lock contention for the most frequently accessed counters.
