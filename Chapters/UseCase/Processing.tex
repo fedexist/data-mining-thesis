@@ -4,7 +4,7 @@ The main backbone of this use case is provided by Flink. After the data is being
 \\
 Before talking about the Flink application per se, it's worth saying that Flink has been deployed on top of YARN with a Job Manager with 1GB of memory allocated and a single Task Manager with 3GB of memory and 3 slots for parallelism, for a total of 4GB and 4 vCPUs allocated on YARN. 
 
-The Flink application has been written in Scala, making use of the appropriate Scala API provided by Flink. The job has been configured to checkpoint every minute, through an externalized checkpoint, to use as a state backend HDFS and use \texttt{EventTime} as the Stream Time Characteristic.
+The Flink application has been written in Scala, making use of the appropriate Scala API provided by Flink. The job has been configured to checkpoint every minute, through an externalised checkpoint, to use as a state backend HDFS and use \texttt{EventTime} as the Stream Time Characteristic.
 
 \subsubsection{Application}
 
@@ -17,7 +17,7 @@ The Flink application has been written in Scala, making use of the appropriate S
 
 
 \paragraph{Source}
-The Flink application has a single source, a Kafka Consumer configured to consume from the \texttt{air\_traffic} topic connecting to both the active kafka brokers on \texttt{master-1} and \texttt{master-2}. Flink built-in Kafka Consumer must be configured with a deserialization schema, which, in this case, parses from each JSON an \texttt{AirTrafficEvent} using Scala library \href{https://www.playframework.com/documentation/2.6.x/ScalaJson#The-Play-JSON-library}{Play-JSON}.
+The Flink application has a single source, a Kafka Consumer configured to consume from the \texttt{air\_traffic} topic connecting to both the active kafka brokers on \texttt{master-1} and \texttt{master-2}. Flink's built-in Kafka Consumer must be configured with a deserialization schema, which, in this case, parses from each JSON an \texttt{AirTrafficEvent} using Scala library \href{https://www.playframework.com/documentation/2.6.x/ScalaJson#The-Play-JSON-library}{Play-JSON}.
 
 \begin{code}
    \begin{minted}[breaklines]{Scala}
@@ -92,7 +92,7 @@ It takes as input a \texttt{KeyedStream} of \texttt{AirTrafficEvent}s and output
 \captionof{listing}{A KeyedStream of AirTrafficEvent processed into an AirTrafficEventWithId stream}
 \end{code}
 
-The function handling the detection of a new instance of a flight is based off an heuristic strategy using the latest available information about the position, speed and time of the flight. This is needed because the stream may be inaccurate when it comes to inter-oceanic flights, passing over dead-zones, without any radar at range being able to catch their transponder signals. The heuristic is described by the following Scala snippet:
+The function handling the detection of a new instance of a flight is based off an heuristic strategy using the latest available information about the position, speed and time of the flight. This is needed because the stream may be inaccurate when it comes to transoceanic flights, passing over dead zones, without any radar at range being able to catch their transponder signals. The heuristic is described by the following Scala snippet:
 
 \begin{minted}[breaklines]{Scala}
 val activeUpperBound = Time.minutes(5) // 5 minutes
@@ -123,7 +123,7 @@ in which can be seen that there are three main conditions being checked:
 \begin{enumerate}
     \item if the difference between the timestamps is less than a certain upper bound (default 5 minutes), meaning that we received an event from the current flight recently.
     \item if the difference between the timestamps is greater than a certain lower bound (default 5 hours), meaning that we haven't received an event from the current flight in a while. This case is used as a discriminant for flights flying over dead zones.
-    \item provides an estimation based off the estimated time to reach the latest position from the previous last position, at constant speed=last\_speed, and the actual time taken to reach the latest position.
+    \item provides a prediction based off the estimated time to reach the latest position from the previous last position, at constant speed=last\_speed, and the actual time taken to reach the latest position.
 \end{enumerate}
 
 This way, we are able to be reasonably certain that an aircraft, even after passing over a dead zone for more than 5 minutes, is still flying towards its destination and we are not dealing with another instance of the same flight. A more accurate heuristic would be possible with a data source not cutting under 37000 feet and using an additional data source with the airports and their position, integrated within the stream structure.
@@ -132,7 +132,7 @@ Additionally, whenever a new instance of a flight is detected a side-output is u
 \\\\
 Just like it has been mentioned, the second operation executed on the stream concerns the event processing used to detect aircrafts arriving to their destination. Since it's been noted that the data stream is incomplete, in order to demonstrate \textbf{FlinkCEP} capabilities when it comes to event processing, instead of using a pattern that detects variations in altitude and speed to correctly determine the sequence of events implied by an aircraft approaching to an airport, it's been used a simple pattern based on the timing out of events sequences.
 
-The pattern is implemented as it follows:
+The pattern is implemented as follows:
 
 \begin{minted}{Scala}
 val airplaneArrivalPattern = 
@@ -221,7 +221,7 @@ CREATE TABLE air_traffic.active (
        AND gc_grace_seconds = 3600
 \end{minted}
 
-in order to contain all of the active aircrafts currently flying. All of the default configurations have been mantained, except for the TTL of the records which has been configured to 10 minutes and the interval of the garbage collection of the table tombstones (expired records after the TTL) which has been set to 1 hour, instead of 1 day.
+in order to contain all of the active aircrafts currently flying. All of the default configurations have been maintained, except for the TTL of the records which has been configured to 10 minutes and the interval of the garbage collection of the table tombstones (expired records after the TTL) which has been set to 1 hour, instead of 1 day.
 \\\\
 Notifications sinks are rather simple \texttt{SinkFunction}s which take as input the \texttt{Alert} and make an async \texttt{POST} request, through a \href{https://dispatchhttp.org/Dispatch.html}{Dispatch} asynchronous HTTP client, to the local notification server, implemented using Firebase FCM, about which we'll talk about later on.
 \\\\
@@ -259,7 +259,7 @@ STORED AS TEXTFILE
 LOCATION '/flink/air_traffic/json_dump';
 \end{minted}
 
-Starting from this very table, which mantains records in text format, uncompressed, further optimizations will be performed before the final storage within Hive.
+Starting from this very table, which maintains records in text format, uncompressed, further optimizations will be performed before the final storage within Hive.
 
 \subsubsection{Post-processing: HDFS to Hive}
 
@@ -340,15 +340,15 @@ GROUP BY
 
 Periodic scheduling has been set using \texttt{crontab} functionalities of CentOS, which is used to execute a Python script called \texttt{hive\_loader} which executes the needed queries. \texttt{Hive\_loader} has four flags used to determine which queries has to be executed:
 \begin{enumerate}
-    \item \texttt{bootstrap}, which creates all of the tables used;
-    \item \texttt{update}, which controls the scheduled execution for the update of raw and history tables
-    \item \texttt{add\_partition\_update}, used after midnight to definitively update \texttt{raw} and \texttt{history} of the previous day, while adding a new partition to \texttt{json\_dump}
-    \item \texttt{drop\_partition}, used to drop the previous day partition, before deleting it
+    \item \texttt{bootstrap}, which creates all of the tables used.
+    \item \texttt{update}, which controls the scheduled execution for the update of raw and history tables.
+    \item \texttt{add\_partition\_update}, used after midnight to definitively update \texttt{raw} and \texttt{history} of the previous day, while adding a new partition to \texttt{json\_dump}.
+    \item \texttt{drop\_partition}, used to drop the previous day partition, before deleting it.
 \end{enumerate}
 
 Together with the aforementioned tables, additional tables have been created and filled to be available to Tableau for visualisation purposes:
 
 \begin{itemize}
-    \item \texttt{aircrafts}, containing the ID model and its capacity in terms of number of passengers;
-    \item \texttt{airports}, containing, for each airport, its complete name, its IATA code, its continent and its ISO country and region codes
+    \item \texttt{aircrafts}, containing the ID model and its capacity in terms of number of passengers.
+    \item \texttt{airports}, containing, for each airport, its complete name, its IATA code, its continent and its ISO country and region codes.
 \end{itemize}

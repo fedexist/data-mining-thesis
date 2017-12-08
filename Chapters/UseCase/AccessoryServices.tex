@@ -26,7 +26,7 @@ Seen that our topic in this case would have been airports, whose list is giant a
 To handle users' data, filtering of notifications and the construction of requests to be forwarded to Firebase, we have implemented a middleware server in JavaScript, listening on internal nodes, which offers a REST API customised for our needs.
 \\
 The server manages users' data, keeping a table on Hive representing the connection between Device Unique ID, Notifire Token and a list of airports the user is subscribed to. Changes to this table can be issued by the users through a request to the server, it is mandatory for the mobile application to send an update after obtaining a new token from Firebase, so that the table is always up to date.
-The table is also cached in memory for performance's reasons.
+The table is also cached in memory for performance reasons.
 \\ \\
 As mentioned the server offers a REST service to ingest notifications and forward it to Firebase. In more detail, the server expects a JSON containing information on a departing plane such as: airport of origin, airport of destination, type of aircraft, flight number and other spatial or temporal values.
 \\ \\
