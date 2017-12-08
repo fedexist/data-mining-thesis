@@ -301,7 +301,6 @@ Flowing downstream, each intermediate operator must receive a barrier for snapsh
 
 At the completion of snapshot $n$, the job will never ask the sources to replay the records from before $S_n$, since they all went through the topology.
 \\\\
-
 If an operator receives more than one input stream, an \textit{\textbf{alignment}} step must be performed between all of the inputs:
 
 \begin{itemize}
@@ -367,7 +366,6 @@ val result: DataStream[Alert] = patternStream.select(createAlert(_))
 
 In FlinkCEP, a \textbf{Pattern}, similarly to a pattern of a Regular Expression, can be \textbf{single} or \textbf{iterative}. For example, in a pattern like \texttt{"a b+ c? d"}, \texttt{a}, \texttt{c?} e \texttt{d} are single patterns, while \texttt{b+} is iterative.
 \\
-
 In a Pattern there can be, analogously to regular expressions, \textbf{quantifiers} and \textbf{conditions}.
 
 \paragraph{Quantifiers}
