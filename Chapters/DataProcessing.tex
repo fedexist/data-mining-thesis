@@ -118,7 +118,7 @@ Graphs implement several operators that can be divided in three classes:
 
 \subsubsection{SparkStreaming}
 
-\textbf{SparkStreaming} in a Spark extension developed to enable live data stream processing in the fault-tolerant and highly scalable framework provided by Spark while maintaining a high throughput.
+\textbf{SparkStreaming} is a Spark extension developed to enable live data stream processing in the fault-tolerant and highly scalable framework provided by Spark while maintaining a high throughput.
 The ingested stream source can be any major source like Kafka, Flume and NiFi; other streams like Amazon Kinesis, filesystems like HDFS or S3 and TCP sockets.
 The stream can be processed through the high-level functions like map, reduce and join and finally output to any filesystem, distributed databases or further stream outputs.
 
@@ -149,7 +149,7 @@ It also offers other tools to transform features, to handle datasets and hyperpa
 	\item \textbf{Table API}: it's a declarative DSL \footnote{Domain Specific Language: a language with a limited expressiveness which focuses on a given domain of use.} which follows the extended relational model and offers the possibility to model a data stream like a table upon which it's possible to execute operations like projections, aggregations and groupings. Despite being less expressive with respect to the Core API, it allows for a greater compactness when it comes to describing the operations to be executed on the data.
 	\item \textbf{SQL}: it's the highest level of abstraction offered by Flink and interacts directly with the Table APIs in order to provide a representation of the application being developed through SQL queries. It can be executed on the tables defined by the Table API, thus directly on the data.
 \end{itemize}
-
+\pagebreak
 \subsection{Programs Dataflows}  \label{ProgramsDataflows}
 
 The base elements of a Flink application are the following:
@@ -385,7 +385,7 @@ Each pattern can have additional conditions specified, which can be related to a
 Methods \texttt{pattern.where()} and \texttt{pattern.or()} can be used to specify \texttt{\justify{IterativeCondition}}s, \texttt{SimpleCondition}s or a combination of multiple conditions. In this case, combinations can be specified concatenating all the previous methods, including the quantifiers, optionally adding more constraints on the contiguity of the same pattern by calling \texttt{consecutive()}, for the strict contiguity, and \texttt{allowCombinations()} for the relaxed non-deterministic contiguity.
 \\
 Some examples:
-
+\\
 \begin{code}
 \label{code:iterative-cond}
 \begin{minted}[breaklines]{Scala}
@@ -411,6 +411,8 @@ start.subtype(classOf[SubEvent]).where(subEvent => ... /* some condition */)
     \end{minted}
     \captionof{listing}{Conditions combinations}
 \end{code}~\\
+
+\pagebreak
 
 \paragraph{Pattern Combination}
 

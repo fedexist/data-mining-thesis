@@ -29,33 +29,29 @@ The ingestion pipeline in NiFi uses in total 4 Processors, as shown in \ref{fig:
     \caption{NiFi pipeline used for the ingestion from Satori}
     \label{fig:nifipipeline}
 \end{figure}
-
+\pagebreak
 In order to get into more details, let's list the entire pipeline:
 
 \begin{enumerate}
     \item \textbf{ExecuteProcess} Processor, where the data fetching actually happens, it runs continuously the following script:
-    
+    \\
     \begin{code}
         \begin{minted}{Python}
 with make_client(endpoint=endpoint, appkey=appkey) as client:
-    
     class SubscriptionObserver(object):
         def on_subscription_data(self, data):
             for in_message in data['messages']:
                 if all(len(str(x)) > 0 for x in in_message.values()):
                     fetched_data.append(json.dumps(in_message))
             got_message_event.set()
-            
     subscription_observer = SubscriptionObserver()
     client.subscribe(
             "air-traffic",
             SubscriptionMode.SIMPLE,
             subscription_observer)
-    
     while got_message_event.wait(10):
         if len(fetched_data) != 0:
             print(fetched_data)
-     
         \end{minted}
     \end{code}
 which basically uses Satori APIs to create a client subscribing to the Air Traffic JSON stream, fetching batches of JSON records, filtering out those with empty values and printing each batch on standard output as a JSON array. ExecuteProcess will then create a \textbf{FlowFile} containing as a payload many JSON arrays from subsequent script calls, which will be the input for the following Processor.

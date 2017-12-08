@@ -15,8 +15,10 @@ Both packages use the same core components for the preparation of cluster hosts:
 \end{itemize}
 
 In addition, \texttt{hw\_install} uses \textbf{Ambari Blueprint} interface, for the cluster deployment, passing the configuration file containing the needed services and their per-component configuration, if any (in absence of this per-component configuration, Ambari will apply default values), and then making a REST call to the Ambari Server which will take care of the installation of the needed components on the selected hosts.
-\\\\
+
+\pagebreak
 An example of a configuration file is:
+\\
 
 \begin{minted}[breaklines, breakafter="ambari/"]{YAML}
 cluster-name: cluster_name
@@ -48,5 +50,6 @@ host-groups:
         - name: AMBARI_SERVER
 .....
 \end{minted}
+\pagebreak
 
 Once a cluster has been installed, it's easy to add another host to the cluster, using \texttt{hw\_add\_new\_host}: after adding the appropriate \texttt{new-hosts} entries to the configuration file of the cluster, executing this script allows to set-up the host before manually adding it to the cluster from the Ambari Server UI, where it's possible to select the new services to be installed.

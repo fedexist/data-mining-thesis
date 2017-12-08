@@ -54,7 +54,7 @@ http://10.0.0.24:8888/query?query=SELECT+*+FROM+history_aggregated+limit+2&user.
 
 \pagebreak
 The server would then respond with a JSON object representing the table output by the query; in particular for this example, provided dummy\_user has the required privileges to be allowed by Ranger, Arnia would return a list of records showing two flights, like this:
-
+\\
 \begin{code}
 	\begin{minted}{javascript}
 {
@@ -90,7 +90,7 @@ The server would then respond with a JSON object representing the table output b
 
 \pagebreak
 The server's core part of the code to handle this calls is here presented.
-
+\\
 \begin{code}
 	\begin{minted}[breaklines]{Python}
 @app.route("/query", methods=['GET','POST'])  # routes GET and POST requests made to server_ip/query to the inner code

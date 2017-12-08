@@ -19,6 +19,8 @@ Thirdly, a service must provide Auditing for all requests, whether denied or all
 The Knox gateway exposes a single secure access point for all REST\footnote{REST: REpresentational State Transfer, a type of stateless software architecture whose aim is to provide access to resource in an interoperable way through the web} APIs and HTTP interactions with the cluster.\newline
 All client requests to RESTful APIs and webUIs are sent to Knox through HTTPS with their respective user credentials, Knox authenticates the user with the help of an authentication provider such as Kerberos or LDAP, then thanks to an authorisation provider offers Access Control to the single services, if access is allowed, the request is routed to the target service.
 Failed authentication, failed authorisation and successful requests are all logged, providing a first layer of Auditing.
+\pagebreak
+
 \subsection{Structure}
 The two main components of Knox are the Topology files and the services' files.
 \newline

@@ -58,7 +58,7 @@ As already mentioned, there are two possible schedulers that can be used in a YA
 
 \paragraph{Capacity Scheduler}
 
-The Capacity Scheduler makes its purpose to maximize both throughput and utilization of the cluster, being designed specifically to run Hadoop applications in a shared, multi-tenant cluster.
+The Capacity Scheduler makes its purpose to maximize both utilisation and throughput of the cluster, being designed specifically to run Hadoop applications in a shared, multi-tenant cluster.
 
 A traditional way to organize computing resources is such that each organization has its own fixed set of machines, needed to meet the client’s Service Level Agreement under peak or near-peak conditions. This way, average utilization is poor and the overhead of managing multiple independent clusters is a burden from a cost-effective standpoint: a unique cluster shared between organizations is a benefit on the long run, since large shared Hadoop installations minimize economic losses, preventing the need for private clusters and reaping the benefits of economies of scale. Nonetheless, there should be guarantees when it comes to resources reservation for each client.
 
@@ -80,7 +80,7 @@ The Capacity Scheduler supports the following features:
 
 \item \textbf{Multi-tenancy} - 
 A rich set of limits is provided from the Capacity Scheduler in order to ensure that a single application, user and queue don't monopolise resources of the queue or the whole cluster and the cluster isn't overwhelmed.
-
+\pagebreak
 \item \textbf{Operability}
     \begin{itemize}
     \item \textbf{Runtime Configuration} - Administrators can change capacity and ACLs at runtime in a secure manner, minimizing disruption to users, and can add additional queues at runtime. A console is provided to view current resources allocations in the system.
@@ -208,6 +208,8 @@ HiveQL Data Manipulation Language allows to modify data in Hive through multiple
 \subsection{Warehouse}
 HDFS is the default physical storage of database and tables in Hive, but support for S3 and any other HDFS compatible filesystem is available. Since all of the files are stored on a distributed filesystem, redundancy and fault tolerance are granted when it comes to data integrity. Hive default storage format is ORC, a compressed format able to decrease file size up to 78\% with respect to normal Text Files \cite{orc_format}.\\
 Hive has built-in direct serialization and deserialization of CSV, JSON, AVRO and Parquet files as row formats, and allows to easily add custom SerDe\footnote{SerDe: Serialization/Deserialization} components.
+
+\pagebreak
 
 \subsubsection{Hive Data Model}
 

@@ -18,7 +18,7 @@ The Flink application has been written in Scala, making use of the appropriate S
 
 \paragraph{Source}
 The Flink application has a single source, a Kafka Consumer configured to consume from the \texttt{air\_traffic} topic connecting to both the active kafka brokers on \texttt{master-1} and \texttt{master-2}. Flink's built-in Kafka Consumer must be configured with a deserialization schema, which, in this case, parses from each JSON an \texttt{AirTrafficEvent} using Scala library \href{https://www.playframework.com/documentation/2.6.x/ScalaJson#The-Play-JSON-library}{Play-JSON}.
-
+\\
 \begin{code}
    \begin{minted}[breaklines]{Scala}
 class JSONDeserializationSchema extends AbstractDeserializationSchema[AirTrafficEvent] {
@@ -36,7 +36,7 @@ class JSONDeserializationSchema extends AbstractDeserializationSchema[AirTraffic
 \end{code}
 
 \texttt{AirTrafficEvent} is defined as a Scala case class with three fields wrapping all of the information contained in the original JSON: \texttt{FlightInfo}, containing flight, callsign, registration, origin, destination and aircraft, \texttt{InstantValues}, containing time, altitude, speed and course, and \texttt{Coordinates}, containing latitude and longitude.
-
+\\
 \begin{code}
     \begin{minted}[breaklines]{Scala}
 //AirTrafficEvent definition
@@ -91,9 +91,9 @@ It takes as input a \texttt{KeyedStream} of \texttt{AirTrafficEvent}s and output
     \end{minted}
 \captionof{listing}{A KeyedStream of AirTrafficEvent processed into an AirTrafficEventWithId stream}
 \end{code}
-
+\pagebreak
 The function handling the detection of a new instance of a flight is based off an heuristic strategy using the latest available information about the position, speed and time of the flight. This is needed because the stream may be inaccurate when it comes to transoceanic flights, passing over dead zones, without any radar at range being able to catch their transponder signals. The heuristic is described by the following Scala snippet:
-
+\\
 \begin{minted}[breaklines]{Scala}
 val activeUpperBound = Time.minutes(5) // 5 minutes
 val notActiveLowerBound = Time.hours(5) // 5 hours
@@ -129,11 +129,13 @@ in which can be seen that there are three main conditions being checked:
 This way, we are able to be reasonably certain that an aircraft, even after passing over a dead zone for more than 5 minutes, is still flying towards its destination and we are not dealing with another instance of the same flight. A more accurate heuristic would be possible with a data source not cutting under 37000 feet and using an additional data source with the airports and their position, integrated within the stream structure.
 
 Additionally, whenever a new instance of a flight is detected a side-output is used to forward outside of the \texttt{ProcessFunction} an \texttt{Alert} containing the relevant event, together with the event type, which is, in this case, \texttt{newAirplane}.
-\\\\
+\\ \\
 Just like it has been mentioned, the second operation executed on the stream concerns the event processing used to detect aircrafts arriving to their destination. Since it's been noted that the data stream is incomplete, in order to demonstrate \textbf{FlinkCEP} capabilities when it comes to event processing, instead of using a pattern that detects variations in altitude and speed to correctly determine the sequence of events implied by an aircraft approaching to an airport, it's been used a simple pattern based on the timing out of events sequences.
 
-The pattern is implemented as follows:
+\pagebreak
 
+The pattern is implemented as follows:
+\\
 \begin{minted}{Scala}
 val airplaneArrivalPattern = 
 Pattern
@@ -154,18 +156,14 @@ val result: DataStream[AirTrafficEventWithId] =
         (pattern: Map[String, Iterable[AirTrafficEventWithId]], 
         timestamp: Long) => {
             val alert = new Alert(pattern("flying").last, 
-                                  AlertType.disappearedAirplane.id)
-            alert
+            AlertType.disappearedAirplane.id) alert
         }
     } { //In time events
         (pattern: Map[String, Iterable[AirTrafficEventWithId]]) =>
-            pattern("flying").last
-    }   
+            pattern("flying").last}   
 // Collect timed out events from the main stream
 val alertStream = result.getSideOutput(outputTag)
-alertStream
-    .addSink(new NotificationSink())
-    .uid("notification-sink")
+alertStream.addSink(new NotificationSink()).uid("notification-sink")
     .name("notification-sink")
 \end{minted}
 
@@ -176,9 +174,11 @@ and is basically structured on the analysis of a Keyed Stream, keying on the eve
 The Flink application has three main sinks where data is forwarded to be stored after processing: \textbf{MongoDB}, \textbf{Hive via HDFS} and \textbf{Cassandra}. On these three sinks there are three types of data stores: a \textit{raw} data store where all the records are saved after being enriched with their unique ID, an \textit{history} data store where it is saved a single record per flight, updated as needed, and an \textit{active} data store used for live monitoring purposes. An additional sink is used for the \texttt{Alert}s constructed during the stream processing.
 
 \textbf{MongoDB} is used as sink for all of the three data stores, with adequately defined collections, while \textbf{Cassandra} is used for the \textit{active} data store, and \textbf{Hive} via HDFS is used only for the \textit{raw} and \textit{history} ones.
-\\\\
-Cassandra Sink in Flink is added through the \texttt{CassandraSinkBuilder} used to specify the query to be used while inserting the records in the table:
 
+\pagebreak
+
+Cassandra Sink in Flink is added through the \texttt{CassandraSinkBuilder} used to specify the query to be used while inserting the records in the table:
+\\
 \begin{minted}{Scala}
 // Add sink to Cassandra cluster
 CassandraSink.addSink(
@@ -202,8 +202,10 @@ def buildCluster(builder: Cluster.Builder): Cluster = {
 }).build()
 \end{minted}
 
-On Cassandra's cluster, composed as already mentioned previously, by the four slave nodes, has been specified an \texttt{air\_traffic} keyspace, configured with a replication factor of 3 via the replication strategy \texttt{SimpleStrategy}. Within this keyspace the following table has been defined:
+\pagebreak
 
+On Cassandra's cluster, composed as already mentioned previously, by the four slave nodes, has been specified an \texttt{air\_traffic} keyspace, configured with a replication factor of 3 via the replication strategy \texttt{SimpleStrategy}. Within this keyspace the following table has been defined:
+\\
 \begin{minted}{SQL}
 CREATE TABLE air_traffic.active (
     id text PRIMARY KEY,
@@ -222,11 +224,12 @@ CREATE TABLE air_traffic.active (
 \end{minted}
 
 in order to contain all of the active aircrafts currently flying. All of the default configurations have been maintained, except for the TTL of the records which has been configured to 10 minutes and the interval of the garbage collection of the table tombstones (expired records after the TTL) which has been set to 1 hour, instead of 1 day.
-\\\\
+\\ \\
 Notifications sinks are rather simple \texttt{SinkFunction}s which take as input the \texttt{Alert} and make an async \texttt{POST} request, through a \href{https://dispatchhttp.org/Dispatch.html}{Dispatch} asynchronous HTTP client, to the local notification server, implemented using Firebase FCM, about which we'll talk about later on.
-\\\\
-Hive is not the direct destination of the Flink sink. As a matter of fact, an HDFS sink is used to write all of the records in JSON format, partitioned in folders according to their timestamp. As a result, each event will be bucketed in the appropriate folder and this folder will be considered as a partition of an Hive external table configured using the \textbf{JsonSerDe} to read all of the files.
 
+\pagebreak
+Hive is not the direct destination of the Flink sink. As a matter of fact, an HDFS sink is used to write all of the records in JSON format, partitioned in folders according to their timestamp. As a result, each event will be bucketed in the appropriate folder and this folder will be considered as a partition of an Hive external table configured using the \textbf{JsonSerDe} to read all of the files.
+\\
 \begin{minted}{Scala}
 val hdfsSink = new BucketingSink[AirTrafficEventWithId](hdfs_path)
 hdfsSink.setBucketer(new EventDateTimeBucketer("YYYY-MM-dd"))
@@ -235,8 +238,9 @@ hdfsSink.setBatchSize(1024 * 1024 * 64) // 64MB files size
 streamWithId.addSink(hdfsSink).uid("hdfs-sink").name("hdfs-sink")
 \end{minted}
 
+\pagebreak
 while the Hive external table is defined as it follows:
-
+\\
 \begin{minted}[breaklines]{SQL}
 CREATE EXTERNAL TABLE IF NOT EXISTS json_dump
 ( `origin` string,
@@ -272,8 +276,10 @@ To sum up, there are three tables stored in Hive:
     \item \texttt{history} in \texttt{air\_traffic} database, aggregating \texttt{raw} creating a single record for each flight.
 \end{itemize}
 
-The raw table is defined to use ORC as storage format, to use Hive partitioning on the date and to be clustered in 100 buckets, in order to make sure that, if needed, a query concerning a certain subset of flights wouldn't read all of the files composing the table.
+\pagebreak
 
+The raw table is defined to use ORC as storage format, to use Hive partitioning on the date and to be clustered in 100 buckets, in order to make sure that, if needed, a query concerning a certain subset of flights wouldn't read all of the files composing the table.
+\\
 \begin{minted}[breaklines]{SQL}
 CREATE TABLE IF NOT EXISTS air_traffic.raw(
 `origin` string,
@@ -295,8 +301,10 @@ STORED AS ORC;
 ALTER TABLE air_traffic.history SET SERDEPROPERTIES("timestamp.formats"="YYYY-MM-dd HH:mm:ss.SSS");
 \end{minted}
 
-The history table is instead defined with the additional fields \texttt{arrival\_date} and \texttt{departure\_date}, removing all of the instant values, deemed as not needed, as it follows:
+\pagebreak
 
+The history table is instead defined with the additional fields \texttt{arrival\_date} and \texttt{departure\_date}, removing all of the instant values, deemed as not needed, as it follows:
+\\
 \begin{minted}{SQL}
 CREATE TABLE `history`(
 `_id` string, 
@@ -311,8 +319,10 @@ CREATE TABLE `history`(
 PARTITIONED BY (`dt` string)
 \end{minted}
 
-Both these tables are filled in a periodic batch operation, scheduled every 20 minutes, through \texttt{INSERT OVERWRITE} queries on the current partition (date): whereas the \texttt{raw} is a simple overwrite from \texttt{json\_dump} as they have the same schema,  \texttt{history} aggregates the time field via \texttt{MAX()} and \texttt{MIN()} Hive aggregated functions as shown below:
+\pagebreak
 
+Both these tables are filled in a periodic batch operation, scheduled every 20 minutes, through \texttt{INSERT OVERWRITE} queries on the current partition (date): whereas the \texttt{raw} is a simple overwrite from \texttt{json\_dump} as they have the same schema,  \texttt{history} aggregates the time field via \texttt{MAX()} and \texttt{MIN()} Hive aggregated functions as shown below:
+\\
 \begin{minted}{SQL}
 INSERT OVERWRITE TABLE air_traffic.history 
 PARTITION(dt="${PARTITION}")
