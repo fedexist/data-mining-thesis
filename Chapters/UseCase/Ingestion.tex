@@ -21,7 +21,7 @@ JSON records ingested from Satori contain the following fields:
     \item \textbf{time}: timestamp since UNIX epoch in seconds of the current record.
 \end{itemize}
 
-The ingestion pipeline in NiFi uses in total 4 Processors, as shown in \ref{fig:nifipipeline}. The first Processor is \textbf{ExecuteProcess} and it is used to execute a Python script that connects to Satori through their already mentioned APIs and prints all of the fetched records as lines containing Json Arrays, on the standard output. The flow continues, then, in the \textbf{SplitText} and \textbf{SplitJson} processors which, respectively, deal with singling out each Json Array and then extracting each Json Object, which is the actual record, for it to be published on Kafka via the proper \textbf{PublishKafkaRecord\_0\_10} processor.
+The ingestion pipeline in NiFi uses in total 4 Processors, as shown in \ref{fig:nifipipeline}. The first Processor is \textbf{ExecuteProcess} and it is used to execute a Python script that connects to Satori through their already mentioned APIs and prints all of the fetched records as lines containing JSON Arrays, on the standard output. The flow continues, then, in the \textbf{SplitText} and \textbf{SplitJson} processors which, respectively, deal with singling out each JSON Array and then extracting each JSON Object, which is the actual record, for it to be published on Kafka via the proper \textbf{PublishKafkaRecord\_0\_10} processor.
 
 \begin{figure}[ph]
     \centering
