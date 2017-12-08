@@ -14,7 +14,7 @@ Both packages use the same core components for the preparation of cluster hosts:
     \item Installation on the selected host of the \textbf{Ambari Server}, together with the Ambari Agents, on all of the hosts
 \end{itemize}
 
-In addition, \texttt{hw\_install} actually uses \textbf{Ambari Blueprint} interface, passing the configuration file containing the needed services and their per-component configuration, if any (in absence of this per-component configuration, Ambari will apply default values), and then making a REST call to the Ambari Server which will take care of the installation of the needed components on the selected hosts.
+In addition, \texttt{hw\_install} uses \textbf{Ambari Blueprint} interface, for the cluster deployment, passing the configuration file containing the needed services and their per-component configuration, if any (in absence of this per-component configuration, Ambari will apply default values), and then making a REST call to the Ambari Server which will take care of the installation of the needed components on the selected hosts.
 \\\\
 An example of a configuration file is:
 

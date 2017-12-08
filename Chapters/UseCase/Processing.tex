@@ -121,9 +121,9 @@ else
 
 in which can be seen that there are three main conditions being checked:
 \begin{enumerate}
-    \item if the difference between the timestamps is less than a certain upper bound (default 5 minutes), meaning that we received an event from the current flight recently.
-    \item if the difference between the timestamps is greater than a certain lower bound (default 5 hours), meaning that we haven't received an event from the current flight in a while. This case is used as a discriminant for flights flying over dead zones.
-    \item provides a prediction based off the estimated time to reach the latest position from the previous last position, at constant speed=last\_speed, and the actual time taken to reach the latest position.
+    \item if the difference between the timestamps is less than a certain upper bound (default 5 minutes), meaning that we received an event from the current flight recently and implying the it is active.
+    \item if the difference between the timestamps is greater than a certain lower bound (default 5 hours), meaning that we haven't received an event from the current flight in a while, implying it's a new instance of a flight. This case is used as a discriminant for flights flying over dead zones.
+    \item provides a prediction based off the estimated time to reach the latest position from the previous last known position, at constant speed=last\_speed, and the actual time taken to reach the latest position.
 \end{enumerate}
 
 This way, we are able to be reasonably certain that an aircraft, even after passing over a dead zone for more than 5 minutes, is still flying towards its destination and we are not dealing with another instance of the same flight. A more accurate heuristic would be possible with a data source not cutting under 37000 feet and using an additional data source with the airports and their position, integrated within the stream structure.
@@ -263,7 +263,7 @@ Starting from this very table, which maintains records in text format, uncompres
 
 \subsubsection{Post-processing: HDFS to Hive}
 
-As we already determined, Hive is not the direct target of Flink, since we're using an Hive external table to read all of the Json files written by the HDFS sink. Using a textfile format is not optimal for storage purposes, since it's not a compressed format and we'd like to save as much storage as possible: for this reason an additional table, in the appropriate database in Hive, has been defined to be the final target of the raw stream written in HDFS. Additionally, from this table, another table called history is filled, aggregating all of the records of a flight in a single record with arrival date and departure date.
+As we already determined, Hive is not the direct target of Flink, since we're using an Hive external table to read all of the Json files written by the HDFS sink. Using a textfile format is not optimal for storage purposes, since it's not a compressed format and we'd like to save as much storage as possible. For this reason an additional table, in the appropriate database in Hive, has been defined to be the final target of the raw stream written in HDFS. Additionally, from this table, another table called history is filled, aggregating all of the records of a flight in a single record with arrival date and departure date.
 
 To sum up, there are three tables stored in Hive:
 \begin{itemize}
