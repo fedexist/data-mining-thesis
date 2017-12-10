@@ -1,7 +1,7 @@
 \subsection{Accessory Services}
 
 While not strictly related to Big Data, the results we archive and process may be used for several different endeavours; we wanted to offer additional features for presentation, other than Visualisations, in the form of push notifications for mobile devices and REST APIs to access securely data in our databases.
-\\ \\
+
 \subsubsection{Push Notifications}
 We have decided to send Push Notifications whenever a plane departs and is directed towards one of our airports of interest or whenever a plane is approaching its destination, descending below 37000 feet of altitude.
 \\
@@ -9,7 +9,7 @@ To offer this service we have implemented a solution based on one of the many co
 
 \paragraph{Firebase Cloud Messaging}
 
-\textbf{Firebase Cloud Messaging (FCM)} is a service for mobile and browser push notifications offered through a REST API listening on Google Firebase servers; the requests sent to this API are formatted in JSON specifying information on the message sent and on the receivers.
+Firebase Cloud Messaging (FCM) is a service for mobile and browser push notifications offered through a REST API listening on Google Firebase servers; the requests sent to this API are formatted in JSON specifying information on the message sent and on the receivers.
 What's more, the Firebase Server assigns to each device attached to our application a unique and expiring token to identify what devices will be receiving each notification.
 \\
 In more detail, FCM supports two different ways to send messages.
@@ -30,7 +30,7 @@ The table is also cached in memory for performance reasons.
 As mentioned, the server offers a REST service to ingest notifications and forward it to Firebase. In more detail, the server expects a JSON containing information on a departing plane such as: airport of origin, airport of destination, type of aircraft, flight number and other spatial or temporal values.
 \\ \\
 For each received and accepted JSON, the server writes a list of tokens that are subscribed to the airport of destination and creates a message informing of the departure. It then creates a request with those data and send it to the Firebase server which in turn sends the actual notification to all target devices and responds back to our server with a report of the action.
-
+\pagebreak
 \subsubsection{REST APIs}
 As for REST APIs we have implemented two servers written in Python with the use of \textbf{Flask} library: \textit{Arnia}, offering a simple REST interface to write queries in SQL, and \textit{KhanUI}, a similarly easy to use REST API to query MongoDB through the use of PyMongo's own syntax.
 
@@ -48,19 +48,15 @@ To make this template a more comprehensible example:
 
 \begin{code}
 	\begin{minted}[breaklines, breakafter=&]{Bash}
-http://10.0.0.24:8888/query?query=SELECT+*+FROM+history_aggregated+limit+2&user.name=dummy_user
+http://10.0.0.24:8888/query?query=SELECT+*+FROM+history_aggregated+limit+1&user.name=dummy_user
 	\end{minted}
 \end{code}
 
-\pagebreak
 The server would then respond with a JSON object representing the table output by the query; in particular for this example, provided dummy\_user has the required privileges to be allowed by Ranger, Arnia would return a list of records showing two flights, like this:
 \\
 \begin{code}
 	\begin{minted}{javascript}
-{
-    Output: [
-    {
-        history_aggregated._id: TP1510-1, 
+{Output: [{history_aggregated._id: TP1510-1, 
         history_aggregated.aircraft: A320, 
         history_aggregated.callsign: TAP1510, 
         history_aggregated.date_arrival: 2017-10-12 04:35:08.0, 
@@ -69,22 +65,7 @@ The server would then respond with a JSON object representing the table output b
         history_aggregated.dt: 2017-10-12, 
         history_aggregated.flight: TP1510, 
         history_aggregated.origin: ABJ, 
-        history_aggregated.registration: CS-TNQ
-    }, 
-    {
-        history_aggregated._id: WB242-1, 
-        history_aggregated.aircraft: B737, 
-        history_aggregated.callsign: RWD242, 
-        history_aggregated.date_arrival: 2017-10-12 18:46:04.0, 
-        history_aggregated.date_depart: 2017-10-12 17:36:04.0, 
-        history_aggregated.destination: DKR, 
-        history_aggregated.dt: 2017-10-12, 
-        history_aggregated.flight: WB242, 
-        history_aggregated.origin: ABJ, 
-        history_aggregated.registration: 9XR-WK
-    }
-    ]
-}
+        history_aggregated.registration: CS-TNQ}]}
 	\end{minted}
 \end{code}
 
@@ -159,3 +140,4 @@ And for which the response would be:
 }
 	\end{minted}
 \end{code}
+\pagebreak

@@ -238,23 +238,16 @@ hdfsSink.setBatchSize(1024 * 1024 * 64) // 64MB files size
 streamWithId.addSink(hdfsSink).uid("hdfs-sink").name("hdfs-sink")
 \end{minted}
 
-\pagebreak
 while the Hive external table is defined as it follows:
 \\
 \begin{minted}[breaklines]{SQL}
 CREATE EXTERNAL TABLE IF NOT EXISTS json_dump
-( `origin` string,
-`flight` string,
-`course` int,
-`aircraft` string,
-`callsign` string,
-`registration` string,
-`lat` double,
-`lon` double,
-`altitude` int,
-`speed` int,
-`destination` string,
-`time` timestamp,
+( `origin` string,`flight` string,
+`course` int,`aircraft` string,
+`callsign` string,`registration` string,
+`lat` double,`lon` double,
+`altitude` int,`speed` int,
+`destination` string,`time` timestamp,
 `_id` string)
 PARTITIONED BY (`dt` string)
 ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
@@ -276,29 +269,18 @@ To sum up, there are three tables stored in Hive:
     \item \texttt{history} in \texttt{air\_traffic} database, aggregating \texttt{raw} creating a single record for each flight.
 \end{itemize}
 
-\pagebreak
-
 The raw table is defined to use ORC as storage format, to use Hive partitioning on the date and to be clustered in 100 buckets, in order to make sure that, if needed, a query concerning a certain subset of flights wouldn't read all of the files composing the table.
 \\
 \begin{minted}[breaklines]{SQL}
 CREATE TABLE IF NOT EXISTS air_traffic.raw(
-`origin` string,
-`flight` string,
-`course` int,
-`aircraft` string,
-`callsign` string,
-`registration` string,
-`lat` double,
-`lon` double,
-`altitude` int,
-`speed` int,
-`destination` string,
-`time` timestamp,
-`_id` string)
+`origin` string,`flight` string,
+`course` int,`aircraft` string,
+`callsign` string,`registration` string,
+`lat` double,`lon` double,`altitude` int,`speed` int,
+`destination` string,`time` timestamp,`_id` string)
 PARTITIONED BY (`dt` string)
 CLUSTERED BY (flight) INTO 100 BUCKETS
 STORED AS ORC;
-ALTER TABLE air_traffic.history SET SERDEPROPERTIES("timestamp.formats"="YYYY-MM-dd HH:mm:ss.SSS");
 \end{minted}
 
 \pagebreak
@@ -308,44 +290,30 @@ The history table is instead defined with the additional fields \texttt{arrival\
 \begin{minted}{SQL}
 CREATE TABLE `history`(
 `_id` string, 
-`date_depart` timestamp, 
-`date_arrival` timestamp, 
-`flight` string, 
-`callsign` string, 
-`registration` string, 
-`aircraft` string, 
-`origin` string, 
-`destination` string)
+`date_depart` timestamp,`date_arrival` timestamp, 
+`flight` string,`callsign` string, 
+`registration` string,`aircraft` string, 
+`origin` string,`destination` string)
 PARTITIONED BY (`dt` string)
 \end{minted}
-
-\pagebreak
 
 Both these tables are filled in a periodic batch operation, scheduled every 20 minutes, through \texttt{INSERT OVERWRITE} queries on the current partition (date): whereas the \texttt{raw} is a simple overwrite from \texttt{json\_dump} as they have the same schema,  \texttt{history} aggregates the time field via \texttt{MAX()} and \texttt{MIN()} Hive aggregated functions as shown below:
 \\
 \begin{minted}{SQL}
-INSERT OVERWRITE TABLE air_traffic.history 
-PARTITION(dt="${PARTITION}")
+INSERT OVERWRITE TABLE air_traffic.history PARTITION(dt="${PARTITION}")
 (SELECT
     `_id`,
     MIN(time) AS date_depart,
     MAX(time) AS date_arrival,
-    flight,
-    callsign,
-    registration,
-    aircraft,
-    origin,
-    destination
+    flight,callsign,
+    registration,aircraft,
+    origin,destination
 FROM air_traffic.raw
 WHERE dt="${PARTITION}"
 GROUP BY 
-    `_id`,
-    flight,
-    callsign,
-    registration,
-    aircraft,
-    origin,
-    destination)
+    `_id`,flight,callsign,
+    registration,aircraft,
+    origin,destination)
 \end{minted}
 
 Periodic scheduling has been set using \texttt{crontab} functionalities of CentOS, which is used to execute a Python script called \texttt{hive\_loader} which executes the needed queries. \texttt{Hive\_loader} has four flags used to determine which queries has to be executed:
@@ -362,3 +330,4 @@ Together with the aforementioned tables, additional tables have been created and
     \item \texttt{aircrafts}, containing the ID model and its capacity in terms of number of passengers.
     \item \texttt{airports}, containing, for each airport, its complete name, its IATA code, its continent and its ISO country and region codes.
 \end{itemize}
+\pagebreak
